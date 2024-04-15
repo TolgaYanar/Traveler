@@ -1,0 +1,111 @@
+{
+    "de": {
+        "name": "Germany",
+        "official_name": "Federal Republic of Germany",
+        "topLevelDomain": [
+            ".de"
+        ],
+        "alpha2Code": "DE",
+        "alpha3Code": "DEU",
+        "cioc": "GER",
+        "numericCode": "276",
+        "callingCode": "+49",
+        "capital": "Berlin",
+        "altSpellings": [
+            "DE",
+            "Federal Republic of Germany",
+            "Bundesrepublik Deutschland"
+        ],
+        "region": "Europe",
+        "subregion": "Western Europe",
+        "population": 83240525,
+        "latLng": {
+            "country": [
+                51,
+                9
+            ],
+            "capital": [
+                52.52,
+                13.4
+            ]
+        },
+        "demonyms": {
+            "eng": {
+                "f": "German",
+                "m": "German"
+            },
+            "fra": {
+                "f": "Allemande",
+                "m": "Allemand"
+            }
+        },
+        "area": 357114,
+        "gini": {
+            "2016": 31.9
+        },
+        "timezones": [
+            "UTC+01:00"
+        ],
+        "borders": [
+            "AUT",
+            "BEL",
+            "CZE",
+            "DNK",
+            "FRA",
+            "LUX",
+            "NLD",
+            "POL",
+            "CHE"
+        ],
+        "nativeNames": {
+            "deu": {
+                "official": "Bundesrepublik Deutschland",
+                "common": "Deutschland"
+            }
+        },
+        "currencies": {
+            "EUR": {
+                "name": "Euro",
+                "symbol": "€"
+            }
+        },
+        "languages": {
+            "deu": "German"
+        },
+        "translations": {
+            "ara": "ألمانيا",
+            "ces": "Německo",
+            "cym": "Germany",
+            "deu": "Deutschland",
+            "est": "Saksamaa",
+            "fin": "Saksa",
+            "fra": "Allemagne",
+            "hrv": "Njemačka",
+            "hun": "Németország",
+            "ita": "Germania",
+            "jpn": "ドイツ",
+            "kor": "독일",
+            "nld": "Duitsland",
+            "per": "آلمان",
+            "pol": "Niemcy",
+            "por": "Alemanha",
+            "rus": "Германия",
+            "slk": "Nemecko",
+            "spa": "Alemania",
+            "swe": "Tyskland",
+            "urd": "جرمنی",
+            "zho": "德国"
+        },
+        "flag": {
+            "small": "https://flagcdn.com/24x18/de.png",
+            "medium": "https://flagcdn.com/96x72/de.png",
+            "large": "https://flagcdn.com/256x192/de.png"
+        },
+        "regionalBlocs": [
+            {
+                "acronym": "EU",
+                "name": "European Union"
+            }
+        ]
+    }
+}
