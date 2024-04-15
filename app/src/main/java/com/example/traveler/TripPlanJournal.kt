@@ -94,91 +94,89 @@ fun TripPlanJournalScreen(navController: NavController, journal: Journal){
             )
         }
     ) {
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it), verticalArrangement = Arrangement.Top
         )
         {
-            item {
-                Row(
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp), verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            )
+            {
+                Card(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp), verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                )
-                {
-                    Card(
-                        modifier = Modifier
-                            .height(45.dp)
-                            .width(160.dp)
-                            .clickable {
-                                journal.notes = notes
-                                FirebaseAuth.getInstance().uid?.let { it1 ->
-                                    val updateJournal = hashMapOf<String, Any?>(
-                                        "notes" to notes
-                                    )
-                                    Injection
-                                        .instance()
-                                        .collection("users")
-                                        .document(it1)
-                                        .collection("journals")
-                                        .document(journal.title)
-                                        .set(updateJournal, SetOptions.merge())
-                                        .addOnSuccessListener {
-                                            println("Notes updated successfully")
-                                            journal.notes = notes
-                                            navController.currentBackStackEntry?.savedStateHandle?.set(
-                                                "journal",
-                                                journal
-                                            )
-                                            navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
-                                        }
-                                        .addOnFailureListener {
-                                            println("Notes couldn't updated")
-                                        }
-                                }
-                            },
-                        backgroundColor = Color.Gray.copy(alpha = 0.4f),
-                        shape = RoundedCornerShape(25.dp),
-                    ) {
-                        Text(text = "Today's Plan", textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(top = 10.dp), fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold)
-                    }
-
-                    Card(
-                        modifier = Modifier
-                            .height(45.dp)
-                            .width(160.dp),
-                        backgroundColor = Color(0xFF728FF3),
-                        shape = RoundedCornerShape(25.dp)
-                    ) {
-                        Text(text = "Journal", textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(top = 10.dp), fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold, color = Color.White)
-                    }
-                }
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-
-                    item {
-                        TextField(value = notes, onValueChange = {
-                            notes = it
-                        }, modifier = Modifier
-                            .height(625.dp)
-                            .width(325.dp), colors = TextFieldDefaults.colors(
-                            unfocusedContainerColor = Color(0xFFE8E8E8), focusedContainerColor = Color(0xFFE8E8E8)),
-                            shape = RoundedCornerShape(25.dp),
-                            label = {
-                                Text(text = "Notes")
+                        .height(45.dp)
+                        .width(160.dp)
+                        .clickable {
+                            journal.notes = notes
+                            FirebaseAuth.getInstance().uid?.let { it1 ->
+                                val updateJournal = hashMapOf<String, Any?>(
+                                    "notes" to notes
+                                )
+                                Injection
+                                    .instance()
+                                    .collection("users")
+                                    .document(it1)
+                                    .collection("journals")
+                                    .document(journal.title)
+                                    .set(updateJournal, SetOptions.merge())
+                                    .addOnSuccessListener {
+                                        println("Notes updated successfully")
+                                        journal.notes = notes
+                                        navController.currentBackStackEntry?.savedStateHandle?.set(
+                                            "journal",
+                                            journal
+                                        )
+                                        navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
+                                    }
+                                    .addOnFailureListener {
+                                        println("Notes couldn't updated")
+                                    }
                             }
-                        )
-                    }
+                        },
+                    backgroundColor = Color.Gray.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(25.dp),
+                ) {
+                    Text(text = "Today's Plan", textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 10.dp), fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold)
+                }
+
+                Card(
+                    modifier = Modifier
+                        .height(45.dp)
+                        .width(160.dp),
+                    backgroundColor = Color(0xFF728FF3),
+                    shape = RoundedCornerShape(25.dp)
+                ) {
+                    Text(text = "Journal", textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 10.dp), fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Bottom
+            ) {
+
+                item {
+                    TextField(value = notes, onValueChange = {
+                        notes = it
+                    }, modifier = Modifier
+                        .height(625.dp)
+                        .width(325.dp), colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Color(0xFFE8E8E8), focusedContainerColor = Color(0xFFE8E8E8)),
+                        shape = RoundedCornerShape(25.dp),
+                        label = {
+                            Text(text = "Notes")
+                        }
+                    )
                 }
             }
         }

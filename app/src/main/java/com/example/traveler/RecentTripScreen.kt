@@ -47,90 +47,86 @@ import com.google.firebase.firestore.SetOptions
 @Composable
 fun RecentTripScreen(navController: NavController, journal: Journal){
 
-    LazyColumn(modifier = Modifier.fillMaxSize()){
-        item {
-            Box(modifier = Modifier.fillMaxSize()){
-                AsyncImage(modifier = Modifier.fillMaxSize(),model = journal.mostMemorialImage, contentDescription = null,
-                    contentScale = ContentScale.Crop)
+    Box(modifier = Modifier.fillMaxSize()){
+        AsyncImage(modifier = Modifier.fillMaxSize(),model = journal.mostMemorialImage, contentDescription = null,
+            contentScale = ContentScale.Crop)
 
-                Column(
-                    modifier = Modifier,
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ){
+        Column(
+            modifier = Modifier,
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
 
-                    Row(modifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Top) {
-                        IconButton(onClick = { navController.navigateUp() }) {
-                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+            Row(modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top) {
+                IconButton(onClick = { navController.navigateUp() }) {
+                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                }
+                if(journal.private){
+                    IconButton(onClick = {
+                        journal.private = false
+                        FirebaseAuth.getInstance().uid?.let {
+                            Injection.instance().collection("users").document(it)
+                                .collection("journals").document(journal.title).set(journal, SetOptions.merge())
                         }
-                        if(journal.private){
-                            IconButton(onClick = {
-                                journal.private = false
-                                FirebaseAuth.getInstance().uid?.let {
-                                    Injection.instance().collection("users").document(it)
-                                        .collection("journals").document(journal.title).set(journal, SetOptions.merge())
-                                }
-                            }) {
-                                Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = null)
-                            }
-                        }
+                    }) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = null)
                     }
                 }
+            }
+        }
 
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
-                    Column {
-                        Spacer(modifier = Modifier
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
+            Column {
+                Spacer(modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.4f))
+                Surface(
+                    contentColor = Color.Black,
+                    color = Color.LightGray,
+                    shape = RoundedCornerShape(25.dp)
+                ) {
+                    LazyColumn(
+                        modifier = Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight(0.4f))
-                        Surface(
-                            contentColor = Color.Black,
-                            color = Color.LightGray,
-                            shape = RoundedCornerShape(25.dp)
-                        ) {
-                            LazyColumn(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                            ){
+                    ){
 
-                                item {
+                        item {
 
-                                    Row(modifier = Modifier
-                                        .padding(16.dp)
-                                        .fillMaxWidth()) {
-                                        Card(backgroundColor = Color.Magenta, modifier = Modifier.padding(4.dp),
-                                            shape = RoundedCornerShape(15.dp)){
-                                            Text(text = "${getDayDifference(journal.startDateInMillis,journal.endDateInMillis)} days",
-                                                fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp))
-                                        }
-                                        Card(backgroundColor = Color.Magenta, modifier = Modifier.padding(4.dp),
-                                            shape = RoundedCornerShape(15.dp)
-                                        ){
-                                            Row(modifier = Modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                                                Icon(imageVector = Icons.Default.Place, contentDescription = null)
-                                                Text(text = journal.location,
-                                                    fontWeight = FontWeight.Bold)
-                                            }
-                                        }
+                            Row(modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth()) {
+                                Card(backgroundColor = Color.Magenta, modifier = Modifier.padding(4.dp),
+                                    shape = RoundedCornerShape(15.dp)){
+                                    Text(text = "${getDayDifference(journal.startDateInMillis,journal.endDateInMillis)} days",
+                                        fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp))
+                                }
+                                Card(backgroundColor = Color.Magenta, modifier = Modifier.padding(4.dp),
+                                    shape = RoundedCornerShape(15.dp)
+                                ){
+                                    Row(modifier = Modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(imageVector = Icons.Default.Place, contentDescription = null)
+                                        Text(text = journal.location,
+                                            fontWeight = FontWeight.Bold)
                                     }
-                                    Text(
-                                        text = journal.title,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 24.sp,
-                                        modifier = Modifier.padding(14.dp)
-                                    )
-
-                                    TextField(modifier = Modifier.fillMaxWidth(),value = journal.notes, onValueChange = {},
-                                        readOnly = true, shape = RoundedCornerShape(25.dp),
-                                        colors = TextFieldDefaults.textFieldColors(
-                                            backgroundColor = Color.LightGray
-                                        )
-                                    )
-
                                 }
                             }
+                            Text(
+                                text = journal.title,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 24.sp,
+                                modifier = Modifier.padding(14.dp)
+                            )
+
+                            TextField(modifier = Modifier.fillMaxWidth(),value = journal.notes, onValueChange = {},
+                                readOnly = true, shape = RoundedCornerShape(25.dp),
+                                colors = TextFieldDefaults.textFieldColors(
+                                    backgroundColor = Color.LightGray
+                                )
+                            )
+
                         }
                     }
                 }

@@ -99,114 +99,112 @@ fun CityInformationScreen(country: Country,
             )
         }
     ) {
-        LazyColumn(modifier = Modifier
+        Column(modifier = Modifier
             .padding(it)
             .fillMaxSize())
         {
            if(tourism_data.isNotEmpty() && catering_data.isNotEmpty()){
-               item {
-                   Card(modifier = Modifier
-                       .padding(30.dp)
-                       .height(140.dp)
-                       .fillMaxWidth(),
-                       border = BorderStroke(2.dp, Color.Black),
-                       colors = CardDefaults.cardColors(
-                           containerColor = Color.White
-                       ),
-                       elevation = CardDefaults.cardElevation(
-                           defaultElevation = 6.dp
-                       )
-                   ) {
+               Card(modifier = Modifier
+                   .padding(30.dp)
+                   .height(140.dp)
+                   .fillMaxWidth(),
+                   border = BorderStroke(2.dp, Color.Black),
+                   colors = CardDefaults.cardColors(
+                       containerColor = Color.White
+                   ),
+                   elevation = CardDefaults.cardElevation(
+                       defaultElevation = 6.dp
+                   )
+               ) {
+                   Box(modifier = Modifier
+                       .fillMaxSize(), contentAlignment = Alignment.CenterStart)
+                   {
+                       weatherViewModel.weatherData.value?.weather?.get(0)
+                           ?.let {Image(painter = painterResource(id = getDrawableResourceId("icon${weatherViewModel.weatherData.value?.weather?.get(0)?.icon}")), contentDescription = null,
+                               modifier = Modifier.size(90.dp))}
+                       Text(text = weatherViewModel.weatherData.value?.main?.temp?.toInt().toString(), fontSize = 35.sp, modifier = Modifier
+                           .padding(horizontal = 90.dp)
+                           .padding(end = 70.dp))
+                       Image(painter = painterResource(id = R.drawable.centigrade), contentDescription = null,
+                           modifier = Modifier
+                               .padding(start = 132.dp)
+                               .size(30.dp))
                        Box(modifier = Modifier
-                           .fillMaxSize(), contentAlignment = Alignment.CenterStart)
+                           .fillMaxSize(), contentAlignment = Alignment.TopEnd)
                        {
                            weatherViewModel.weatherData.value?.weather?.get(0)
-                               ?.let {Image(painter = painterResource(id = getDrawableResourceId("icon${weatherViewModel.weatherData.value?.weather?.get(0)?.icon}")), contentDescription = null,
-                                   modifier = Modifier.size(90.dp))}
-                           Text(text = weatherViewModel.weatherData.value?.main?.temp?.toInt().toString(), fontSize = 35.sp, modifier = Modifier
-                               .padding(horizontal = 90.dp)
-                               .padding(end = 70.dp))
-                           Image(painter = painterResource(id = R.drawable.centigrade), contentDescription = null,
-                               modifier = Modifier
-                                   .padding(start = 132.dp)
-                                   .size(30.dp))
-                           Box(modifier = Modifier
-                               .fillMaxSize(), contentAlignment = Alignment.TopEnd)
-                           {
-                               weatherViewModel.weatherData.value?.weather?.get(0)
-                                   ?.let { it1 -> Text(text = it1.description, fontSize = 20.sp, modifier = Modifier.padding(horizontal = 15.dp, vertical = 50.dp)) }
-                               Text(text = "RealFeel " + formattedDouble(doubleValue = weatherViewModel.weatherData.value?.main?.feels_like), fontSize = 14.sp, modifier = Modifier
-                                   .padding(horizontal = 15.dp)
-                                   .padding(top = 78.dp))
-                           }
+                               ?.let { it1 -> Text(text = it1.description, fontSize = 20.sp, modifier = Modifier.padding(horizontal = 15.dp, vertical = 50.dp)) }
+                           Text(text = "RealFeel " + formattedDouble(doubleValue = weatherViewModel.weatherData.value?.main?.feels_like), fontSize = 14.sp, modifier = Modifier
+                               .padding(horizontal = 15.dp)
+                               .padding(top = 78.dp))
                        }
                    }
-                   Card(modifier = Modifier
-                       .padding(horizontal = 30.dp)
-                       .height(325.dp)
-                       .fillMaxWidth(),
-                       colors = CardDefaults.cardColors(
-                           //containerColor = Color.Transparent
-                       )
-                   ) {
-                       Text(text = "Touristic Destinations", fontSize = 17.sp, fontWeight = FontWeight.Bold,
-                           modifier = Modifier.padding(horizontal = 16.dp))
-                       for (destination in tourism_data){
-                           Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top, modifier = Modifier
-                               .fillMaxWidth()
-                               .padding(vertical = 4.dp)) {
-                               Canvas(modifier = Modifier.padding(horizontal = 10.dp, vertical = 9.dp), onDraw = {
-                                   drawCircle(color = Color.Black, radius = 10f)
-                               })
-                               Text(text = "${destination.properties.name} - ${destination.properties.city}",
-                                   fontSize = 14.sp, modifier = Modifier)
-                           }
-                       }
-                       Text(text = "Restaurants", fontSize = 17.sp, fontWeight = FontWeight.Bold,
-                           modifier = Modifier.padding(horizontal = 16.dp))
-                       for (restaurant in catering_data){
-                           Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top, modifier = Modifier
-                               .fillMaxWidth()
-                               .padding(vertical = 4.dp)) {
-                               Canvas(modifier = Modifier.padding(horizontal = 10.dp, vertical = 9.dp), onDraw = {
-                                   drawCircle(color = Color.Black, radius = 10f)
-                               })
-                               Text(text = "${restaurant.properties.name} - ${restaurant.properties.district},${restaurant.properties.city}",
-                                   fontSize = 14.sp, modifier = Modifier)
-                           }
+               }
+               Card(modifier = Modifier
+                   .padding(horizontal = 30.dp)
+                   .height(325.dp)
+                   .fillMaxWidth(),
+                   colors = CardDefaults.cardColors(
+                       //containerColor = Color.Transparent
+                   )
+               ) {
+                   Text(text = "Touristic Destinations", fontSize = 17.sp, fontWeight = FontWeight.Bold,
+                       modifier = Modifier.padding(horizontal = 16.dp))
+                   for (destination in tourism_data){
+                       Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top, modifier = Modifier
+                           .fillMaxWidth()
+                           .padding(vertical = 4.dp)) {
+                           Canvas(modifier = Modifier.padding(horizontal = 10.dp, vertical = 9.dp), onDraw = {
+                               drawCircle(color = Color.Black, radius = 10f)
+                           })
+                           Text(text = "${destination.properties.name} - ${destination.properties.city}",
+                               fontSize = 14.sp, modifier = Modifier)
                        }
                    }
+                   Text(text = "Restaurants", fontSize = 17.sp, fontWeight = FontWeight.Bold,
+                       modifier = Modifier.padding(horizontal = 16.dp))
+                   for (restaurant in catering_data){
+                       Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top, modifier = Modifier
+                           .fillMaxWidth()
+                           .padding(vertical = 4.dp)) {
+                           Canvas(modifier = Modifier.padding(horizontal = 10.dp, vertical = 9.dp), onDraw = {
+                               drawCircle(color = Color.Black, radius = 10f)
+                           })
+                           Text(text = "${restaurant.properties.name} - ${restaurant.properties.district},${restaurant.properties.city}",
+                               fontSize = 14.sp, modifier = Modifier)
+                       }
+                   }
+               }
 
-                   Text(text = "Explore Journals", fontSize = 16.sp, fontWeight = FontWeight.Bold,
-                       modifier = Modifier.padding(horizontal = 30.dp).padding(top = 10.dp).alpha(0.6f))
+               Text(text = "Explore Journals", fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                   modifier = Modifier.padding(horizontal = 30.dp).padding(top = 10.dp).alpha(0.6f))
 
-                   LazyColumn(modifier = Modifier
-                       .fillMaxSize()
-                       .padding(horizontal = 30.dp),
-                       horizontalAlignment = Alignment.CenterHorizontally)
-                   {
+               LazyColumn(modifier = Modifier
+                   .fillMaxSize()
+                   .padding(horizontal = 30.dp),
+                   horizontalAlignment = Alignment.CenterHorizontally)
+               {
 
-                       items(otherUsers){
-
-                           Card(modifier = Modifier
-                               .padding(vertical = 10.dp)
-                               .height(90.dp)
-                               .fillMaxWidth()
-                               .clickable {
-                                   navController.currentBackStackEntry?.savedStateHandle?.set("user", it)
-                                   navController.navigate(Screen.UserProfileScreen.route)
-                               }
-                           ) {
-                               Box(modifier = Modifier.fillMaxSize()){
-                                   AsyncImage(model = it.profile_image, contentDescription = null,
-                                       contentScale = ContentScale.Crop)
-                                   Box(modifier = Modifier
-                                       .fillMaxSize()
-                                       .padding(8.dp)
-                                       .background(Color.Transparent),
-                                       contentAlignment = Alignment.BottomStart) {
-                                       Text(text = it.fullName, fontWeight = FontWeight.Bold, color = Color.Black, fontSize = 20.sp)
-                                   }
+                   items(otherUsers){
+                       
+                       Card(modifier = Modifier
+                           .padding(vertical = 10.dp)
+                           .height(90.dp)
+                           .fillMaxWidth()
+                           .clickable {
+                               navController.currentBackStackEntry?.savedStateHandle?.set("user", it)
+                               navController.navigate(Screen.UserProfileScreen.route)
+                           }
+                       ) {
+                           Box(modifier = Modifier.fillMaxSize()){
+                               AsyncImage(model = it.profile_image, contentDescription = null,
+                                   contentScale = ContentScale.Crop)
+                               Box(modifier = Modifier
+                                   .fillMaxSize()
+                                   .padding(8.dp)
+                                   .background(Color.Transparent),
+                                   contentAlignment = Alignment.BottomStart) {
+                                   Text(text = it.fullName, fontWeight = FontWeight.Bold, color = Color.Black, fontSize = 20.sp)
                                }
                            }
                        }
@@ -214,11 +212,9 @@ fun CityInformationScreen(country: Country,
                }
                
            }else{
-               item {
-                   CircularProgressIndicator(modifier = Modifier
-                       .fillMaxSize()
-                       .wrapContentSize(Alignment.Center))
-               }
+               CircularProgressIndicator(modifier = Modifier
+                   .fillMaxSize()
+                   .wrapContentSize(Alignment.Center))
            }
         }
     }
