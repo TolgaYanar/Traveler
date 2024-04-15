@@ -179,7 +179,7 @@ fun EditProfileScreen(navController: NavController){
                             })
                     }
                     Spacer(modifier = Modifier.height(40.dp))
-                    Column(modifier = Modifier.padding(horizontal = 40.dp), horizontalAlignment = Alignment.CenterHorizontally){
+                    Column(modifier = Modifier.padding(horizontal = 10.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
 
 
                         TextField(value = user!!.fullName, onValueChange = {fullname -> user = user!!.copy(fullName = fullname)},

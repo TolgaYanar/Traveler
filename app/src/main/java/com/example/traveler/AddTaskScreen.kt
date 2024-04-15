@@ -1,8 +1,6 @@
 package com.example.traveler
 
-import android.app.TimePickerDialog
 import android.widget.Toast
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,25 +9,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.IconButton
-import androidx.compose.material.Slider
 import androidx.compose.material.Surface
-import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -42,37 +34,25 @@ import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.traveler.data.Injection
 import com.example.traveler.data.Journal
-import com.example.traveler.data.Task
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -100,6 +80,14 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
         mutableStateOf("")
     }
     var timePickerExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    var repeatExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    var reminderExpanded by remember {
         mutableStateOf(false)
     }
 
@@ -170,21 +158,39 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
 
 
                 Spacer(modifier = Modifier.height(30.dp))
-                TextField(value = repeat, onValueChange = {repeat = it},
+                TextField(value = repeat, onValueChange = {},
                     trailingIcon = {
                         Image(painter = painterResource(id = R.drawable.baseline_repeat_on_24), contentDescription = null,
                             modifier = Modifier.clickable {
-
+                                repeatExpanded = !repeatExpanded
                             })
                     })
+                DropDownMenu(
+                    list = listOf("Once", "Often", "Always"),
+                    expanded = repeatExpanded,
+                    onDismissRequest = { repeatExpanded = false },
+                    onClick = {item->
+                        repeat = item.toString()
+                        repeatExpanded = false
+                    }
+                )
                 Spacer(modifier = Modifier.height(30.dp))
-                TextField(value = reminder, onValueChange = {reminder = it},
+                TextField(value = "$reminder minutes", onValueChange = {},
                     trailingIcon = {
                         Image(painter = painterResource(id = R.drawable.baseline_access_time_24), contentDescription = null,
                             modifier = Modifier.clickable {
-
+                                reminderExpanded = !repeatExpanded
                             })
                     })
+                DropDownMenu(
+                    list = listOf("5", "10", "15", "30"),
+                    expanded = reminderExpanded,
+                    onDismissRequest = { reminderExpanded = false },
+                    onClick = {item->
+                        reminder = item.toString()
+                        reminderExpanded = false
+                    }
+                )
                 Spacer(modifier = Modifier.height(50.dp))
                 OutlinedTextField(value = notes, onValueChange = {notes = it},
                     colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Gray, focusedContainerColor = Color.Gray),
@@ -199,35 +205,21 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                     .fillMaxWidth()
                     .padding(20.dp), horizontalArrangement = Arrangement.End) {
                     Button(onClick = {
-                        if(title.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty() ){
+                        if(title.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty() && repeat.isNotEmpty() && reminder.isNotEmpty() ){
 
-                            val user = FirebaseAuth.getInstance().currentUser
-                            val firestore = Injection.instance()
                             val task = hashMapOf<String, Any>(
                                 "title" to title,
                                 "startTime" to (timeToLong(startTime) + thatDay),
                                 "endTime" to (timeToLong(endTime) + thatDay),
-                                "notes" to notes
+                                "notes" to notes,
+                                "remind" to reminder
                             )
-
-                            if (user != null) {
-                                task?.let { it1 ->
-                                    firestore.collection("users").document(user.uid)
-                                        .collection("journals").document(journal.title)
-                                        .collection("days").document("day$dayNumber").collection("tasks")
-                                        .document(title).set(task)
-                                        .addOnSuccessListener {
-                                            navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
-                                            navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
-                                        }.addOnFailureListener {
-                                            println("Error occurred while trying to add task to database")
-                                        }
-                                }
-                            }
+                            addTask(repeat, journal, dayNumber, task = task)
+                            navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
+                            navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
 
                         }else{
-                            Toast.makeText(context, "Please fulfill the title, starting time and ending time of the task " +
-                                    "in order to be able to add task.", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "Please fill the blanks.", Toast.LENGTH_LONG).show()
                         }
                     }, ) {
                         Text(text = "Add")
@@ -342,4 +334,61 @@ fun timeToLong(timeString: String): Long {
     return (date?.time ) ?: 0L
 }
 
+@Composable
+fun DropDownMenu(list : List<Any>, expanded : Boolean,
+                 onDismissRequest: () -> Unit, onClick: (Any) -> Unit){
+
+    DropdownMenu(expanded = expanded, onDismissRequest = { onDismissRequest() }) {
+
+        list.forEach {item->
+            DropdownMenuItem(onClick = { onClick(item) }) {
+                Text(text = item.toString(), fontSize = 16.sp, modifier = Modifier.fillMaxSize(),
+                    textAlign = TextAlign.Center)
+            }
+        }
+    }
+}
+
+fun addTask(repeat : String, journal : Journal, dayNum : Int, task : HashMap<String, Any>){
+    val daysCollection = Injection.instance().collection("users").document(FirebaseAuth.getInstance().uid!!)
+        .collection("journals").document(journal.title).collection("days")
+    val journalDuration = getDayDifference(journal.startDateInMillis, journal.endDateInMillis)
+    if(repeat.equals("Always")){
+        for (day in 0 until journalDuration){
+            daysCollection.document("day${day + 1}").set({})
+            daysCollection.document("day${day+1}").collection("tasks")
+                .document(task["title"].toString()).set(task)
+                .addOnSuccessListener {
+                    println("task added for day${day+1}")
+                }
+                .addOnFailureListener {
+                    println("task couldn't add for day${day+1}")
+                }
+        }
+    }
+    else if(repeat.equals("Often")){
+        for (day in 0 until journalDuration step 2){
+            daysCollection.document("day${day + 1}").set({})
+            daysCollection.document("day${day+1}").collection("tasks")
+                .document(task["title"].toString()).set(task)
+                .addOnSuccessListener {
+                    println("task added for day${day+1}")
+                }
+                .addOnFailureListener {
+                    println("task couldn't add for day${day+1}")
+                }
+        }
+    }
+    else{
+        daysCollection.document("day${dayNum}").set({})
+        daysCollection.document("day${dayNum}").collection("tasks")
+            .document(task["title"].toString()).set(task)
+            .addOnSuccessListener {
+                println("task added for day${dayNum}")
+            }
+            .addOnFailureListener {
+                println("task couldn't add for day${dayNum}")
+            }
+    }
+}
 

@@ -27,4 +27,6 @@ data class Task(
     val startTime : Long = 0L,
     val endTime : Long = 0L,
     val notes : String = "",
+    val repeat : String = "",
+    val remind : String = ""
 )

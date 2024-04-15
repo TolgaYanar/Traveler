@@ -86,7 +86,6 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal){
         startDate = journal.startDateInMillis,
         endDate = journal.endDateInMillis
     )
-    println(journalDuration)
 
     var selected by remember {
         mutableStateOf(-1)
@@ -335,9 +334,6 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal){
                             navController.currentBackStackEntry?.savedStateHandle?.set("thatday", (journal.startDateInMillis + (selected*24*60*60*1000)))
                             navController.currentBackStackEntry?.savedStateHandle?.set("daynumber", selected+1)
                             navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
-                            Injection.instance().collection("users").document(FirebaseAuth.getInstance().uid!!)
-                                .collection("journals").document(journal.title).collection("days")
-                                .document("day${selected+1}").set({})
                             navController.navigate(Screen.AddTaskScreen.route)
                         }else{
                             Toast.makeText(context, "You need to choose a day to continue...", Toast.LENGTH_LONG).show()
