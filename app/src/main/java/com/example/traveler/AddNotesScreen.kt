@@ -116,7 +116,10 @@ fun AddNotesScreen(navController: NavController, journal: Journal){
         topBar = {
             CenterAlignedTopAppBar(title = { Text(text = "Add Notes") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigate(Screen.TripPlanJournalScreen.route) }) {
+                    IconButton(onClick = {
+                        navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
+                        navController.navigate(Screen.TripPlanJournalScreen.route)
+                    }) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 },
