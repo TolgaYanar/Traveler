@@ -43,17 +43,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.traveler.data.Country
+import com.example.traveler.data.Flag
 import com.example.traveler.data.Injection
 import com.example.traveler.data.Journal
 import com.example.traveler.data.User
+import com.example.traveler.data.latLng
 import com.google.firebase.auth.FirebaseAuth
+import com.google.type.LatLng
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -148,36 +153,43 @@ fun CityInformationScreen(country: Country,
                        //containerColor = Color.Transparent
                    )
                ) {
-                   Text(text = "Touristic Destinations", fontSize = 17.sp, fontWeight = FontWeight.Bold,
-                       modifier = Modifier.padding(horizontal = 16.dp))
-                   for (destination in tourism_data){
-                       Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top, modifier = Modifier
-                           .fillMaxWidth()
-                           .padding(vertical = 4.dp)) {
-                           Canvas(modifier = Modifier.padding(horizontal = 10.dp, vertical = 9.dp), onDraw = {
-                               drawCircle(color = Color.Black, radius = 10f)
-                           })
-                           Text(text = "${destination.properties.name} - ${destination.properties.city}",
-                               fontSize = 14.sp, modifier = Modifier)
-                       }
-                   }
-                   Text(text = "Restaurants", fontSize = 17.sp, fontWeight = FontWeight.Bold,
-                       modifier = Modifier.padding(horizontal = 16.dp))
-                   for (restaurant in catering_data){
-                       Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top, modifier = Modifier
-                           .fillMaxWidth()
-                           .padding(vertical = 4.dp)) {
-                           Canvas(modifier = Modifier.padding(horizontal = 10.dp, vertical = 9.dp), onDraw = {
-                               drawCircle(color = Color.Black, radius = 10f)
-                           })
-                           Text(text = "${restaurant.properties.name} - ${restaurant.properties.district},${restaurant.properties.city}",
-                               fontSize = 14.sp, modifier = Modifier)
+                   LazyColumn(modifier = Modifier.fillMaxSize()){
+                       item {
+                           Text(text = "Touristic Destinations", fontSize = 17.sp, fontWeight = FontWeight.Bold,
+                               modifier = Modifier.padding(horizontal = 16.dp))
+                           for (destination in tourism_data){
+                               Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top, modifier = Modifier
+                                   .fillMaxWidth()
+                                   .padding(vertical = 4.dp)) {
+                                   Canvas(modifier = Modifier.padding(horizontal = 10.dp, vertical = 9.dp), onDraw = {
+                                       drawCircle(color = Color.Black, radius = 10f)
+                                   })
+                                   Text(text = "${destination.properties.name} - ${destination.properties.city}",
+                                       fontSize = 14.sp, modifier = Modifier)
+                               }
+                           }
+                           Text(text = "Restaurants", fontSize = 17.sp, fontWeight = FontWeight.Bold,
+                               modifier = Modifier.padding(horizontal = 16.dp))
+                           for (restaurant in catering_data){
+                               Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top, modifier = Modifier
+                                   .fillMaxWidth()
+                                   .padding(vertical = 4.dp)) {
+                                   Canvas(modifier = Modifier.padding(horizontal = 10.dp, vertical = 9.dp), onDraw = {
+                                       drawCircle(color = Color.Black, radius = 10f)
+                                   })
+                                   Text(text = "${restaurant.properties.name} - ${restaurant.properties.district},${restaurant.properties.city}",
+                                       fontSize = 14.sp, modifier = Modifier)
+                               }
+                           }
                        }
                    }
                }
 
                Text(text = "Explore Journals", fontSize = 16.sp, fontWeight = FontWeight.Bold,
-                   modifier = Modifier.padding(horizontal = 30.dp).padding(top = 10.dp).alpha(0.6f))
+                   modifier = Modifier
+                       .padding(horizontal = 30.dp)
+                       .padding(top = 10.dp)
+                       .alpha(0.6f))
 
                LazyColumn(modifier = Modifier
                    .fillMaxSize()
@@ -192,7 +204,10 @@ fun CityInformationScreen(country: Country,
                            .height(90.dp)
                            .fillMaxWidth()
                            .clickable {
-                               navController.currentBackStackEntry?.savedStateHandle?.set("user", it)
+                               navController.currentBackStackEntry?.savedStateHandle?.set(
+                                   "user",
+                                   it
+                               )
                                navController.navigate(Screen.UserProfileScreen.route)
                            }
                        ) {
@@ -220,6 +235,12 @@ fun CityInformationScreen(country: Country,
     }
 }
 
+@Preview
+@Composable
+fun previ(){
+    CityInformationScreen(country = Country("","",
+        Flag("","",""),"","", latLng(listOf(0.0,0.0), listOf(0.0,0.0))), navController = rememberNavController())
+}
 
 fun formattedDouble(doubleValue: Double?): String {
     return String.format(Locale.getDefault(), "%.1f", doubleValue)

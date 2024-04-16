@@ -2,9 +2,6 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="RegisterScreen">
-        <State />
-      </entry>
       <entry key="TripPlanJournalScreen">
         <State />
       </entry>
@@ -31,6 +28,9 @@
         </State>
       </entry>
       <entry key="preeeview">
+        <State />
+      </entry>
+      <entry key="previ">
         <State />
       </entry>
     </value>

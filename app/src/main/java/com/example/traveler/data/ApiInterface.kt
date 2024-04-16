@@ -10,7 +10,7 @@ interface ApiInterface {
     //country api
     @GET("capital/{city}")
     suspend fun getCapital(@Path("city") city: String,
-        @Query("apikey") apiKey: String = "FzssNbdVig8dg1tprDKpvQBznPCtuV7rgmHYGO9m"): CountryResponse  //idueNDdQAVDeVmoCNeEXsSDOwRVaHFEp8HrzpApc
+        @Query("apikey") apiKey: String = "SZE5Xt6bKFAaIV9GfYHYSqXqPKa3UgPvybj7Syay"): CountryResponse
 
     //image api
     @GET("search")

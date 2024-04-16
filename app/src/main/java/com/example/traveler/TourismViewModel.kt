@@ -23,10 +23,10 @@ class TourismViewModel : ViewModel() {
             val filter = "circle:${country.latlng.capital[1]},${country.latlng.capital[0]},5000"
             try {
                 val tourism_response = ApiClient.apiServiceTourism.getTourist(filter = filter, categories = "tourism",
-                    limit = 5)
+                    limit = 10)
                 _tourismData.value = tourism_response.features
                 val catering_response = ApiClient.apiServiceTourism.getTourist(filter = filter, categories = "catering.restaurant",
-                    limit = 5)
+                    limit = 10)
                 _restaurantData.value = catering_response.features
             } catch (e: Exception) {
                 e.printStackTrace()
