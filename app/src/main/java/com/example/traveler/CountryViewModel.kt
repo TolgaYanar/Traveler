@@ -39,7 +39,7 @@ class CountryViewModel : ViewModel() {
 
     private fun listFetchData() {
         viewModelScope.launch(Dispatchers.IO) {
-            val countriesToFetch = listOf("ankara", "berlin", "tokyo", "london","canberra","Washington, D.C.", "kabul","amsterdam","moscow","brussels")//"ankara", "berlin", "tokyo", "london","canberra","Washington, D.C.", "kabul","amsterdam","moscow","brussels"
+            val countriesToFetch = listOf("ankara", "berlin")//"ankara", "berlin", "tokyo", "london","canberra","Washington, D.C.", "kabul","amsterdam","moscow","brussels"
             for (countryName in countriesToFetch) {
                 try {
                     val country = ApiClient.apiService.getCapital(countryName)

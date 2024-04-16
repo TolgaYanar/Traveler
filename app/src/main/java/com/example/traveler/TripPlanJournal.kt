@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,11 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +35,8 @@ import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +47,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -52,17 +58,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.traveler.data.Injection
 import com.example.traveler.data.Journal
+import com.example.traveler.data.Notes
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripPlanJournalScreen(navController: NavController, journal: Journal){
 
-    var notes by remember {
-        mutableStateOf(journal.notes)
+    val notes by remember {
+        mutableStateOf(mutableStateOf(emptyList<Notes>()))
+    }
+    LaunchedEffect(key1 = true){
+        getNotes(journal, notes)
     }
 
     Scaffold(
@@ -70,24 +84,18 @@ fun TripPlanJournalScreen(navController: NavController, journal: Journal){
             CenterAlignedTopAppBar(title = { Text(text = "Trip Plan") },
                 navigationIcon = {
                     IconButton(onClick = {
-                        val updateJournal = hashMapOf<String, Any?>(
-                            "notes" to notes
-                        )
-                        FirebaseAuth.getInstance().uid?.let { it1 ->
-                            Injection.instance().collection("users").document(it1)
-                                .collection("journals").document(journal.title).set(updateJournal, SetOptions.merge())
-                                .addOnSuccessListener {
-                                    println("Notes updated successfully")
-                                    journal.notes = notes
-                                    navController.navigate(Screen.UserProfileScreen.route)
-                                }
-                                .addOnFailureListener {
-                                    println("Notes couldn't updated")
-                                }
-                        }
+                        navController.navigate(Screen.UserProfileScreen.route)
                     }) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
+                },
+                actions = {
+                          IconButton(onClick = {
+                              navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
+                              navController.navigate(Screen.AddNotesScreen.route)
+                          }) {
+                              Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+                          }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.White)
@@ -112,31 +120,11 @@ fun TripPlanJournalScreen(navController: NavController, journal: Journal){
                         .height(45.dp)
                         .width(160.dp)
                         .clickable {
-                            journal.notes = notes
-                            FirebaseAuth.getInstance().uid?.let { it1 ->
-                                val updateJournal = hashMapOf<String, Any?>(
-                                    "notes" to notes
-                                )
-                                Injection
-                                    .instance()
-                                    .collection("users")
-                                    .document(it1)
-                                    .collection("journals")
-                                    .document(journal.title)
-                                    .set(updateJournal, SetOptions.merge())
-                                    .addOnSuccessListener {
-                                        println("Notes updated successfully")
-                                        journal.notes = notes
-                                        navController.currentBackStackEntry?.savedStateHandle?.set(
-                                            "journal",
-                                            journal
-                                        )
-                                        navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
-                                    }
-                                    .addOnFailureListener {
-                                        println("Notes couldn't updated")
-                                    }
-                            }
+                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                "journal",
+                                journal
+                            )
+                            navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
                         },
                     backgroundColor = Color.Gray.copy(alpha = 0.4f),
                     shape = RoundedCornerShape(25.dp),
@@ -162,24 +150,43 @@ fun TripPlanJournalScreen(navController: NavController, journal: Journal){
                 modifier = Modifier
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Bottom
+                verticalArrangement = Arrangement.Top
             ) {
 
-                item {
-                    TextField(value = notes, onValueChange = {
-                        notes = it
-                    }, modifier = Modifier
-                        .height(625.dp)
-                        .width(325.dp), colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color(0xFFE8E8E8), focusedContainerColor = Color(0xFFE8E8E8)),
-                        shape = RoundedCornerShape(25.dp),
-                        label = {
-                            Text(text = "Notes")
+                items(notes.value) {
+                    if(it.note.startsWith("https://firebasestorage.googleapis.com/v0/b/traveller-4d4df.appspot.com/o/images")){
+                        Card(
+                            modifier = Modifier
+                                .height(250.dp).width(250.dp)
+                                .padding(20.dp)
+                        ) {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                                Image(painter = rememberAsyncImagePainter(model = it.note,
+                                    contentScale = ContentScale.Crop), contentDescription = null,
+                                    contentScale = ContentScale.Crop)
+                            }
                         }
-                    )
+                    }
+                    else{
+                        Text(text = it.note, modifier = Modifier.width(325.dp).padding(20.dp))
+                    }
                 }
             }
         }
+    }
+
+}
+
+fun getNotes(journal : Journal, list : MutableState<List<Notes>>){
+
+    GlobalScope.launch {
+        val firestore = Injection.instance()
+        val user = FirebaseAuth.getInstance().currentUser
+        val notesCollection = firestore.collection("users").document(user!!.uid)
+            .collection("journals").document(journal.title).collection("notes")
+            .orderBy("added")
+        val notesSnapshot = notesCollection.get().await()
+        list.value = notesSnapshot.toObjects(Notes::class.java)
     }
 
 }

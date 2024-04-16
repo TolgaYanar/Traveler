@@ -82,6 +82,13 @@ fun Navigation(
                 TripPlanJournalScreen(navController = navController, journal = result)
             }
         }
+
+        composable(Screen.AddNotesScreen.route){
+            val result = navController.previousBackStackEntry?.savedStateHandle?.get<Journal>("journal")
+            if (result != null) {
+                AddNotesScreen(navController = navController, journal = result)
+            }
+        }
         
         composable(Screen.AddTaskScreen.route){
             val thatDay = navController.previousBackStackEntry?.savedStateHandle?.get<Long>("thatday")

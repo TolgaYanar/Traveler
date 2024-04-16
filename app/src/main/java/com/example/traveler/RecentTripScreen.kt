@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.IconButton
@@ -27,6 +30,10 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,13 +46,22 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.example.traveler.data.Injection
 import com.example.traveler.data.Journal
+import com.example.traveler.data.Notes
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.SetOptions
 
 @Composable
 fun RecentTripScreen(navController: NavController, journal: Journal){
+
+    val notes by remember {
+        mutableStateOf(mutableStateOf(emptyList<Notes>()))
+    }
+    LaunchedEffect(key1 = true){
+        getNotes(journal, notes)
+    }
 
     Box(modifier = Modifier.fillMaxSize()){
         AsyncImage(modifier = Modifier.fillMaxSize(),model = journal.mostMemorialImage, contentDescription = null,
@@ -90,14 +106,16 @@ fun RecentTripScreen(navController: NavController, journal: Journal){
                 ) {
                     LazyColumn(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ){
 
                         item {
 
                             Row(modifier = Modifier
                                 .padding(16.dp)
-                                .fillMaxWidth()) {
+                                .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start) {
                                 Card(backgroundColor = Color.Magenta, modifier = Modifier.padding(4.dp),
                                     shape = RoundedCornerShape(15.dp)){
                                     Text(text = "${getDayDifference(journal.startDateInMillis,journal.endDateInMillis)} days",
@@ -119,14 +137,27 @@ fun RecentTripScreen(navController: NavController, journal: Journal){
                                 fontSize = 24.sp,
                                 modifier = Modifier.padding(14.dp)
                             )
-
-                            TextField(modifier = Modifier.fillMaxWidth(),value = journal.notes, onValueChange = {},
-                                readOnly = true, shape = RoundedCornerShape(25.dp),
-                                colors = TextFieldDefaults.textFieldColors(
-                                    backgroundColor = Color.LightGray
+                        }
+                        items(notes.value) {
+                            if(it.note.startsWith("https://firebasestorage.googleapis.com/v0/b/traveller-4d4df.appspot.com/o/images")){
+                                Card(
+                                    modifier = Modifier
+                                        .height(250.dp).width(250.dp)
+                                        .padding(20.dp)
+                                ) {
+                                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                                        Image(painter = rememberAsyncImagePainter(model = it.note,
+                                            contentScale = ContentScale.Crop), contentDescription = null,
+                                            contentScale = ContentScale.Crop)
+                                    }
+                                }
+                            }
+                            else{
+                                androidx.compose.material3.Text(
+                                    text = it.note,
+                                    modifier = Modifier.width(325.dp).padding(20.dp)
                                 )
-                            )
-
+                            }
                         }
                     }
                 }
