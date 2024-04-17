@@ -311,7 +311,7 @@ fun UserProfileScreen(
                                     if (ongoingJournal.value.title.isNotEmpty()) {
                                         navController.currentBackStackEntry?.savedStateHandle?.set(
                                             "journal",
-                                            ongoingJournal
+                                            ongoingJournal.value
                                         )
                                         navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
                                     } else {

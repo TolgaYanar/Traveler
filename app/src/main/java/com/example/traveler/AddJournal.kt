@@ -64,7 +64,6 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddJournal(navController: NavController,

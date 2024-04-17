@@ -10,6 +10,7 @@ import com.example.traveler.data.Result
 import com.example.traveler.data.User
 import com.example.traveler.data.UserRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -118,11 +119,23 @@ class ProfileViewModel : ViewModel() {
 
     fun loadOngoingTrip(user: User, journal: MutableState<Journal>){
         viewModelScope.launch {
-            val ongoing_journal = Injection.instance().collection("users")
-                .document(user.uid).collection("journals")
-                .document(user.ongoing_trip).get().await()
+            try {
+                val journalsCol = Injection.instance().collection("users")
+                    .document(user.uid).collection("journals")
 
-            journal.value = ongoing_journal.toObject(Journal::class.java)!!
+                val journalSnapshot = journalsCol.document(user.ongoing_trip).get().await()
+
+                if (journalSnapshot.exists()) {
+                    val journalData = journalSnapshot.toObject<Journal>()
+                    journalData?.let {
+                        journal.value = it
+                    }
+                } else {
+                    // Handle case where document does not exist
+                }
+            } catch (e: Exception) {
+                // Handle errors
+            }
         }
     }
 }

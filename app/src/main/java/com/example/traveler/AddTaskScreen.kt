@@ -59,7 +59,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
-import java.util.UUID
 import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -152,7 +151,7 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
 
                 if (timePickerExpanded){
                     TimePicker(onDismissRequest = { timePickerExpanded = false },
-                        onColorSelected = {start, end ->
+                        onTimeSelected = { start, end ->
                             startTime = start
                             endTime = end
                             timePickerExpanded = false
@@ -239,7 +238,7 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePicker(onDismissRequest: () -> Unit,
-                onColorSelected: (String, String) -> Unit)
+               onTimeSelected: (String, String) -> Unit)
 {
 
     val startTimeDialog = rememberTimePickerState()
@@ -311,7 +310,7 @@ fun TimePicker(onDismissRequest: () -> Unit,
                     startTime = "${startHour}:$startMin"
                     endTime = "${endHour}:$endMin"
                     if(startTime != ":" || endTime != ":"){
-                        onColorSelected(startTime, endTime)
+                        onTimeSelected(startTime, endTime)
                         onDismissRequest()
                     }
                      },
