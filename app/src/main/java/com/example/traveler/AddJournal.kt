@@ -214,7 +214,7 @@ fun AddJournal(navController: NavController,
                     ) {
                         DateRangePicker(state = dateRangeDialogState,
 //                        dateValidator = {
-//                            it >= Calendar.getInstance().time.time
+//                            it >= Calendar.getInstance(TimeZone.getDefault()).time.time
 //                        }
                         )
                     }

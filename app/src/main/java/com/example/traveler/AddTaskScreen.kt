@@ -306,7 +306,7 @@ fun TimePicker(onDismissRequest: () -> Unit,
                     startHour = startTimeDialog.hour
                     startMin = startTimeDialog.minute
                     endHour = endTimeDialog.hour
-                    endMin = startTimeDialog.minute
+                    endMin = endTimeDialog.minute
                     startTime = "${startHour}:$startMin"
                     endTime = "${endHour}:$endMin"
                     if(startTime != ":" || endTime != ":"){
@@ -409,7 +409,7 @@ fun addAlarm(schedular : AndroidAlarmSchedular,
              task : HashMap<String, Any>)
 {
     val alarmItem = AlarmItem(
-        time = time,
+        time = time - 3 * 60 * 60 * 1000,
         message = message,
         id = Random.nextInt(10000,99999).toString()
     )
