@@ -5,6 +5,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import com.google.common.hash.HashCode
 import java.time.ZoneId
 import java.util.UUID
 
@@ -31,11 +32,11 @@ class AndroidAlarmSchedular(
         )
     }
 
-    override fun cancel(item: AlarmItem) {
+    override fun cancel(hashCode : Int) {
         alarmManager.cancel(
             PendingIntent.getBroadcast(
                 context,
-                item.hashCode(),
+                hashCode,
                 Intent(context, AlarmReceiver::class.java),
                 PendingIntent.FLAG_IMMUTABLE
             )

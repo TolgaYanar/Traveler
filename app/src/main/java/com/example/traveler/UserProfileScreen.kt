@@ -112,7 +112,7 @@ fun UserProfileScreen(
     }
 
     var ongoingJournal by remember {
-        mutableStateOf(Journal())
+        mutableStateOf(mutableStateOf(Journal()))
     }
 
     val journals by remember {
@@ -136,7 +136,15 @@ fun UserProfileScreen(
                             modifier = Modifier.size(40.dp)
                         )
                     }
-            }, title = {}, backgroundColor = colorResource(id = R.color.app_bar_color)
+            }, title = {}, backgroundColor = colorResource(id = R.color.app_bar_color),
+                actions = {
+                    IconButton(onClick = {
+                        FirebaseAuth.getInstance().signOut()
+                        navController.navigate(Screen.LoginScreen.route)
+                    }) {
+                        Icon(painter = painterResource(id = R.drawable.baseline_logout_24), contentDescription = null)
+                    }
+                }
             )
         }
     ) {
@@ -300,7 +308,7 @@ fun UserProfileScreen(
                             .width(340.dp)
                             .clickable {
                                 if (isOwnProfile) {
-                                    if (ongoingJournal.title.isNotEmpty()) {
+                                    if (ongoingJournal.value.title.isNotEmpty()) {
                                         navController.currentBackStackEntry?.savedStateHandle?.set(
                                             "journal",
                                             ongoingJournal
@@ -317,13 +325,17 @@ fun UserProfileScreen(
                                             .show()
                                     }
                                 }
-                            },backgroundColor = Color(ongoingJournal.color.toULong()), shape = RoundedCornerShape(20.dp)
+                            },backgroundColor = Color(ongoingJournal.value.color.toULong()), shape = RoundedCornerShape(20.dp)
                         ) {
+                            LaunchedEffect(key1 = ongoingJournal){
+                                profileViewModel.loadOngoingTrip(user, ongoingJournal)
+                            }
+
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
-                                Text(text = ongoingJournal.title, modifier = Modifier.padding(10.dp))
+                                Text(text = ongoingJournal.value.title, modifier = Modifier.padding(10.dp))
                             }
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomStart) {
-                                Text(text = ongoingJournal.location, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp))
+                                Text(text = ongoingJournal.value.location, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp))
                             }
                         }
                     }
@@ -351,7 +363,13 @@ fun UserProfileScreen(
                             journals = journals,
                             onDismissRequest = { expanded = false },
                             onSuccessRequest = {journal->
-                                ongoingJournal = journal
+                                ongoingJournal.value = journal
+                                Injection.instance().collection("users").document(user.uid)
+                                    .update("ongoing_trip", journal.title).addOnSuccessListener {
+                                        println("ongoing trip updated.")
+                                    }.addOnFailureListener {
+                                        println("ongoing trip couldn't updated.")
+                                    }
                                 expanded = false
                             }
                         )
@@ -517,7 +535,7 @@ fun UpdateJournal(journals : MutableState<List<Journal>>, onDismissRequest: () -
                                     endDateInMillis = endDateInMillis,
                                     endDate = endDate,
                                     startDate = startDate,
-                                    notes = notes,
+                                    notes = notes
                                 )
 
                                 onSuccessRequest(currentJournal)

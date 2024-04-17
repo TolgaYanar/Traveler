@@ -94,25 +94,35 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-    fun loadTasksOfUser(journal: Journal, dayNumber: Int) {
-        viewModelScope.launch {
-            val user = FirebaseAuth.getInstance().currentUser
-            val firestore = Injection.instance()
+//    fun loadTasksOfUser(journal: Journal, dayNumber: Int) {
+//        viewModelScope.launch {
+//            val user = FirebaseAuth.getInstance().currentUser
+//            val firestore = Injection.instance()
+//
+//            val collectionRef = user?.let {
+//                firestore.collection("users")
+//                    .document(it.uid).collection("journals").document(journal.title)
+//                    .collection("days").document("day$dayNumber")
+//                    .collection("tasks")
+//            }
+//            val snapshot = collectionRef?.get()?.await()
+//            val itemList = snapshot?.documents?.mapNotNull { document ->
+//                document.data?.toMutableMap()?.apply {
+//                    // including the document ID in the map to access along with its fields later
+//                    put("documentId", document.id)
+//                }
+//            }
+//            _tasks.value = itemList
+//        }
+//    }
 
-            val collectionRef = user?.let {
-                firestore.collection("users")
-                    .document(it.uid).collection("journals").document(journal.title)
-                    .collection("days").document("day$dayNumber")
-                    .collection("tasks")
-            }
-            val snapshot = collectionRef?.get()?.await()
-            val itemList = snapshot?.documents?.mapNotNull { document ->
-                document.data?.toMutableMap()?.apply {
-                    // including the document ID in the map to access along with its fields later
-                    put("documentId", document.id)
-                }
-            }
-            _tasks.value = itemList
+    fun loadOngoingTrip(user: User, journal: MutableState<Journal>){
+        viewModelScope.launch {
+            val ongoing_journal = Injection.instance().collection("users")
+                .document(user.uid).collection("journals")
+                .document(user.ongoing_trip).get().await()
+
+            journal.value = ongoing_journal.toObject(Journal::class.java)!!
         }
     }
 }

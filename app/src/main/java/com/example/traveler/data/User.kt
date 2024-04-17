@@ -13,4 +13,5 @@ data class User(
     val following : Int = 0,
     var uid : String = "",
     var uri : String = "",
+    var ongoing_trip : String = ""
     ): Parcelable

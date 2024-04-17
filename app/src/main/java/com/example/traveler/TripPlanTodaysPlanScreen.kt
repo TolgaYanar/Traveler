@@ -1,5 +1,6 @@
 package com.example.traveler
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -61,9 +62,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.traveler.data.AndroidAlarmSchedular
 import com.example.traveler.data.Injection
 import com.example.traveler.data.Journal
 import com.example.traveler.data.Task
@@ -295,18 +298,7 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal){
                                                             contentAlignment = Alignment.Center,
                                                             modifier = Modifier.fillMaxHeight().width(40.dp).background(Color.Red)
                                                                 .clickable {
-                                                                    FirebaseAuth.getInstance().uid?.let { it1 ->
-                                                                        Injection.instance().collection("users")
-                                                                            .document(it1).collection("journals").document(journal.title)
-                                                                            .collection("days").document(selectedDay!!)
-                                                                            .collection("tasks").document(it.title).delete()
-                                                                            .addOnSuccessListener {
-                                                                                println("Task deleted successfully")
-                                                                                navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
-                                                                                navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
-                                                                            }
-                                                                            .addOnFailureListener { println("Error occurred while trying to delete task") }
-                                                                    }
+                                                                    deleteTask(selectedDay!!, navController, it, journal, context)
                                                                 }
                                                         ) {
                                                             Icon(imageVector = Icons.Filled.Delete, contentDescription = null)
@@ -390,5 +382,29 @@ fun loadTasksOfDay(journal: Journal, day: String, tasks : MutableList<Task>){
         }catch (e : Exception){
             e.printStackTrace()
         }
+    }
+}
+
+fun deleteTask(selectedDay : String, navController: NavController,
+               task: Task, journal: Journal, context: Context)
+{
+    val notificationManager = NotificationManagerCompat.from(context)
+    notificationManager.cancel(task.notificationID.toInt())
+
+    val androidAlarmSchedular = AndroidAlarmSchedular(context)
+
+    androidAlarmSchedular.cancel(task.alarmItemHashCode)
+
+    FirebaseAuth.getInstance().uid?.let { it1 ->
+        Injection.instance().collection("users")
+            .document(it1).collection("journals").document(journal.title)
+            .collection("days").document(selectedDay)
+            .collection("tasks").document(task.title).delete()
+            .addOnSuccessListener {
+                println("Task deleted successfully")
+                navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
+                navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
+            }
+            .addOnFailureListener { println("Error occurred while trying to delete task") }
     }
 }
