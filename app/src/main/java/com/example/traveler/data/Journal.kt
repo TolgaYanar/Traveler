@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.compose.ui.graphics.Color
 import com.google.firebase.firestore.IgnoreExtraProperties
 import kotlinx.parcelize.Parcelize
+import java.util.UUID
 
 @IgnoreExtraProperties
 @Parcelize
@@ -27,5 +28,7 @@ data class Task(
     val startTime : Long = 0L,
     val endTime : Long = 0L,
     val notes : String = "",
-    val remind : String = ""
+    val remind : String = "",
+    val notificationID : String = "",
+    val alarmItemHashCode : Int = 0
 )

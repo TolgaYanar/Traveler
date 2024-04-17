@@ -1,5 +1,6 @@
 package com.example.traveler
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -49,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import com.example.traveler.data.AlarmItem
+import com.example.traveler.data.AndroidAlarmSchedular
 import com.example.traveler.data.Injection
 import com.example.traveler.data.Journal
 import com.google.firebase.auth.FirebaseAuth
@@ -56,6 +59,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import java.util.UUID
+import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -214,7 +219,7 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                                 "notes" to notes,
                                 "remind" to reminder
                             )
-                            addTask(repeat, journal, dayNumber, task = task)
+                            addTask(context, repeat, reminder = reminder, journal, dayNumber, task = task)
                             navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
                             navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
 
@@ -349,10 +354,15 @@ fun DropDownMenu(list : List<Any>, expanded : Boolean,
     }
 }
 
-fun addTask(repeat : String, journal : Journal, dayNum : Int, task : HashMap<String, Any>){
+fun addTask(context: Context, repeat : String, reminder : String, journal : Journal, dayNum : Int, task : HashMap<String, Any>){
+
     val daysCollection = Injection.instance().collection("users").document(FirebaseAuth.getInstance().uid!!)
         .collection("journals").document(journal.title).collection("days")
+
     val journalDuration = getDayDifference(journal.startDateInMillis, journal.endDateInMillis)
+
+    val schedular = AndroidAlarmSchedular(context)
+
     if(repeat.equals("Always")){
         for (day in 0 until journalDuration){
             daysCollection.document("day${day + 1}").set({})
@@ -380,6 +390,9 @@ fun addTask(repeat : String, journal : Journal, dayNum : Int, task : HashMap<Str
         }
     }
     else{
+        addAlarm(schedular, (task["startTime"].toString().toLong()-reminder.toLong()*60*1000),
+            "${task["title"]} at ${longToTime(task["startTime"].toString().toLong())}", task)
+
         daysCollection.document("day${dayNum}").set({})
         daysCollection.document("day${dayNum}").collection("tasks")
             .document(task["title"].toString()).set(task)
@@ -390,5 +403,20 @@ fun addTask(repeat : String, journal : Journal, dayNum : Int, task : HashMap<Str
                 println("task couldn't add for day${dayNum}")
             }
     }
+}
+
+fun addAlarm(schedular : AndroidAlarmSchedular,
+             time: Long, message : String,
+             task : HashMap<String, Any>)
+{
+    val alarmItem = AlarmItem(
+        time = time,
+        message = message,
+        id = Random.nextInt(10000,99999).toString()
+    )
+    task.put("notificationID", alarmItem.id)
+    task.put("alarmItemHashCode", alarmItem.hashCode())
+    alarmItem.let(schedular::schedule)
+
 }
 
