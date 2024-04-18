@@ -413,6 +413,10 @@ fun UserProfileScreen(
                                                         "journal",
                                                         journal
                                                     )
+                                                    navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                        "user",
+                                                        user
+                                                    )
                                                     navController.navigate(Screen.RecentTripScreen.route)
                                                 }
                                         ) {

@@ -52,9 +52,9 @@ fun Navigation(
 
         composable(Screen.RecentTripScreen.route){
             val result = navController.previousBackStackEntry?.savedStateHandle?.get<Journal>("journal")
-
-            if (result != null) {
-                RecentTripScreen(navController = navController, journal = result)
+            val user = navController.previousBackStackEntry?.savedStateHandle?.get<User>("user")
+            if (result != null && user != null) {
+                RecentTripScreen(navController = navController, journal = result, user = user)
             }
         }
         

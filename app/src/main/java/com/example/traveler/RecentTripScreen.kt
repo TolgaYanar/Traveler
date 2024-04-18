@@ -50,17 +50,18 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.traveler.data.Injection
 import com.example.traveler.data.Journal
 import com.example.traveler.data.Notes
+import com.example.traveler.data.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.SetOptions
 
 @Composable
-fun RecentTripScreen(navController: NavController, journal: Journal){
+fun RecentTripScreen(navController: NavController, journal: Journal, user: User){
 
     val notes by remember {
         mutableStateOf(mutableStateOf(emptyList<Notes>()))
     }
     LaunchedEffect(key1 = true){
-        getNotes(journal, notes)
+        getNotes(journal, notes, user = user)
     }
 
     Box(modifier = Modifier.fillMaxSize()){
@@ -153,7 +154,7 @@ fun RecentTripScreen(navController: NavController, journal: Journal){
                                 }
                             }
                             else{
-                                androidx.compose.material3.Text(
+                                Text(
                                     text = it.note,
                                     modifier = Modifier.width(325.dp).padding(20.dp)
                                 )
@@ -173,5 +174,5 @@ fun RecentTripScreen(navController: NavController, journal: Journal){
 @Preview
 @Composable
 fun preeeview(){
-    RecentTripScreen(navController = rememberNavController(), journal = Journal())
+    RecentTripScreen(navController = rememberNavController(), journal = Journal(), User())
 }
