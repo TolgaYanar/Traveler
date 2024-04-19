@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -34,6 +35,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,6 +62,11 @@ fun RecentTripScreen(navController: NavController, journal: Journal, user: User)
     val notes by remember {
         mutableStateOf(mutableStateOf(emptyList<Notes>()))
     }
+
+    var private by remember {
+        mutableStateOf(journal.private)
+    }
+
     LaunchedEffect(key1 = true){
         getNotes(journal, notes, user = user)
     }
@@ -81,9 +88,10 @@ fun RecentTripScreen(navController: NavController, journal: Journal, user: User)
                 IconButton(onClick = { navController.navigateUp() }) {
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                 }
-                if(journal.private){
+                if(private){
                     IconButton(onClick = {
                         journal.private = false
+                        private = false
                         FirebaseAuth.getInstance().uid?.let {
                             Injection.instance().collection("users").document(it)
                                 .collection("journals").document(journal.title).set(journal, SetOptions.merge())
@@ -91,6 +99,9 @@ fun RecentTripScreen(navController: NavController, journal: Journal, user: User)
                     }) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = null)
                     }
+                }
+                else{
+                    Icon(imageVector = Icons.Default.Lock, contentDescription = null)
                 }
             }
         }
@@ -143,7 +154,8 @@ fun RecentTripScreen(navController: NavController, journal: Journal, user: User)
                             if(it.note.startsWith("https://firebasestorage.googleapis.com/v0/b/traveller-4d4df.appspot.com/o/images")){
                                 Card(
                                     modifier = Modifier
-                                        .height(250.dp).width(250.dp)
+                                        .height(250.dp)
+                                        .width(250.dp)
                                         .padding(20.dp)
                                 ) {
                                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
@@ -156,7 +168,9 @@ fun RecentTripScreen(navController: NavController, journal: Journal, user: User)
                             else{
                                 Text(
                                     text = it.note,
-                                    modifier = Modifier.width(325.dp).padding(20.dp)
+                                    modifier = Modifier
+                                        .width(325.dp)
+                                        .padding(20.dp)
                                 )
                             }
                         }
