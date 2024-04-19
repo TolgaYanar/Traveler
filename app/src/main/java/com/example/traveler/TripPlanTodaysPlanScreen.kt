@@ -57,6 +57,7 @@ import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -78,6 +79,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.time.LocalTime
 import java.util.Calendar
+import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,6 +105,10 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal){
     val isLoading : MutableState<Boolean> = remember { mutableStateOf(false) }
 
     var isEdit : MutableState<Boolean> = remember { mutableStateOf(false) }
+
+    var calendar by remember {
+        mutableStateOf(Calendar.getInstance())
+    }
 
     val context = LocalContext.current
     
@@ -220,8 +226,8 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal){
                         .padding(start = 20.dp)
                         .padding(vertical = 20.dp), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top
                 ) {
-
-                    longToDate(Calendar.getInstance().time.time)?.let {
+                    calendar.timeZone = TimeZone.getTimeZone("Europe/Istanbul")
+                    longToDate(calendar.time.time)?.let {
                             it1 -> Text(text = it1, fontSize = 17.sp, fontWeight = FontWeight.Bold,
                         modifier = Modifier.alpha(0.8f))}
 
@@ -287,7 +293,10 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal){
                                                     ) {
                                                         Box(
                                                             contentAlignment = Alignment.Center,
-                                                            modifier = Modifier.fillMaxHeight().width(40.dp).background(Color.Gray)
+                                                            modifier = Modifier
+                                                                .fillMaxHeight()
+                                                                .width(40.dp)
+                                                                .background(Color.Gray)
                                                                 .clickable {
 
                                                                 }
@@ -296,9 +305,18 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal){
                                                         }
                                                         Box(
                                                             contentAlignment = Alignment.Center,
-                                                            modifier = Modifier.fillMaxHeight().width(40.dp).background(Color.Red)
+                                                            modifier = Modifier
+                                                                .fillMaxHeight()
+                                                                .width(40.dp)
+                                                                .background(Color.Red)
                                                                 .clickable {
-                                                                    deleteTask(selectedDay!!, navController, it, journal, context)
+                                                                    deleteTask(
+                                                                        selectedDay!!,
+                                                                        navController,
+                                                                        it,
+                                                                        journal,
+                                                                        context
+                                                                    )
                                                                 }
                                                         ) {
                                                             Icon(imageVector = Icons.Filled.Delete, contentDescription = null)

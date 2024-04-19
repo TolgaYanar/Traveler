@@ -425,9 +425,11 @@ fun addAlarm(schedular : AndroidAlarmSchedular,
              task : HashMap<String, Any>)
 {
     val alarmItem = AlarmItem(
-        time = time - 3 * 60 * 60 * 1000,
+        notified = time - 3 * 60 * 60 * 1000,
         message = message,
-        id = Random.nextInt(10000,99999).toString()
+        id = Random.nextInt(10000,99999).toString(),
+        startTime = task.get("startTime").toString().toLong(),
+        title = task.get("title").toString()
     )
     task.put("notificationID", alarmItem.id)
     task.put("alarmItemHashCode", alarmItem.hashCode())

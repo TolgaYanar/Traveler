@@ -1,6 +1,7 @@
 package com.example.traveler
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -101,7 +103,7 @@ fun AddJournal(navController: NavController,
         mutableStateOf(dateRangeDialogState.selectedEndDateMillis)
     }
 
-
+    val context = LocalContext.current
 
 
     Scaffold(
@@ -247,28 +249,35 @@ fun AddJournal(navController: NavController,
 
                     Button(onClick = {
 
-                        val journal = hashMapOf<String, Any?>(
-                            "title" to title,
-                            "location" to location,
-                            "color" to color.value.toString(),
-                            "startDate" to longToDate(startDateInMillis),
-                            "endDate" to longToDate(endDateInMillis),
-                            "startDateInMillis" to startDateInMillis,
-                            "endDateInMillis" to endDateInMillis,
-                            "notes" to notes,
-                            "private" to private
-                        )
+                        if(location.isNotEmpty() && title.isNotEmpty() && startDateInMillis != null &&
+                            endDateInMillis != null)
+                        {
+                            val journal = hashMapOf<String, Any?>(
+                                "title" to title,
+                                "location" to location,
+                                "color" to color.value.toString(),
+                                "startDate" to longToDate(startDateInMillis),
+                                "endDate" to longToDate(endDateInMillis),
+                                "startDateInMillis" to startDateInMillis,
+                                "endDateInMillis" to endDateInMillis,
+                                "notes" to notes,
+                                "private" to private
+                            )
 
-                        profileViewModel.currentUser.value?.let { it1 ->
-                            Injection.instance().collection("users").document(
-                                it1.uid).collection("journals").document(title).set(journal)
-                                .addOnSuccessListener {
-                                    println("Journal added successfully")
-                                    navController.navigateUp()
-                                }.addOnFailureListener{
-                                    println("Error occurred during journal adding")
+                            profileViewModel.currentUser.value?.let { it1 ->
+                                Injection.instance().collection("users").document(
+                                    it1.uid).collection("journals").document(title).set(journal)
+                                    .addOnSuccessListener {
+                                        println("Journal added successfully")
+                                        navController.navigateUp()
+                                    }.addOnFailureListener{
+                                        println("Error occurred during journal adding")
 
-                                }
+                                    }
+                            }
+                        }
+                        else{
+                            Toast.makeText(context, "Please fill the blanks.", Toast.LENGTH_LONG).show()
                         }
                     }
                     ) {

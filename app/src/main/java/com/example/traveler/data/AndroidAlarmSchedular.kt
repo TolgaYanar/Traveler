@@ -19,10 +19,13 @@ class AndroidAlarmSchedular(
         val intent = Intent(context, AlarmReceiver::class.java).apply {
             putExtra("EXTRA_MESSAGE", item.message)
             putExtra("UNIQUE_ID", item.id)
+            putExtra("TASK_TIME", item.startTime)
+            putExtra("TITLE", item.title)
+            putExtra("NOTIFIED", item.notified)
         }
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
-            item.time,
+            item.notified,
             PendingIntent.getBroadcast(
                 context,
                 item.hashCode(),
