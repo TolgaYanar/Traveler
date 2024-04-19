@@ -364,6 +364,14 @@ fun addTask(context: Context, repeat : String, reminder : String, journal : Jour
 
     if(repeat.equals("Always")){
         for (day in 0 until journalDuration){
+            if(day != 0){
+                task.set("startTime", task.get("startTime").toString().toLong() + 24 * 60 * 60 * 1000)
+                task.set("endTime", task.get("endTime").toString().toLong() + 24 * 60 * 60 * 1000)
+            }
+
+            addAlarm(schedular, (task["startTime"].toString().toLong()-reminder.toLong()*60*1000),
+                "${task["title"]} at ${longToTime(task["startTime"].toString().toLong())}", task)
+
             daysCollection.document("day${day + 1}").set({})
             daysCollection.document("day${day+1}").collection("tasks")
                 .document(task["title"].toString()).set(task)
@@ -377,6 +385,14 @@ fun addTask(context: Context, repeat : String, reminder : String, journal : Jour
     }
     else if(repeat.equals("Often")){
         for (day in 0 until journalDuration step 2){
+            if(day != 0){
+                task.set("startTime", task.get("startTime").toString().toLong() + 2 * 24 * 60 * 60 * 1000)
+                task.set("endTime", task.get("endTime").toString().toLong() + 2 * 24 * 60 * 60 * 1000)
+            }
+
+            addAlarm(schedular, (task["startTime"].toString().toLong()-reminder.toLong()*60*1000),
+                "${task["title"]} at ${longToTime(task["startTime"].toString().toLong())}", task)
+
             daysCollection.document("day${day + 1}").set({})
             daysCollection.document("day${day+1}").collection("tasks")
                 .document(task["title"].toString()).set(task)
