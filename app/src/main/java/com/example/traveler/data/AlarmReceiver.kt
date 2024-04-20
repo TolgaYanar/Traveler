@@ -36,6 +36,8 @@ class AlarmReceiver: BroadcastReceiver() {
 
         val notified = intent.getLongExtra("NOTIFIED", 0L)
 
+        val seen = intent.getBooleanExtra("SEEN", false)
+
         createNotificationChannel(context)
 
         //build notification
@@ -57,10 +59,12 @@ class AlarmReceiver: BroadcastReceiver() {
                 "title" to title,
                 "startTime" to taskStart,
                 "message" to message,
-                "notified" to notified
+                "notified" to notified,
+                "seen" to seen,
+                "id" to id
             )
 
-            uploadNotification(notified.toString(), notificationHash)
+            uploadNotification(id, notificationHash)
         }
 
     }
@@ -79,18 +83,17 @@ class AlarmReceiver: BroadcastReceiver() {
         val notificationManager = context.getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(channel)
     }
+}
 
-    private fun uploadNotification(notified : String, notification : HashMap<String, Any>){
-        val firestore = Injection.instance()
-        val userID = FirebaseAuth.getInstance().uid
+fun uploadNotification(id : String, notification : HashMap<String, Any>){
+    val firestore = Injection.instance()
+    val userID = FirebaseAuth.getInstance().uid
 
-        firestore.collection("users").document(userID!!)
-            .collection("notifications").document(notified)
-            .set(notification).addOnSuccessListener {
-                println("Notification added to notifications.")
-            }.addOnFailureListener {
-                println("Notification couldn't added to notifications.")
-            }
-    }
-
+    firestore.collection("users").document(userID!!)
+        .collection("notifications").document(id)
+        .set(notification).addOnSuccessListener {
+            println("Notification added to notifications.")
+        }.addOnFailureListener {
+            println("Notification couldn't added to notifications.")
+        }
 }

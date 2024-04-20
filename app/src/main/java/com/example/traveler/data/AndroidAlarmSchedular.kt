@@ -22,6 +22,7 @@ class AndroidAlarmSchedular(
             putExtra("TASK_TIME", item.startTime)
             putExtra("TITLE", item.title)
             putExtra("NOTIFIED", item.notified)
+            putExtra("SEEN", item.seen)
         }
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,

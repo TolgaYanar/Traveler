@@ -7,6 +7,7 @@ data class AlarmItem(
     val message: String = "",
     val id: String = "",
     val startTime : Long = 0L,
-    val title : String = ""
+    val title : String = "",
+    var seen : Boolean = false
 )
 
