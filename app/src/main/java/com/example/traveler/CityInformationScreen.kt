@@ -70,7 +70,8 @@ import java.util.Locale
 fun CityInformationScreen(country: Country,
                           navController: NavController,
                           tourismViewModel: TourismViewModel = viewModel(),
-                          weatherViewModel: WeatherViewModel = viewModel()
+                          weatherViewModel: WeatherViewModel = viewModel(),
+                          journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()
                           ){
 
     LaunchedEffect(key1 = true){
@@ -85,7 +86,7 @@ fun CityInformationScreen(country: Country,
     val otherUsers =  remember { mutableListOf<User>() }
 
     LaunchedEffect(key1 = true){
-        getRandomUsersWithMatchingLocation(1,country.capital,otherUsers)
+        journalPropertiesViewModel.getRandomUsersWithMatchingLocation(1,country.capital,otherUsers)
     }
 
     Scaffold(
@@ -242,7 +243,7 @@ fun previ(){
         Flag("","",""),"","", latLng(listOf(0.0,0.0), listOf(0.0,0.0))), navController = rememberNavController())
 }
 
-fun formattedDouble(doubleValue: Double?): String {
+private fun formattedDouble(doubleValue: Double?): String {
     return String.format(Locale.getDefault(), "%.1f", doubleValue)
 }
 
@@ -254,52 +255,5 @@ private fun getDrawableResourceId(imageName: String): Int {
     } catch (e: Exception) {
         e.printStackTrace()
         0 // Return 0 if resource not found
-    }
-}
-
-@OptIn(DelicateCoroutinesApi::class)
-fun getRandomUsersWithMatchingLocation(number : Int, location : String, list : MutableList<User>){
-
-    GlobalScope.launch {
-
-        val usersID = mutableListOf<String>()
-        val users = mutableListOf<String>()
-        val firestore = Injection.instance()
-
-        val usersCollection = firestore.collection("users")
-        val usersCollectionSnapshot = usersCollection.get().await()
-
-        usersCollectionSnapshot?.forEach { document->
-            val userId = document.reference.id
-            if (!usersID.contains(userId) && userId !=  FirebaseAuth.getInstance().uid) {
-                usersID.add(userId)
-                if(usersID.size == number){
-                    return@forEach
-                }
-            }
-        }
-
-        for (id in usersID){
-            val journalsShapshot = usersCollection.document(id).collection("journals").get().await()
-
-            journalsShapshot.forEach { journal->
-                val journalRef = journal.toObject(Journal::class.java)
-
-                val currentDate = Calendar.getInstance().time.time
-                val journalEndDate = journalRef.endDateInMillis
-                if(journalRef.location.contains(location) && !journalRef.private && currentDate>journalEndDate){
-                    if(!users.contains(id)){
-                        users.add(id)
-                    }
-                }
-            }
-        }
-        list.shuffle()
-        users.forEach { userID->
-            val user = usersCollection.document(userID).get().await().toObject(User::class.java)
-            if (user != null) {
-                list.add(user)
-            }
-        }
     }
 }

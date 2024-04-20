@@ -45,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
@@ -57,7 +58,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.SetOptions
 
 @Composable
-fun RecentTripScreen(navController: NavController, journal: Journal, user: User){
+fun RecentTripScreen(navController: NavController, journal: Journal, user: User,
+                     journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
 
     val notes by remember {
         mutableStateOf(mutableStateOf(emptyList<Notes>()))
@@ -68,7 +70,7 @@ fun RecentTripScreen(navController: NavController, journal: Journal, user: User)
     }
 
     LaunchedEffect(key1 = true){
-        getNotes(journal, notes, user = user)
+        journalPropertiesViewModel.getNotes(journal, notes, user = user)
     }
 
     Box(modifier = Modifier.fillMaxSize()){
@@ -130,7 +132,7 @@ fun RecentTripScreen(navController: NavController, journal: Journal, user: User)
                                 horizontalArrangement = Arrangement.Start) {
                                 Card(backgroundColor = Color.Magenta, modifier = Modifier.padding(4.dp),
                                     shape = RoundedCornerShape(15.dp)){
-                                    Text(text = "${getDayDifference(journal.startDateInMillis,journal.endDateInMillis)} days",
+                                    Text(text = "${journalPropertiesViewModel.getDayDifference(journal.startDateInMillis,journal.endDateInMillis)} days",
                                         fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp))
                                 }
                                 Card(backgroundColor = Color.Magenta, modifier = Modifier.padding(4.dp),

@@ -69,7 +69,8 @@ import java.util.TimeZone
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddJournal(navController: NavController,
-               profileViewModel: ProfileViewModel = viewModel()){
+               profileViewModel: ProfileViewModel = viewModel(),
+               journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
 
     var title by remember {
         mutableStateOf("")
@@ -161,7 +162,7 @@ fun AddJournal(navController: NavController,
                                 })
                     }
                     if(colorPickerVisibility){
-                        ColorPicker(onDismissRequest = { colorPickerVisibility = false },
+                        journalPropertiesViewModel.ColorPicker(onDismissRequest = { colorPickerVisibility = false },
                             onColorSelected = {
                                 color = it
                                 colorPickerVisibility = false
@@ -172,7 +173,7 @@ fun AddJournal(navController: NavController,
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                TextField(value = "" + longToDate(startDateInMillis), onValueChange = {}, modifier = Modifier.padding(vertical = 10.dp),
+                TextField(value = "" + journalPropertiesViewModel.longToDate(startDateInMillis), onValueChange = {}, modifier = Modifier.padding(vertical = 10.dp),
                     label = {
                         Text(text = "Starting Time")
                     }, enabled = false,
@@ -184,7 +185,7 @@ fun AddJournal(navController: NavController,
                     }
                 )
 
-                TextField(value = "" + longToDate(endDateInMillis), onValueChange = {}, modifier = Modifier.padding(vertical = 10.dp),
+                TextField(value = "" + journalPropertiesViewModel.longToDate(endDateInMillis), onValueChange = {}, modifier = Modifier.padding(vertical = 10.dp),
                     label = {
                         Text(text = "Ending Time")
                     }, enabled = false,
@@ -236,10 +237,13 @@ fun AddJournal(navController: NavController,
 
                 Row(modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 20.dp).padding(top = 20.dp), horizontalArrangement = Arrangement.End)
+                    .padding(horizontal = 20.dp)
+                    .padding(top = 20.dp), horizontalArrangement = Arrangement.End)
                 {
 
-                    Column(modifier = Modifier.fillMaxHeight().padding(horizontal = 60.dp), verticalArrangement = Arrangement.Top,
+                    Column(modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(horizontal = 60.dp), verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.CenterHorizontally) {
                         Checkbox(checked = private, onCheckedChange = {
                             private = !private
@@ -256,8 +260,8 @@ fun AddJournal(navController: NavController,
                                 "title" to title,
                                 "location" to location,
                                 "color" to color.value.toString(),
-                                "startDate" to longToDate(startDateInMillis),
-                                "endDate" to longToDate(endDateInMillis),
+                                "startDate" to journalPropertiesViewModel.longToDate(startDateInMillis),
+                                "endDate" to journalPropertiesViewModel.longToDate(endDateInMillis),
                                 "startDateInMillis" to startDateInMillis,
                                 "endDateInMillis" to endDateInMillis,
                                 "notes" to notes,
@@ -295,75 +299,4 @@ fun AddJournal(navController: NavController,
 @Composable
 fun preview(){
     AddJournal(navController = rememberNavController())
-}
-
-@Composable
-fun ColorPicker(onDismissRequest: () -> Unit,
-                onColorSelected: (Color) -> Unit)
-{
-    var red by remember {
-        mutableStateOf(0f)
-    }
-    var blue by remember {
-        mutableStateOf(0f)
-    }
-    var green by remember {
-        mutableStateOf(0f)
-    }
-
-
-    Dialog(onDismissRequest = { onDismissRequest() })
-    {
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            elevation = 6.dp
-        ) {
-            Column(
-                modifier = Modifier.padding(8.dp)
-            ) {
-
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .background(Color(red = red / 255f, blue = blue / 255f, green = green / 255f))
-                )
-
-                Text(text = "Red : ${red.toInt()}")
-                Slider(value = red, onValueChange = {
-                    red = it
-                }, valueRange = 0f..255f)
-
-                Text(text = "Blue : ${blue.toInt()}")
-                Slider(value = blue, onValueChange = {
-                    blue = it
-                }, valueRange = 0f..255f)
-
-                Text(text = "Green : ${green.toInt()}")
-                Slider(value = green, onValueChange = {
-                    green = it
-                }, valueRange = 0f..255f)
-
-                Button(onClick = {
-                    onColorSelected(Color(red = red/255f, green = green/255f, blue = blue/255f))
-                    onDismissRequest() }, modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Choose")
-                }
-            }
-        }
-    }
-}
-
-fun longToDate(longDate: Long?): String? {
-    val date = longDate?.let { Date(it) }
-    val dateFormat = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault())
-    dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-    return date?.let { dateFormat.format(it) }
-}
-
-fun dateToLong(dateString: String): Long {
-    val dateFormat = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault())
-    dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-    val date = dateFormat.parse(dateString)
-    return date?.time ?: 0L
 }

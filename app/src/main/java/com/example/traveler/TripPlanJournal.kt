@@ -75,7 +75,8 @@ import kotlinx.coroutines.tasks.await
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripPlanJournalScreen(navController: NavController, journal: Journal,
-                          profileViewModel: ProfileViewModel = viewModel()){
+                          profileViewModel: ProfileViewModel = viewModel(),
+                          journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
 
     val user by profileViewModel.currentUser.observeAsState()
 
@@ -153,7 +154,7 @@ fun TripPlanJournalScreen(navController: NavController, journal: Journal,
                 }
 
                 LaunchedEffect(key1 = true){
-                    getNotes(journal, notes, user)
+                    journalPropertiesViewModel.getNotes(journal, notes, user)
                 }
 
                 LazyColumn(
@@ -188,23 +189,6 @@ fun TripPlanJournalScreen(navController: NavController, journal: Journal,
             }else{
                 CircularProgressIndicator()
             }
-        }
-    }
-
-}
-
-fun getNotes(journal : Journal, list : MutableState<List<Notes>>, user : User?){
-
-    GlobalScope.launch {
-        val firestore = Injection.instance()
-        val notesCollection = user?.let {
-            firestore.collection("users").document(it.uid)
-                .collection("journals").document(journal.title).collection("notes")
-                .orderBy("added")
-        }
-        val notesSnapshot = notesCollection?.get()?.await()
-        if (notesSnapshot != null) {
-            list.value = notesSnapshot.toObjects(Notes::class.java)
         }
     }
 

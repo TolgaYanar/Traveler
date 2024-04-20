@@ -74,7 +74,8 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 @Composable
-fun EditProfileScreen(navController: NavController){
+fun EditProfileScreen(navController: NavController,
+                      authenticationViewModel: AuthenticationViewModel = viewModel()){
 
     val auth = FirebaseAuth.getInstance()
     val currentUser = auth.currentUser
@@ -179,7 +180,9 @@ fun EditProfileScreen(navController: NavController){
                             })
                     }
                     Spacer(modifier = Modifier.height(40.dp))
-                    Column(modifier = Modifier.padding(horizontal = 10.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
+                    Column(modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
 
 
                         TextField(value = user!!.fullName, onValueChange = {fullname -> user = user!!.copy(fullName = fullname)},
@@ -261,7 +264,7 @@ fun EditProfileScreen(navController: NavController){
                                 else{
                                     Injection.instance().collection("users").document(user!!.uid).set(user!!)
                                     if(newPassword.isNotEmpty() && currentPassword.isNotEmpty()) {
-                                        reauthentication(
+                                        authenticationViewModel.reauthentication(
                                             user = currentUser,
                                             currentPassword = currentPassword,
                                             newPassword = newPassword,
@@ -269,7 +272,7 @@ fun EditProfileScreen(navController: NavController){
                                         )
                                     }
                                     else if(newEmail != currentUser.email && newEmail.isNotEmpty()){
-                                        updateEmail(newEmail, context)
+                                        authenticationViewModel.updateEmail(newEmail, context)
                                     }
                                     navController.navigate(Screen.UserProfileScreen.route)
                                 }
@@ -289,58 +292,4 @@ fun EditProfileScreen(navController: NavController){
         }
     }
 
-}
-
-private fun reauthentication(user: FirebaseUser?, currentPassword: String, newPassword: String, context: Context){
-
-    GlobalScope.launch {
-        if(user!= null){
-            val credential = EmailAuthProvider.getCredential(user.email!!, currentPassword)
-            user.reauthenticate(credential).addOnCompleteListener{completion ->
-                if(completion.isSuccessful) {
-                    //success
-                    user.updatePassword(newPassword).addOnCompleteListener {success ->
-                        if(success.isSuccessful){
-                            user.sendEmailVerification()
-                            showToast("Password updated successfully", context)
-                        }
-                    }
-                }else{
-                    //fail
-                    showToast("Password couldn't updated", context)
-                }
-            }
-        } else{
-            //Reauthentication failed
-            showToast("Reauthentication failed!", context = context )
-        }
-    }
-}
-
-@OptIn(DelicateCoroutinesApi::class)
-private fun updateEmail(newEmail: String, context: Context){
-
-    GlobalScope.launch {
-        val auth = FirebaseAuth.getInstance()
-        val currentUser = auth.currentUser
-
-        if (currentUser != null) {
-            try {
-                currentUser.verifyBeforeUpdateEmail(newEmail).await()
-                // Email verification sent successfully
-                showToast("Verify your new email!", context)
-                println("Email update successful")
-            } catch (e: Exception) {
-                // Email verification sending failed
-                showToast("Error occurred while trying to send email verification", context)
-                println("Error sending email verification: ${e.message}")
-            }
-        }
-    }
-}
-
-private fun showToast(message: String, context: Context) {
-    Handler(Looper.getMainLooper()).post {
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-    }
 }

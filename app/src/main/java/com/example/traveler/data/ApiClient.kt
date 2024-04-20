@@ -2,17 +2,16 @@ package com.example.traveler.data
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 
 object ApiClient {
-    private const val BASE_URL = "https://countryapi.io/api/"
+    private const val BASE_URL_COUNTRY = "https://countryapi.io/api/"
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+    private val retrofitCountry = Retrofit.Builder()
+        .baseUrl(BASE_URL_COUNTRY)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val apiService: ApiInterface = retrofit.create(ApiInterface::class.java)
+    val apiServiceCountry: ApiInterface = retrofitCountry.create(ApiInterface::class.java)
 
 
     private const val BASE_URL_IMAGE = "https://api.pexels.com/v1/"

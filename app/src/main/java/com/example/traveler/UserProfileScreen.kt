@@ -71,7 +71,9 @@ import java.util.Calendar
 @Composable
 fun UserProfileScreen(
     navController: NavController, profileViewModel: ProfileViewModel = viewModel(),
-    user: User? = profileViewModel.currentUser.value){
+    user: User? = profileViewModel.currentUser.value,
+    journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()
+    ){
 
     val currentUser by profileViewModel.currentUser.observeAsState()
 
@@ -102,7 +104,7 @@ fun UserProfileScreen(
     LaunchedEffect(key1 = isFollowing){
         if (!isOwnProfile){
             if (user != null) {
-                isFollowing(user, isFollowing, followingBox)
+                profileViewModel.isFollowing(user, isFollowing, followingBox)
             }
         }
     }
@@ -359,7 +361,7 @@ fun UserProfileScreen(
                     }
 
                     if(expanded){
-                        UpdateJournal(
+                        profileViewModel.UpdateJournal(
                             journals = journals,
                             onDismissRequest = { expanded = false },
                             onSuccessRequest = {journal->
@@ -431,7 +433,7 @@ fun UserProfileScreen(
                                                 }
                                             }
                                         }
-                                        Text(text = "${getDayDifference(journalEndDate,currentDate)} days ago...", fontWeight = FontWeight.Bold,
+                                        Text(text = "${journalPropertiesViewModel.getDayDifference(journalEndDate,currentDate)} days ago...", fontWeight = FontWeight.Bold,
                                             modifier = Modifier
                                                 .alpha(0.5f)
                                                 .padding(horizontal = 15.dp))
@@ -471,115 +473,4 @@ fun UserProfileScreen(
 @Composable
 fun prrreview(){
     UserProfileScreen(navController = rememberNavController())
-}
-
-@Composable
-fun UpdateJournal(journals : MutableState<List<Journal>>, onDismissRequest: () -> Unit,
-                  onSuccessRequest: (Journal) -> Unit ){
-    var title by remember {
-        mutableStateOf("")
-    }
-    var location by remember {
-        mutableStateOf("")
-    }
-    var color by remember {
-        mutableStateOf(Color.White.value)
-    }
-    var startDateInMillis by remember {
-        mutableStateOf(Calendar.getInstance().time.time)
-    }
-    var endDateInMillis by remember {
-        mutableStateOf(Calendar.getInstance().time.time)
-    }
-    var startDate by remember {
-        mutableStateOf("")
-    }
-    var endDate by remember {
-        mutableStateOf("")
-    }
-    var notes by remember {
-        mutableStateOf("")
-    }
-
-    Dialog(onDismissRequest = { onDismissRequest() }) {
-
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            elevation = 6.dp
-        ) {
-
-            LazyColumn(modifier = Modifier
-                .padding(8.dp)
-                .fillMaxSize(0.75f),
-                verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally)
-            {
-
-                journals.value.let {journals->
-
-                    items(journals){journal->
-
-                        Card(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp)
-                            .clickable {
-                                title = journal.title
-                                location = journal.location
-                                color = journal.color.toULong()
-                                startDateInMillis = journal.startDateInMillis
-                                endDateInMillis = journal.endDateInMillis
-                                startDate = journal.startDate
-                                endDate = journal.endDate
-                                notes = journal.notes
-
-                                val currentJournal = Journal(
-                                    title = title,
-                                    location = location,
-                                    color = color.toString(),
-                                    startDateInMillis = startDateInMillis,
-                                    endDateInMillis = endDateInMillis,
-                                    endDate = endDate,
-                                    startDate = startDate,
-                                    notes = notes
-                                )
-
-                                onSuccessRequest(currentJournal)
-                            },
-                            backgroundColor = Color(journal.color.toULong()))
-                        {
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
-                                Text(text = journal.title, modifier = Modifier.padding(10.dp))
-                            }
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomStart) {
-                                Text(text = journal.location, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(DelicateCoroutinesApi::class)
-fun isFollowing(user: User, isFollowing : MutableState<Boolean?>, followingBox : MutableState<String?>){
-
-    GlobalScope.launch {
-        isFollowing.value = false
-        followingBox.value = "Follow"
-        val firestore = Injection.instance()
-        val currentUser = FirebaseAuth.getInstance().currentUser
-
-        val followingCollectionSnapshot = currentUser?.let {
-            firestore.collection("users").document(it.uid).collection("following")
-                .get().await()
-        }
-
-        followingCollectionSnapshot?.forEach { following ->
-            if (user.uid == following.id) {
-                isFollowing.value = true
-                followingBox.value = "Following"
-            }
-        }
-
-    }
 }

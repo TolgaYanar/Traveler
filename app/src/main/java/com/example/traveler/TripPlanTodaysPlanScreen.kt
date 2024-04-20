@@ -84,10 +84,11 @@ import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal){
+fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
+                             journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
 
 
-    val journalDuration = getDayDifference(
+    val journalDuration = journalPropertiesViewModel.getDayDifference(
         startDate = journal.startDateInMillis,
         endDate = journal.endDateInMillis
     )
@@ -208,7 +209,7 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal){
                                             selected = it
                                             selectedDay = "day${selected + 1}"
                                             selectedTasks = SnapshotStateList()
-                                            loadTasksOfDay(journal, selectedDay!!, selectedTasks)
+                                            journalPropertiesViewModel.loadTasksOfDay(journal, selectedDay!!, selectedTasks)
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -227,7 +228,7 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal){
                         .padding(vertical = 20.dp), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top
                 ) {
                     calendar.timeZone = TimeZone.getTimeZone("Europe/Istanbul")
-                    longToDate(calendar.time.time)?.let {
+                    journalPropertiesViewModel.longToDate(calendar.time.time)?.let {
                             it1 -> Text(text = it1, fontSize = 17.sp, fontWeight = FontWeight.Bold,
                         modifier = Modifier.alpha(0.8f))}
 
@@ -260,7 +261,7 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal){
                                                     .background(Color.Transparent)
                                                     .padding(horizontal = 10.dp)
                                                     .padding(top = 10.dp)) {
-                                                    Text(text = longToTime(it.startTime), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                                    Text(text = journalPropertiesViewModel.longToTime(it.startTime), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                                 }
                                                 Column(modifier = Modifier
                                                     .padding(horizontal = 10.dp)
@@ -310,7 +311,7 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal){
                                                                 .width(40.dp)
                                                                 .background(Color.Red)
                                                                 .clickable {
-                                                                    deleteTask(
+                                                                    journalPropertiesViewModel.deleteTask(
                                                                         selectedDay!!,
                                                                         navController,
                                                                         it,
@@ -362,67 +363,4 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal){
 fun Preview(){
     TripPlanTodaysPlanScreen(navController = rememberNavController(),
         journal = Journal())
-}
-
-fun getDayDifference(startDate : Long, endDate : Long) : Int{
-
-    val difference = endDate - startDate
-
-    return (difference / (24*60*60*1000)).toInt() + 1
-}
-
-
-@OptIn(DelicateCoroutinesApi::class)
-fun loadTasksOfDay(journal: Journal, day: String, tasks : MutableList<Task>){
-
-    GlobalScope.launch{
-        try {
-            val user = FirebaseAuth.getInstance().currentUser
-            val firestore = Injection.instance()
-            //val tasksList =  mutableListOf<Task>()
-            //val list: MutableList<Map<String, Any>> = mutableListOf()
-
-            val dayCollectionRef = firestore.collection("users")
-                .document(user!!.uid).collection("journals").document(journal.title)
-                .collection("days").document(day).collection("tasks").orderBy("startTime")
-
-            val daySnapshot = dayCollectionRef.get().await()
-
-
-            for (task in daySnapshot.documents){
-                val eachTask = task.toObject(Task::class.java)
-                if (eachTask != null) {
-                    tasks.add(eachTask)
-                }
-            }
-
-
-        }catch (e : Exception){
-            e.printStackTrace()
-        }
-    }
-}
-
-fun deleteTask(selectedDay : String, navController: NavController,
-               task: Task, journal: Journal, context: Context)
-{
-    val notificationManager = NotificationManagerCompat.from(context)
-    notificationManager.cancel(task.notificationID.toInt())
-
-    val androidAlarmSchedular = AndroidAlarmSchedular(context)
-
-    androidAlarmSchedular.cancel(task.alarmItemHashCode)
-
-    FirebaseAuth.getInstance().uid?.let { it1 ->
-        Injection.instance().collection("users")
-            .document(it1).collection("journals").document(journal.title)
-            .collection("days").document(selectedDay)
-            .collection("tasks").document(task.title).delete()
-            .addOnSuccessListener {
-                println("Task deleted successfully")
-                navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
-                navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
-            }
-            .addOnFailureListener { println("Error occurred while trying to delete task") }
-    }
 }

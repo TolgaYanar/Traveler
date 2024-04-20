@@ -14,7 +14,6 @@ import com.example.traveler.data.Country
 import com.example.traveler.data.Journal
 import com.example.traveler.data.User
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation(
     navController: NavHostController = rememberNavController(),

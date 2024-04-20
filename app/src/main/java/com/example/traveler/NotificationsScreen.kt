@@ -56,6 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.traveler.data.AlarmItem
@@ -76,7 +77,8 @@ import java.util.Calendar
 import java.util.TimeZone
 
 @Composable
-fun NotificationsScreen(navController: NavController) {
+fun NotificationsScreen(navController: NavController,
+                        journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()) {
 
     val bottomNavClass = BottomNavigationClass()
     bottomNavClass.selectedItemIndex = 2
@@ -90,7 +92,7 @@ fun NotificationsScreen(navController: NavController) {
     }
 
     LaunchedEffect(key1 = notifications){
-        getNotifications(notifications)
+        journalPropertiesViewModel.getNotifications(notifications)
     }
 
     Scaffold(
@@ -202,7 +204,7 @@ fun NotificationsScreen(navController: NavController) {
                                 Row {
                                     Icon(painter = painterResource(id = R.drawable.baseline_notifications_24),
                                         contentDescription = null)
-                                    Text(text = longToTime(notification.startTime), fontSize = 16.sp,
+                                    Text(text = journalPropertiesViewModel.longToTime(notification.startTime), fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold)
                                 }
                                 Row(modifier = Modifier
@@ -215,7 +217,7 @@ fun NotificationsScreen(navController: NavController) {
                                     verticalAlignment = Alignment.Bottom,
                                     horizontalArrangement = Arrangement.End)
                                 {
-                                    Text(text = longToTime(notification.notified + 3 * 60 * 60 * 1000), fontSize = 16.sp,
+                                    Text(text = journalPropertiesViewModel.longToTime(notification.notified + 3 * 60 * 60 * 1000), fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold)
                                 }
                             }
@@ -227,41 +229,9 @@ fun NotificationsScreen(navController: NavController) {
     }
 }
 
-@OptIn(DelicateCoroutinesApi::class)
-fun getNotifications(notificationList : MutableState<List<AlarmItem>>){
-
-    GlobalScope.launch {
-        val firestore = Injection.instance()
-        val userID = FirebaseAuth.getInstance().uid
-
-        val notificationsCollection = firestore.collection("users")
-            .document(userID!!).collection("notifications").orderBy("startTime")
-
-        val notificationsCollectionSnap = notificationsCollection.get().await()
-
-        notificationList.value = notificationsCollectionSnap.toObjects(AlarmItem::class.java)
-        notificationList.value = notificationList.value.reversed()
-    }
-}
-
-@OptIn(DelicateCoroutinesApi::class)
-fun deleteNotification(id : String){
-
-    GlobalScope.launch {
-        val firestore = Injection.instance()
-        val userID = FirebaseAuth.getInstance().uid
-
-        val notificationDocument = firestore.collection("users")
-            .document(userID!!).collection("notifications").document(id)
-
-        val deleteNotification = notificationDocument.delete()
-
-    }
-}
-
 @Preview
 @Composable
-fun previi(){
+fun previi(journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
     Card(
         modifier = Modifier
             .width(300.dp)
@@ -276,7 +246,7 @@ fun previi(){
                 Row {
                     Icon(painter = painterResource(id = R.drawable.baseline_notifications_24),
                         contentDescription = null)
-                    Text(text = longToTime(1713578820000), fontSize = 16.sp,
+                    Text(text = journalPropertiesViewModel.longToTime(1713578820000), fontSize = 16.sp,
                         fontWeight = FontWeight.Bold)
                 }
                 Row(modifier = Modifier
@@ -289,7 +259,7 @@ fun previi(){
                     verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.End)
                 {
-                    Text(text = longToTime(1713567720000), fontSize = 16.sp,
+                    Text(text = journalPropertiesViewModel.longToTime(1713567720000), fontSize = 16.sp,
                         fontWeight = FontWeight.Bold)
                 }
             }

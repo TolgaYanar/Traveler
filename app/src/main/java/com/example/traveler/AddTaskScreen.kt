@@ -49,6 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.traveler.data.AlarmItem
 import com.example.traveler.data.AndroidAlarmSchedular
@@ -63,7 +64,8 @@ import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Long, dayNumber : Int){
+fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Long, dayNumber : Int,
+                  journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
 
     var title by remember {
         mutableStateOf("TITLE")
@@ -169,7 +171,7 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                                 repeatExpanded = !repeatExpanded
                             })
                     })
-                DropDownMenu(
+                journalPropertiesViewModel.DropDownMenu(
                     list = listOf("Once", "Often", "Always"),
                     expanded = repeatExpanded,
                     onDismissRequest = { repeatExpanded = false },
@@ -186,7 +188,7 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                                 reminderExpanded = !repeatExpanded
                             })
                     })
-                DropDownMenu(
+                journalPropertiesViewModel.DropDownMenu(
                     list = listOf("5", "10", "15", "30"),
                     expanded = reminderExpanded,
                     onDismissRequest = { reminderExpanded = false },
@@ -213,12 +215,12 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
 
                             val task = hashMapOf<String, Any>(
                                 "title" to title,
-                                "startTime" to (timeToLong(startTime) + thatDay),
-                                "endTime" to (timeToLong(endTime) + thatDay),
+                                "startTime" to (journalPropertiesViewModel.timeToLong(startTime) + thatDay),
+                                "endTime" to (journalPropertiesViewModel.timeToLong(endTime) + thatDay),
                                 "notes" to notes,
                                 "remind" to reminder
                             )
-                            addTask(context, repeat, reminder = reminder, journal, dayNumber, task = task)
+                            journalPropertiesViewModel.addTask(context, repeat, reminder = reminder, journal, dayNumber, task = task)
                             navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
                             navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
 
@@ -322,118 +324,5 @@ fun TimePicker(onDismissRequest: () -> Unit,
             }
         }
     }
-}
-
-fun longToTime(longDate: Long): String {
-    val date = Date(longDate)
-    val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-    dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-    return date.let { dateFormat.format(it) }
-}
-
-fun timeToLong(timeString: String): Long {
-    val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-    dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-    val date = dateFormat.parse(timeString)
-    return (date?.time ) ?: 0L
-}
-
-@Composable
-fun DropDownMenu(list : List<Any>, expanded : Boolean,
-                 onDismissRequest: () -> Unit, onClick: (Any) -> Unit){
-
-    DropdownMenu(expanded = expanded, onDismissRequest = { onDismissRequest() }) {
-
-        list.forEach {item->
-            DropdownMenuItem(onClick = { onClick(item) }) {
-                Text(text = item.toString(), fontSize = 16.sp, modifier = Modifier.fillMaxSize(),
-                    textAlign = TextAlign.Center)
-            }
-        }
-    }
-}
-
-fun addTask(context: Context, repeat : String, reminder : String, journal : Journal, dayNum : Int, task : HashMap<String, Any>){
-
-    val daysCollection = Injection.instance().collection("users").document(FirebaseAuth.getInstance().uid!!)
-        .collection("journals").document(journal.title).collection("days")
-
-    val journalDuration = getDayDifference(journal.startDateInMillis, journal.endDateInMillis)
-
-    val schedular = AndroidAlarmSchedular(context)
-
-    if(repeat.equals("Always")){
-        for (day in 0 until journalDuration){
-            if(day != 0){
-                task.set("startTime", task.get("startTime").toString().toLong() + 24 * 60 * 60 * 1000)
-                task.set("endTime", task.get("endTime").toString().toLong() + 24 * 60 * 60 * 1000)
-            }
-
-            addAlarm(schedular, (task["startTime"].toString().toLong()-reminder.toLong()*60*1000),
-                "${task["title"]} at ${longToTime(task["startTime"].toString().toLong())}", task)
-
-            daysCollection.document("day${day + 1}").set({})
-            daysCollection.document("day${day+1}").collection("tasks")
-                .document(task["title"].toString()).set(task)
-                .addOnSuccessListener {
-                    println("task added for day${day+1}")
-                }
-                .addOnFailureListener {
-                    println("task couldn't add for day${day+1}")
-                }
-        }
-    }
-    else if(repeat.equals("Often")){
-        for (day in 0 until journalDuration step 2){
-            if(day != 0){
-                task.set("startTime", task.get("startTime").toString().toLong() + 2 * 24 * 60 * 60 * 1000)
-                task.set("endTime", task.get("endTime").toString().toLong() + 2 * 24 * 60 * 60 * 1000)
-            }
-
-            addAlarm(schedular, (task["startTime"].toString().toLong()-reminder.toLong()*60*1000),
-                "${task["title"]} at ${longToTime(task["startTime"].toString().toLong())}", task)
-
-            daysCollection.document("day${day + 1}").set({})
-            daysCollection.document("day${day+1}").collection("tasks")
-                .document(task["title"].toString()).set(task)
-                .addOnSuccessListener {
-                    println("task added for day${day+1}")
-                }
-                .addOnFailureListener {
-                    println("task couldn't add for day${day+1}")
-                }
-        }
-    }
-    else{
-        addAlarm(schedular, (task["startTime"].toString().toLong()-reminder.toLong()*60*1000),
-            "${task["title"]} at ${longToTime(task["startTime"].toString().toLong())}", task)
-
-        daysCollection.document("day${dayNum}").set({})
-        daysCollection.document("day${dayNum}").collection("tasks")
-            .document(task["title"].toString()).set(task)
-            .addOnSuccessListener {
-                println("task added for day${dayNum}")
-            }
-            .addOnFailureListener {
-                println("task couldn't add for day${dayNum}")
-            }
-    }
-}
-
-fun addAlarm(schedular : AndroidAlarmSchedular,
-             time: Long, message : String,
-             task : HashMap<String, Any>)
-{
-    val alarmItem = AlarmItem(
-        notified = time - 3 * 60 * 60 * 1000,
-        message = message,
-        id = Random.nextInt(10000,99999).toString(),
-        startTime = task.get("startTime").toString().toLong(),
-        title = task.get("title").toString()
-    )
-    task.put("notificationID", alarmItem.id)
-    task.put("alarmItemHashCode", alarmItem.hashCode())
-    alarmItem.let(schedular::schedule)
-
 }
 

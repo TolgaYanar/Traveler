@@ -1,17 +1,13 @@
 package com.example.traveler
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traveler.data.ApiClient
 import com.example.traveler.data.Country
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class CountryViewModel : ViewModel() {
@@ -28,7 +24,7 @@ class CountryViewModel : ViewModel() {
     private fun fetchData() {
         viewModelScope.launch{
             try {
-                val response = ApiClient.apiService.getCapital(city = "paris")
+                val response = ApiClient.apiServiceCountry.getCapital(city = "paris")
                 _countryData.value = response.id
 
             } catch (e: Exception) {
@@ -42,7 +38,7 @@ class CountryViewModel : ViewModel() {
             val countriesToFetch = listOf("ankara", "berlin")//"ankara", "berlin", "tokyo", "london","canberra","Washington, D.C.", "kabul","amsterdam","moscow","brussels"
             for (countryName in countriesToFetch) {
                 try {
-                    val country = ApiClient.apiService.getCapital(countryName)
+                    val country = ApiClient.apiServiceCountry.getCapital(countryName)
                     val image = ApiClient.apiServiceImage.getImage(countryName).photos.get(0).src.original
                     country.id.imageUrl = image
                     countryList.add(country.id)

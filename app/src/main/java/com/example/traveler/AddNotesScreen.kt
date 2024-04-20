@@ -49,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
@@ -62,7 +63,8 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddNotesScreen(navController: NavController, journal: Journal){
+fun AddNotesScreen(navController: NavController, journal: Journal,
+                   journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
 
     val context = LocalContext.current
 
@@ -211,7 +213,7 @@ fun AddNotesScreen(navController: NavController, journal: Journal){
                         verticalAlignment = Alignment.Bottom
                     ) {
                         Button(onClick = {
-                            uploadToNotes(image, journal, context)
+                            journalPropertiesViewModel.uploadToNotes(image, journal, context)
                         }) {
                             Text(text = "Add Image")
                         }
@@ -234,7 +236,7 @@ fun AddNotesScreen(navController: NavController, journal: Journal){
                     )
 
                     Button(onClick = {
-                        uploadToNotes(text, journal, context)
+                        journalPropertiesViewModel.uploadToNotes(text, journal, context)
                         text = ""
                     }) {
                         Text(text = "Add Text")
@@ -250,22 +252,4 @@ fun AddNotesScreen(navController: NavController, journal: Journal){
 @Composable
 fun addnotespreview(){
     AddNotesScreen(navController = rememberNavController(), journal = Journal())
-}
-
-fun uploadToNotes(imageOrText : String, journal : Journal, context: Context){
-    val user = FirebaseAuth.getInstance().currentUser
-    val added = Calendar.getInstance().time.time
-    val firestore = Injection.instance()
-    val notesCollection = firestore.collection("users").document(user!!.uid).collection("journals")
-        .document(journal.title).collection("notes")
-    val noteDoc = notesCollection.document(added.toString())
-    val hashmap = hashMapOf<String, Any>(
-        "note" to imageOrText,
-        "added" to added
-    )
-    noteDoc.set(hashmap).addOnSuccessListener {
-        Toast.makeText(context, "Added to notes successfully", Toast.LENGTH_SHORT).show()
-    }.addOnFailureListener {
-        Toast.makeText(context, "Couldn't added to notes. Error.", Toast.LENGTH_SHORT).show()
-    }
 }
