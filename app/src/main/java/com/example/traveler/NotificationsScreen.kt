@@ -17,10 +17,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Badge
 import androidx.compose.material.BadgedBox
+import androidx.compose.material.Checkbox
 import androidx.compose.material.IconButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -31,6 +33,8 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -53,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -91,6 +96,18 @@ fun NotificationsScreen(navController: NavController,
         mutableStateOf(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())
     }
 
+    var deleteMode by remember {
+        mutableStateOf(false)
+    }
+
+    val deleteFolder by remember {
+        mutableStateOf(mutableListOf<AlarmItem>())
+    }
+
+    var printedNotifications by remember {
+        mutableStateOf(0)
+    }
+
     LaunchedEffect(key1 = notifications){
         journalPropertiesViewModel.getNotifications(notifications)
     }
@@ -113,7 +130,7 @@ fun NotificationsScreen(navController: NavController,
                             modifier = Modifier.size(30.dp,30.dp))
                     }
                     IconButton(onClick = {
-                        navController.navigate(Screen.UserProfileScreen.route)
+                        deleteMode = !deleteMode
                     }) {
                         Icon(imageVector = Icons.Default.Delete, contentDescription = null,
                             modifier = Modifier.size(30.dp,30.dp))
@@ -158,12 +175,6 @@ fun NotificationsScreen(navController: NavController,
         {
 
             if (notifications.value.isNotEmpty()){
-                item {
-                    Text(text = "Today", fontSize = 20.sp, fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .alpha(0.6f)
-                            .padding(10.dp))
-                }
 
                 notifications.value.forEach {
                     if(it.seen == false){
@@ -180,51 +191,110 @@ fun NotificationsScreen(navController: NavController,
                     }
                 }
 
+                item {
+
+                    Text(text = "Today", fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .alpha(0.6f)
+                            .padding(5.dp)
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Start)
+
+                }
+
                 items(notifications.value){notification ->
 
-                    Card(
-                        modifier = Modifier
-                            .width(300.dp)
-                            .height(100.dp)
-                            .padding(10.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor =
-                                if(notification.seen && currentTime >= notification.startTime - 3 * 60 * 60 * 1000){
-                                    Color.Red
-                                }else {
-                                    Color.Green
-                                }
+                    if(currentTime - notification.notified <= 24*60*60*1000){
+                        notificationCard(
+                            deleteMode = deleteMode,
+                            deleteFolder = deleteFolder,
+                            notification = notification,
+                            currentTime = currentTime,
+                            journalPropertiesViewModel = journalPropertiesViewModel
                         )
-                    ) {
-                        Box(modifier = Modifier
+                    }
+
+                }
+
+                item {
+
+                    Text(text = "Yesterday", fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .alpha(0.6f)
                             .padding(5.dp)
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Start)
+
+                }
+
+                items(notifications.value){notification ->
+
+                    if(currentTime - notification.notified > 24*60*60*1000
+                        && currentTime - notification.notified <= 48*60*60*1000){
+                        notificationCard(
+                            deleteMode = deleteMode,
+                            deleteFolder = deleteFolder,
+                            notification = notification,
+                            currentTime = currentTime,
+                            journalPropertiesViewModel = journalPropertiesViewModel
+                        )
+                    }
+
+                }
+
+                item {
+                    Text(text = "Past", fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .alpha(0.6f)
+                            .padding(5.dp)
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Start)
+
+                }
+
+                items(notifications.value){notification ->
+
+                    if(currentTime - notification.notified > 48*60*60*1000){
+                        notificationCard(
+                            deleteMode = deleteMode,
+                            deleteFolder = deleteFolder,
+                            notification = notification,
+                            currentTime = currentTime,
+                            journalPropertiesViewModel = journalPropertiesViewModel
+                        )
+                    }
+
+                }
+
+
+            }
+
+
+            item {
+                if(deleteMode){
+                    Row(
+                        modifier = Modifier
                             .fillMaxSize()
-                        ){
-                            Column(modifier = Modifier.fillMaxSize()) {
-                                Row {
-                                    Icon(painter = painterResource(id = R.drawable.baseline_notifications_24),
-                                        contentDescription = null)
-                                    Text(text = journalPropertiesViewModel.longToTime(notification.startTime), fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold)
-                                }
-                                Row(modifier = Modifier
-                                    .padding(2.dp)
-                                    .requiredWidth(250.dp)) {
-                                    Text(text = notification.title, fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold)
-                                }
-                                Row(modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.Bottom,
-                                    horizontalArrangement = Arrangement.End)
-                                {
-                                    Text(text = journalPropertiesViewModel.longToTime(notification.notified + 3 * 60 * 60 * 1000), fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold)
-                                }
+                            .padding(10.dp),
+                        verticalAlignment = Alignment.Bottom,
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Button(onClick = {
+                            deleteFolder.forEach { alarmItem ->
+                                journalPropertiesViewModel.deleteNotification(alarmItem.id)
                             }
+                            navController.navigate(Screen.NotificationsScreen.route)
+                        },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Red.copy(alpha = 0.7f),
+                                contentColor = Color.Gray
+                            )) {
+                            Text(text = "Delete", fontWeight = FontWeight.Bold)
                         }
                     }
                 }
             }
+
         }
     }
 }
@@ -232,35 +302,120 @@ fun NotificationsScreen(navController: NavController,
 @Preview
 @Composable
 fun previi(journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
-    Card(
+    var checked by remember {
+        mutableStateOf(true)
+    }
+
+    Text(text = "Today", fontSize = 20.sp, fontWeight = FontWeight.Bold,
         modifier = Modifier
-            .width(300.dp)
-            .height(100.dp)
+            .alpha(0.6f)
             .padding(10.dp)
-    ) {
-        Box(modifier = Modifier
-            .padding(5.dp)
-            .fillMaxSize()
-        ){
-            Column(modifier = Modifier.fillMaxSize()) {
-                Row {
-                    Icon(painter = painterResource(id = R.drawable.baseline_notifications_24),
-                        contentDescription = null)
-                    Text(text = journalPropertiesViewModel.longToTime(1713578820000), fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold)
+            .fillMaxWidth(),
+        textAlign = TextAlign.Start)
+
+
+    Row {
+        Column(verticalArrangement = Arrangement.Center,
+            modifier = Modifier.height(100.dp)) {
+            Checkbox(checked = checked, onCheckedChange = {
+                checked = !checked
+                if(checked){
+
+                }else{
+
                 }
-                Row(modifier = Modifier
-                    .padding(2.dp)
-                    .requiredWidth(250.dp)) {
-                    Text(text = "Tatilden Donus Seremonisi", fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold)
+            })
+        }
+
+
+        Card(
+            modifier = Modifier
+                .wrapContentSize()
+                .width(350.dp)
+                .padding(10.dp)
+        ) {
+            Box(modifier = Modifier
+                .padding(5.dp)
+            ){
+                Column() {
+                    Row {
+                        Icon(painter = painterResource(id = R.drawable.baseline_notifications_24),
+                            contentDescription = null)
+                        Text(text = journalPropertiesViewModel.longToTime(1713578820000), fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold)
+                    }
+                    Row(modifier = Modifier
+                        .padding(start = 2.dp)) {
+                        Text(text = "Tatilden Donus Seremonisi", fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold)
+                    }
+                    Row {
+                        Text(text = journalPropertiesViewModel.longToTime(1713567720000), fontSize = 16.sp,
+                           fontWeight = FontWeight.Bold, textAlign = TextAlign.End,
+                            modifier = Modifier.fillMaxWidth())
+                    }
                 }
-                Row(modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.Bottom,
-                    horizontalArrangement = Arrangement.End)
-                {
-                    Text(text = journalPropertiesViewModel.longToTime(1713567720000), fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@Composable
+fun notificationCard(deleteMode : Boolean, deleteFolder : MutableList<AlarmItem>,
+                 notification: AlarmItem, currentTime : Long, journalPropertiesViewModel: JournalPropertiesViewModel){
+    Row {
+        if (deleteMode){
+            var checked by remember {
+                mutableStateOf(false)
+            }
+
+            Column(verticalArrangement = Arrangement.Center,
+                modifier = Modifier.height(100.dp))
+            {
+                Checkbox(checked = checked, onCheckedChange = {
+                    checked = !checked
+                    if(checked){
+                        deleteFolder.add(notification)
+                    }else{
+                        deleteFolder.remove(notification)
+                    }
+                })
+            }
+        }
+
+        Card(
+            modifier = Modifier
+                .width(350.dp)
+                .wrapContentSize()
+                .padding(10.dp),
+            colors = CardDefaults.cardColors(
+                containerColor =
+                if(notification.seen && currentTime >= notification.startTime - 3 * 60 * 60 * 1000){
+                    Color.Red.copy(alpha = 0.5f)
+                }else {
+                    Color.Green.copy(alpha = 0.5f)
+                }
+            )
+        ) {
+            Box(modifier = Modifier
+                .padding(5.dp)
+            ){
+                Column {
+                    Row {
+                        Icon(painter = painterResource(id = R.drawable.baseline_notifications_24),
+                            contentDescription = null)
+                        Text(text = journalPropertiesViewModel.longToTime(notification.startTime), fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold)
+                    }
+                    Row(modifier = Modifier
+                        .padding(2.dp)) {
+                        Text(text = notification.title, fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold)
+                    }
+                    Row{
+                        Text(text = journalPropertiesViewModel.longToTime(notification.notified + 3 * 60 * 60 * 1000), fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.fillMaxWidth())
+                    }
                 }
             }
         }
