@@ -157,7 +157,8 @@ fun MainMenu(profileViewModel: ProfileViewModel = viewModel(), navController: Na
                                             value = city
                                         )
                                         navController.navigate(Screen.CityInformationScreen.route)
-                                    }
+                                    },
+                                elevation = 20.dp
                             ) {
                                 Box(modifier = Modifier.background(Color.Transparent)){
 

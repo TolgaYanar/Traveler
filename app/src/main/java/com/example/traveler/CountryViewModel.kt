@@ -8,8 +8,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.traveler.data.ApiClient
 import com.example.traveler.data.City
 import com.example.traveler.data.Country
+import com.example.traveler.data.Injection
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
 class CountryViewModel : ViewModel() {
 
@@ -55,8 +58,15 @@ class CountryViewModel : ViewModel() {
 
     private fun listCityFetchData() {
         viewModelScope.launch(Dispatchers.IO) {
-            val citiesToFetch = listOf("ankara", "berlin", "tokyo", "london","canberra","Washington", "kabul","amsterdam","moscow","brussels",
-                "paris", "istanbul", "madrid", "barcelona", "manchester", "san francisco", "eskisehir", "kars", "dubai")
+
+//            val firestore = Injection.instance()
+//
+//            val cities = firestore.collection("cities").document("list")
+//                .get().await()
+
+
+            val citiesToFetch = listOf("miami","las vegas","moscow","brussels",
+                "paris", "istanbul", "madrid", "barcelona", "dubai")
             for (cityName in citiesToFetch) {
                 try {
                     val city = ApiClient.apiServiceCity.getCity(cityName)

@@ -19,6 +19,7 @@ import androidx.compose.material.BadgedBox
 import androidx.compose.material.IconButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -99,7 +100,9 @@ fun FavoritesScreen(navController: NavController, profileViewModel: ProfileViewM
             }
         }
     ) {
-        LazyVerticalGrid(modifier = Modifier.padding(it).fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween,
+        LazyVerticalGrid(modifier = Modifier
+            .padding(it)
+            .fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween,
             verticalArrangement = Arrangement.Top, columns = GridCells.Fixed(2))
         {
             profileViewModel.favoriteCountries.value.let {
@@ -109,6 +112,10 @@ fun FavoritesScreen(navController: NavController, profileViewModel: ProfileViewM
                     items(it){city->
 
                         Card(
+                            elevation = CardDefaults.cardElevation(
+                                defaultElevation = 20.dp,
+                                focusedElevation = 30.dp
+                            ),
                             modifier = Modifier
                                 .background(Color.Transparent)
                                 .width(160.dp)

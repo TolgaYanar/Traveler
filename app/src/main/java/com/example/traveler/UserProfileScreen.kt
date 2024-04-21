@@ -49,6 +49,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -167,7 +168,8 @@ fun UserProfileScreen(
                             .padding(horizontal = 30.dp, vertical = 10.dp)
                             .padding(start = 10.dp)
                             .size(115.dp),
-                            shape = CircleShape)
+                            shape = CircleShape,
+                            elevation = 20.dp)
                         {
                             Image(painter = rememberAsyncImagePainter(model = user.profile_image), //"https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
                                 contentDescription = null, contentScale = ContentScale.Crop)
@@ -404,6 +406,7 @@ fun UserProfileScreen(
                                 if(isOwnProfile || (!isOwnProfile && !journal.private))
                                     Column {
                                         Card(
+                                            elevation = 20.dp,
                                             backgroundColor = Color(journal.color.toULong()),
                                             modifier = Modifier
                                                 .width(160.dp)
@@ -444,7 +447,7 @@ fun UserProfileScreen(
                     }
 
                     if(isOwnProfile){
-                        Row(horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.Bottom, modifier = Modifier
+                        Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom, modifier = Modifier
                             .fillMaxSize()
                             .padding(25.dp)) {
                             Image(painter = painterResource(id = R.drawable.baseline_add_circle_outline_24), contentDescription = null,
@@ -455,6 +458,8 @@ fun UserProfileScreen(
                                         navController.navigate(Screen.AddJournalScreen.route)
                                     }
                             )
+                            Text(text = "Add Journal", fontWeight = FontWeight.Bold, fontSize = 16.sp,
+                                textAlign = TextAlign.End)
                         }
                     }
 
