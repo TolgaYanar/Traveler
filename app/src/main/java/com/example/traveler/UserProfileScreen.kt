@@ -155,183 +155,183 @@ fun UserProfileScreen(
             followingNum = user.following
             followersNum = user.followers
 
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .padding(it),
                 horizontalAlignment = Alignment.Start
             ) {
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .padding(horizontal = 30.dp, vertical = 10.dp)
-                            .padding(start = 10.dp)
-                            .size(115.dp),
-                        shape = CircleShape,
-                        elevation = 20.dp
-                    )
-                    {
-                        Image(
-                            painter = rememberAsyncImagePainter(model = user.profile_image), //"https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-                            contentDescription = null, contentScale = ContentScale.Crop
-                        )
-                    }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth(), horizontalAlignment = Alignment.End
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End
                     ) {
-
-                        Row(modifier = Modifier.padding(end = 70.dp)) {
-                            Text(text = followingNum.toString(), fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.width(70.dp))
-                            Text(text = followersNum.toString(), fontWeight = FontWeight.Bold)
-                        }
-                        Row(
+                        Card(
                             modifier = Modifier
-                                .padding(vertical = 5.dp, horizontal = 10.dp)
-                                .padding(end = 30.dp)
-                        ) {
-                            Text(text = "Following")
-                            Spacer(modifier = Modifier.width(20.dp))
-                            Text(text = "Followers")
+                                .padding(horizontal = 30.dp, vertical = 10.dp)
+                                .padding(start = 10.dp)
+                                .size(115.dp),
+                            shape = CircleShape,
+                            elevation = 20.dp
+                        )
+                        {
+                            Image(
+                                painter = rememberAsyncImagePainter(model = user.profile_image), //"https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                                contentDescription = null, contentScale = ContentScale.Crop
+                            )
                         }
-                        if (!isOwnProfile) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(), horizontalAlignment = Alignment.End
+                        ) {
+
+                            Row(modifier = Modifier.padding(end = 70.dp)) {
+                                Text(text = followingNum.toString(), fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.width(70.dp))
+                                Text(text = followersNum.toString(), fontWeight = FontWeight.Bold)
+                            }
                             Row(
-                                horizontalArrangement = Arrangement.Center, modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 5.dp)
+                                modifier = Modifier
+                                    .padding(vertical = 5.dp, horizontal = 10.dp)
+                                    .padding(end = 30.dp)
                             ) {
-                                Card(backgroundColor = Color.LightGray, modifier = Modifier
-                                    .height(30.dp)
-                                    .width(80.dp)
-                                    .clickable {
-                                        if (followingBox.value == "Follow") {
-
-                                            Injection
-                                                .instance()
-                                                .collection("users")
-                                                .document(
-                                                    currentUser!!.uid
-                                                )
-                                                .collection("following")
-                                                .document(user.uid)
-                                                .set(user)
-                                                .addOnSuccessListener {
-                                                    Injection
-                                                        .instance()
-                                                        .collection("users")
-                                                        .document(currentUser!!.uid)
-                                                        .update(
-                                                            "following",
-                                                            currentUser!!.following + 1
-                                                        )
-                                                    Injection
-                                                        .instance()
-                                                        .collection("users")
-                                                        .document(user.uid)
-                                                        .update(
-                                                            "followers",
-                                                            user.followers + 1
-                                                        )
-                                                    followersNum = followersNum!! + 1
-                                                    user.followers++
-                                                    println("User followed successfully")
-                                                }
-                                                .addOnFailureListener {
-                                                    println("User couldn't followed. Error.")
-                                                }
-                                            followingBox.value = "Following"
-                                        } else if (followingBox.value == "Following") {
-
-                                            Injection
-                                                .instance()
-                                                .collection("users")
-                                                .document(
-                                                    currentUser!!.uid
-                                                )
-                                                .collection("following")
-                                                .document(user.uid)
-                                                .delete()
-                                                .addOnSuccessListener {
-                                                    Injection
-                                                        .instance()
-                                                        .collection("users")
-                                                        .document(currentUser!!.uid)
-                                                        .update(
-                                                            "following",
-                                                            currentUser!!.following - 1
-                                                        )
-                                                    Injection
-                                                        .instance()
-                                                        .collection("users")
-                                                        .document(user.uid)
-                                                        .update(
-                                                            "followers",
-                                                            user.followers - 1
-                                                        )
-                                                    followersNum = followersNum!! - 1
-                                                    user.followers--
-                                                    println("User unfollowed successfully")
-                                                }
-                                                .addOnFailureListener {
-                                                    println("User couldn't unfollowed. Error.")
-                                                }
-                                            followingBox.value = "Follow"
-                                        }
-                                    }
+                                Text(text = "Following")
+                                Spacer(modifier = Modifier.width(20.dp))
+                                Text(text = "Followers")
+                            }
+                            if (!isOwnProfile) {
+                                Row(
+                                    horizontalArrangement = Arrangement.Center, modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 5.dp)
                                 ) {
+                                    Card(backgroundColor = Color.LightGray, modifier = Modifier
+                                        .height(30.dp)
+                                        .width(80.dp)
+                                        .clickable {
+                                            if (followingBox.value == "Follow") {
 
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
+                                                Injection
+                                                    .instance()
+                                                    .collection("users")
+                                                    .document(
+                                                        currentUser!!.uid
+                                                    )
+                                                    .collection("following")
+                                                    .document(user.uid)
+                                                    .set(user)
+                                                    .addOnSuccessListener {
+                                                        Injection
+                                                            .instance()
+                                                            .collection("users")
+                                                            .document(currentUser!!.uid)
+                                                            .update(
+                                                                "following",
+                                                                currentUser!!.following + 1
+                                                            )
+                                                        Injection
+                                                            .instance()
+                                                            .collection("users")
+                                                            .document(user.uid)
+                                                            .update(
+                                                                "followers",
+                                                                user.followers + 1
+                                                            )
+                                                        followersNum = followersNum!! + 1
+                                                        user.followers++
+                                                        println("User followed successfully")
+                                                    }
+                                                    .addOnFailureListener {
+                                                        println("User couldn't followed. Error.")
+                                                    }
+                                                followingBox.value = "Following"
+                                            } else if (followingBox.value == "Following") {
+
+                                                Injection
+                                                    .instance()
+                                                    .collection("users")
+                                                    .document(
+                                                        currentUser!!.uid
+                                                    )
+                                                    .collection("following")
+                                                    .document(user.uid)
+                                                    .delete()
+                                                    .addOnSuccessListener {
+                                                        Injection
+                                                            .instance()
+                                                            .collection("users")
+                                                            .document(currentUser!!.uid)
+                                                            .update(
+                                                                "following",
+                                                                currentUser!!.following - 1
+                                                            )
+                                                        Injection
+                                                            .instance()
+                                                            .collection("users")
+                                                            .document(user.uid)
+                                                            .update(
+                                                                "followers",
+                                                                user.followers - 1
+                                                            )
+                                                        followersNum = followersNum!! - 1
+                                                        user.followers--
+                                                        println("User unfollowed successfully")
+                                                    }
+                                                    .addOnFailureListener {
+                                                        println("User couldn't unfollowed. Error.")
+                                                    }
+                                                followingBox.value = "Follow"
+                                            }
+                                        }
                                     ) {
 
-                                        if (followingBox.value != null) {
-                                            Text(
-                                                text = followingBox.value!!,
-                                                fontWeight = FontWeight.Bold
-                                            )
+                                        Box(
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+
+                                            if (followingBox.value != null) {
+                                                Text(
+                                                    text = followingBox.value!!,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+
                                         }
 
                                     }
-
                                 }
                             }
                         }
                     }
-                }
-                Row {
-                    Text(
-                        text = user.fullName, modifier = Modifier
-                            .padding(end = 15.dp)
-                            .padding(start = 60.dp),
-                        fontWeight = FontWeight.Bold
-                    )
-                    if (isOwnProfile) {
-                        Image(painter = painterResource(id = R.drawable.baseline_edit_24),
-                            contentDescription = null,
-                            alpha = 0.5f,
-                            modifier = Modifier
-                                .size(18.dp)
-                                .clickable { navController.navigate(Screen.EditProfileScreen.route) })
+                    Row {
+                        Text(
+                            text = user.fullName, modifier = Modifier
+                                .padding(end = 15.dp)
+                                .padding(start = 60.dp),
+                            fontWeight = FontWeight.Bold
+                        )
+                        if (isOwnProfile) {
+                            Image(painter = painterResource(id = R.drawable.baseline_edit_24),
+                                contentDescription = null,
+                                alpha = 0.5f,
+                                modifier = Modifier
+                                    .size(18.dp)
+                                    .clickable { navController.navigate(Screen.EditProfileScreen.route) })
+                        }
                     }
-                }
-                Text(
-                    text = user.about,
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .padding(start = 19.dp),
-                    maxLines = 3,
-                )
+                    Text(
+                        text = user.about,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .padding(start = 19.dp),
+                        maxLines = 3,
+                    )
 
-                LazyColumn(modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
-
-                    item {
+                    Column(modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally)
+                    {
 
                         Row {
                             Spacer(modifier = Modifier.width(20.dp))
@@ -503,9 +503,6 @@ fun UserProfileScreen(
                         }
                     }
                 }
-
-
-
             }
         }else{
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {

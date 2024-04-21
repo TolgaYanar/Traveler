@@ -15,9 +15,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -31,6 +36,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -116,17 +122,19 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text(text = "Trip Plan") },
+            CenterAlignedTopAppBar(title = { Text(text = "Trip Plan", color = Color.Black) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate(Screen.UserProfileScreen.route) }) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null,
+                            tint = Color.Black)
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.White),
                 actions = {
                     IconButton(onClick = { isEdit.value = !isEdit.value }) {
-                        Icon(imageVector = Icons.Default.Build, contentDescription = null)
+                        Icon(imageVector = Icons.Default.Build, contentDescription = null,
+                            tint = Color.Black)
                     }
                 }
                 )
@@ -143,7 +151,7 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp), verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 )
                 {
                     Card(
@@ -186,7 +194,8 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                     Card(
                         modifier = Modifier
                             .height(30.dp)
-                            .width(340.dp),
+                            .fillMaxWidth()
+                            .padding(horizontal = 30.dp),
                         backgroundColor = Color.Gray.copy(alpha = 0.4f),
                         shape = RoundedCornerShape(25.dp)
                     ) {
@@ -209,7 +218,11 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                                             selected = it
                                             selectedDay = "day${selected + 1}"
                                             selectedTasks = SnapshotStateList()
-                                            journalPropertiesViewModel.loadTasksOfDay(journal, selectedDay!!, selectedTasks)
+                                            journalPropertiesViewModel.loadTasksOfDay(
+                                                journal,
+                                                selectedDay!!,
+                                                selectedTasks
+                                            )
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -224,7 +237,7 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                 Column(
                     modifier = Modifier
                         .height(575.dp)
-                        .padding(start = 20.dp)
+                        .padding(horizontal = 20.dp)
                         .padding(vertical = 20.dp), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top
                 ) {
                     calendar.timeZone = TimeZone.getTimeZone("Europe/Istanbul")
@@ -232,7 +245,7 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                             it1 -> Text(text = it1, fontSize = 17.sp, fontWeight = FontWeight.Bold,
                         modifier = Modifier.alpha(0.8f))}
 
-                    Divider(modifier = Modifier.width(325.dp))
+                    Divider(modifier = Modifier.fillMaxWidth())
 
                     Spacer(modifier = Modifier.padding(15.dp))
 
@@ -246,14 +259,14 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
 
                                 LazyColumn(modifier = Modifier
                                     .padding(horizontal = 10.dp)
-                                    .fillMaxSize(),
+                                    .wrapContentSize(),
                                     horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top){
                                     var index = 0
                                     items(selectedTasks){
 
                                         Card(modifier = Modifier
                                             .height(120.dp)
-                                            .width(360.dp)
+                                            .fillMaxWidth()
                                         )
                                         {
                                             Row {
@@ -261,7 +274,8 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                                                     .background(Color.Transparent)
                                                     .padding(horizontal = 10.dp)
                                                     .padding(top = 10.dp)) {
-                                                    Text(text = journalPropertiesViewModel.longToTime(it.startTime), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                                    Text(text = journalPropertiesViewModel.longToTime(it.startTime),
+                                                        fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                                                 }
                                                 Column(modifier = Modifier
                                                     .padding(horizontal = 10.dp)
@@ -282,7 +296,8 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                                                 Column(modifier  = Modifier
                                                     .padding(10.dp)
                                                     .width(150.dp)) {
-                                                    Text(text = it.title, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                                    Text(text = it.title, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                                                        color = Color.Black)
                                                     Spacer(modifier = Modifier.height(10.dp))
                                                     Text(text = it.notes, color = Color(0xFF5581F1))
                                                 }

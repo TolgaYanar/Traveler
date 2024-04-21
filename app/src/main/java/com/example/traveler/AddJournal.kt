@@ -109,7 +109,7 @@ fun AddJournal(navController: NavController,
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text(text = "Add Journal") },
+            CenterAlignedTopAppBar(title = { Text(text = "Add Journal", color = Color.Black) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
@@ -130,15 +130,15 @@ fun AddJournal(navController: NavController,
             item {
                 TextField(value = title, onValueChange = {title = it}, modifier = Modifier.padding(vertical = 10.dp),
                     label = {
-                        Text(text = "Title")
+                        Text(text = "Title", color = Color.Black)
                     }, placeholder = {
-                        Text(text = "Enter Title")
+                        Text(text = "Enter Title", color = Color.Black)
                     })
                 TextField(value = location, onValueChange = {location = it}, modifier = Modifier.padding(vertical = 10.dp),
                     label = {
-                        Text(text = "Location")
+                        Text(text = "Location", color = Color.Black)
                     }, placeholder = {
-                        Text(text = "Enter Location")
+                        Text(text = "Enter Location", color = Color.Black)
                     })
 
                 Spacer(modifier = Modifier.height(30.dp))
@@ -149,7 +149,7 @@ fun AddJournal(navController: NavController,
                     .padding(vertical = 10.dp),
                     backgroundColor = color
                 ) {
-                    Text(text = "Color of Journal", modifier = Modifier.padding(6.dp),
+                    Text(text = "Color of Journal", color = Color.Black, modifier = Modifier.padding(6.dp),
                         fontWeight = FontWeight.Bold)
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
                         Icon(painter = painterResource(id = R.drawable.baseline_color_lens_24),
@@ -175,7 +175,7 @@ fun AddJournal(navController: NavController,
 
                 TextField(value = "" + journalPropertiesViewModel.longToDate(startDateInMillis), onValueChange = {}, modifier = Modifier.padding(vertical = 10.dp),
                     label = {
-                        Text(text = "Starting Time")
+                        Text(text = "Starting Time", color = Color.Black)
                     }, enabled = false,
                     trailingIcon = {
                         Icon(imageVector = Icons.Filled.DateRange, contentDescription = null,
@@ -187,7 +187,7 @@ fun AddJournal(navController: NavController,
 
                 TextField(value = "" + journalPropertiesViewModel.longToDate(endDateInMillis), onValueChange = {}, modifier = Modifier.padding(vertical = 10.dp),
                     label = {
-                        Text(text = "Ending Time")
+                        Text(text = "Ending Time", color = Color.Black)
                     }, enabled = false,
                     trailingIcon = {
                         Icon(imageVector = Icons.Filled.DateRange, contentDescription = null,
@@ -228,17 +228,17 @@ fun AddJournal(navController: NavController,
                 OutlinedTextField(value = notes, onValueChange = {notes = it},
                     colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Gray, focusedContainerColor = Color.Gray),
                     placeholder = {
-                        Text(text = "Notes")
+                        Text(text = "Notes", color = Color.Black)
                     }, modifier = Modifier.height(200.dp),
                     label = {
-                        Text(text = "Notes")
+                        Text(text = "Notes", color = Color.Black)
                     }
                 )
 
                 Checkbox(checked = private, onCheckedChange = {
                     private = !private
                 })
-                Text(text = "Make it private")
+                Text(text = "Make it private", color = Color.Black)
 
                 Row(modifier = Modifier
                     .fillMaxSize()

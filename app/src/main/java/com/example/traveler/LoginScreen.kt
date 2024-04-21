@@ -156,7 +156,8 @@ fun LoginScreen(
                     Text(text = "Don't have an account?", modifier = Modifier.padding(horizontal = 27.dp), fontSize = 16.sp, color = Color(4278190208))
                     Text(text = "Sign Up", fontWeight = FontWeight.Bold, modifier = Modifier
                         .padding(horizontal = 27.dp)
-                        .clickable { navController.navigate(Screen.RegisterScreen.route) }, fontSize = 16.sp)
+                        .clickable { navController.navigate(Screen.RegisterScreen.route) }, fontSize = 16.sp,
+                        color = Color.Black)
                 }
             }
         }

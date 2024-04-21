@@ -101,10 +101,11 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text(text = "Add Task") },
+            CenterAlignedTopAppBar(title = { Text(text = "Add Task", color = Color.Black) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null,
+                            tint = Color.Black)
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(

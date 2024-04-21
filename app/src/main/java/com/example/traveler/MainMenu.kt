@@ -117,26 +117,26 @@ fun MainMenu(profileViewModel: ProfileViewModel = viewModel(), navController: Na
             }
         }
     ) {
-        Column(modifier = Modifier
-            .background(Color.White)
+        LazyColumn(modifier = Modifier
             .padding(it)
             .padding(vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top)
         {
 
-            Image(painter = painterResource(id = R.drawable.specialofferimage), contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .padding(horizontal = 20.dp),
-                contentScale = ContentScale.Crop)
+            item {
 
-            LazyColumn(modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center)
-            {
+                Image(painter = painterResource(id = R.drawable.specialofferimage), contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .padding(horizontal = 20.dp),
+                    contentScale = ContentScale.Crop)
 
-                item {
+                Column(modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center)
+                {
+
                     if(countryViewModel.cityList.isNotEmpty()){
 
                         Row(modifier = Modifier
@@ -239,6 +239,7 @@ fun MainMenu(profileViewModel: ProfileViewModel = viewModel(), navController: Na
                     }else{
                         CircularProgressIndicator()
                     }
+
                 }
             }
         }

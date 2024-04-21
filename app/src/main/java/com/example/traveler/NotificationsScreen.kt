@@ -167,7 +167,6 @@ fun NotificationsScreen(navController: NavController,
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
                 .padding(it)
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -287,7 +286,6 @@ fun NotificationsScreen(navController: NavController,
                         },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Red.copy(alpha = 0.7f),
-                                contentColor = Color.Gray
                             )) {
                             Text(text = "Delete", fontWeight = FontWeight.Bold)
                         }

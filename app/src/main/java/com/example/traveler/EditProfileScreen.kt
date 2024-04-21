@@ -171,7 +171,7 @@ fun EditProfileScreen(navController: NavController,
                         }
                     }
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                        Text(text = "Edit Profile Picture", modifier = Modifier
+                        Text(text = "Edit Profile Picture", color = Color.Black, modifier = Modifier
                             .alpha(0.7f)
                             .clickable {
                                 singlePhotoPicker.launch(
@@ -187,11 +187,14 @@ fun EditProfileScreen(navController: NavController,
 
                         TextField(value = user!!.fullName, onValueChange = {fullname -> user = user!!.copy(fullName = fullname)},
                             trailingIcon = {
-                                Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,)
+                                Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,
+                                    tint = Color.Black)
                             },
                             singleLine = true, colors = TextFieldDefaults
                                 .colors(unfocusedContainerColor = Color.Transparent,
-                                    focusedContainerColor = Color.Transparent),
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedTextColor = Color.Black),
                             modifier = Modifier.width(330.dp)
                         )
 
@@ -199,15 +202,18 @@ fun EditProfileScreen(navController: NavController,
 
                         TextField(value = newEmail, onValueChange = {email -> newEmail = email},
                             trailingIcon = {
-                                Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,)
+                                Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,
+                                    tint = Color.Black)
                             },
                             singleLine = true, colors = TextFieldDefaults
                                 .colors(unfocusedContainerColor = Color.Transparent,
-                                    focusedContainerColor = Color.Transparent),
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedTextColor = Color.Black),
                             modifier = Modifier.width(330.dp),
                             placeholder = {
                                 if (currentUser != null) {
-                                    currentUser.email?.let { it1 -> Text(text = it1) }
+                                    currentUser.email?.let { it1 -> Text(text = it1, color = Color.Black) }
                                 }
                             }
                         )
@@ -217,26 +223,33 @@ fun EditProfileScreen(navController: NavController,
 
                         TextField(value = currentPassword, onValueChange = {currentPassword = it},
                             trailingIcon = {
-                                Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,)
+                                Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,
+                                    tint = Color.Black)
                             },
                             singleLine = true, colors = TextFieldDefaults
                                 .colors(unfocusedContainerColor = Color.Transparent,
-                                    focusedContainerColor = Color.Transparent),
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedTextColor = Color.Black),
                             label = {
-                                Text(text = "Current Password")
+                                Text(text = "Current Password", color = Color.Black)
                             }, modifier = Modifier.width(330.dp))
 
                         Spacer(modifier = Modifier.height(20.dp))
 
                         TextField(value = newPassword, onValueChange = {newPassword = it},
                             trailingIcon = {
-                                Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,)
+                                Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,
+                                    tint = Color.Black)
                             },
                             singleLine = true, colors = TextFieldDefaults
                                 .colors(unfocusedContainerColor = Color.Transparent,
-                                    focusedContainerColor = Color.Transparent),
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedTextColor = Color.Black,
+                                    ),
                             label = {
-                                Text(text = "New Password")
+                                Text(text = "New Password", color = Color.Black)
                             }, modifier = Modifier.width(330.dp))
 
                         Spacer(modifier = Modifier.height(20.dp))
@@ -244,11 +257,14 @@ fun EditProfileScreen(navController: NavController,
 
                         TextField(value = user!!.about, onValueChange = {about -> user = user!!.copy(about = about)},
                             trailingIcon = {
-                                Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,)
+                                Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,
+                                    tint = Color.Black)
                             },
                             singleLine = false, maxLines = 3, colors = TextFieldDefaults
                                 .colors(unfocusedContainerColor = Color.Transparent,
-                                    focusedContainerColor = Color.Transparent),
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedTextColor = Color.Black),
                             modifier = Modifier.width(330.dp),
                         )
 
