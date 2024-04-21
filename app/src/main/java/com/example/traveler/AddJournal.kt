@@ -125,7 +125,7 @@ fun AddJournal(navController: NavController,
                 .fillMaxSize()
                 .padding(it)
                 .background(colorResource(id = R.color.add_journal_color)),
-            verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally
+            verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
                 TextField(value = title, onValueChange = {title = it}, modifier = Modifier.padding(vertical = 10.dp),
@@ -235,21 +235,16 @@ fun AddJournal(navController: NavController,
                     }
                 )
 
+                Checkbox(checked = private, onCheckedChange = {
+                    private = !private
+                })
+                Text(text = "Make it private")
+
                 Row(modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 20.dp), horizontalArrangement = Arrangement.End)
+                    .padding(bottom = 20.dp).padding(end = 30.dp),
+                    horizontalArrangement = Arrangement.End)
                 {
-
-                    Column(modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(horizontal = 60.dp), verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally) {
-                        Checkbox(checked = private, onCheckedChange = {
-                            private = !private
-                        })
-                        Text(text = "Make it private")
-                    }
 
                     Button(onClick = {
 
