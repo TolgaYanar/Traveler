@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.example.traveler.data.City
 import com.example.traveler.data.Country
 import com.example.traveler.data.Journal
 import com.example.traveler.data.User
@@ -105,10 +106,10 @@ fun Navigation(
         }
 
         composable(Screen.CityInformationScreen.route){
-            val result = navController.previousBackStackEntry?.savedStateHandle?.get<Country>("country")
+            val result = navController.previousBackStackEntry?.savedStateHandle?.get<City>("city")
 
             if (result != null) {
-                CityInformationScreen(country = result, navController = navController)
+                CityInformationScreen(city = result, navController = navController)
             }
         }
     }

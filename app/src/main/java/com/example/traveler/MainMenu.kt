@@ -126,7 +126,7 @@ fun MainMenu(profileViewModel: ProfileViewModel = viewModel(), navController: Na
         {
 
             item {
-                if(countryViewModel.countryList.isNotEmpty()){
+                if(countryViewModel.cityList.isNotEmpty()){
                     Image(painter = painterResource(id = R.drawable.specialofferimage), contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -142,7 +142,7 @@ fun MainMenu(profileViewModel: ProfileViewModel = viewModel(), navController: Na
 
 
                     LazyRow {
-                        items(countryViewModel.countryList){country->
+                        items(countryViewModel.cityList){city->
 
                             Card(
                                 backgroundColor = Color.Transparent,
@@ -153,15 +153,15 @@ fun MainMenu(profileViewModel: ProfileViewModel = viewModel(), navController: Na
                                     .padding(horizontal = 8.dp)
                                     .clickable {
                                         navController.currentBackStackEntry?.savedStateHandle?.set(
-                                            key = "country",
-                                            value = country
+                                            key = "city",
+                                            value = city
                                         )
                                         navController.navigate(Screen.CityInformationScreen.route)
                                     }
                             ) {
                                 Box(modifier = Modifier.background(Color.Transparent)){
 
-                                    AsyncImage(model = country.imageUrl, contentDescription = null,
+                                    AsyncImage(model = city.imageUrl, contentDescription = null,
                                         contentScale = ContentScale.Crop)
 
                                     Box(modifier = Modifier
@@ -169,7 +169,7 @@ fun MainMenu(profileViewModel: ProfileViewModel = viewModel(), navController: Na
                                         .padding(8.dp)
                                         .background(Color.Transparent),
                                         contentAlignment = Alignment.BottomStart){
-                                        Text(text = country.capital, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 20.sp)
+                                        Text(text = city.name, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 20.sp)
                                     }
 
                                     var favorite by remember {
@@ -178,18 +178,17 @@ fun MainMenu(profileViewModel: ProfileViewModel = viewModel(), navController: Na
 
                                     user?.let { it1 ->
                                         firestore.collection("users").document(it1.uid)
-                                            .collection("favorites").document(country.capital).get().addOnSuccessListener {
+                                            .collection("favorites").document(city.name).get().addOnSuccessListener {
                                                 if(it.exists()) favorite = true
                                             }
                                     }
 
                                     val hashMapOfCountry = hashMapOf<String, Any>(
-                                        "name" to country.name,
-                                        "capital" to country.capital,
-                                        "lat" to country.latlng.capital[0],
-                                        "lon" to country.latlng.capital[1],
-                                        "flag" to country.flag.medium,
-                                        "imageUrl" to country.imageUrl
+                                        "name" to city.name,
+                                        "country" to city.country,
+                                        "latitude" to city.latitude,
+                                        "longitude" to city.longitude,
+                                        "imageUrl" to city.imageUrl
                                     )
                                     Box(modifier = Modifier
                                         .fillMaxSize()
@@ -200,7 +199,7 @@ fun MainMenu(profileViewModel: ProfileViewModel = viewModel(), navController: Na
                                                 modifier = Modifier.clickable {
                                                     user?.let { it1 ->
                                                         firestore.collection("users").document(
-                                                            it1.uid).collection("favorites").document(country.capital).set(hashMapOfCountry, SetOptions.merge())
+                                                            it1.uid).collection("favorites").document(city.name).set(hashMapOfCountry, SetOptions.merge())
                                                             .addOnSuccessListener {
                                                                 favorite = !favorite
                                                                 println("Document updated successfully")
@@ -215,7 +214,7 @@ fun MainMenu(profileViewModel: ProfileViewModel = viewModel(), navController: Na
                                                 modifier = Modifier.clickable {
                                                     user?.let { it1 ->
                                                         firestore.collection("users").document(
-                                                            it1.uid).collection("favorites").document(country.capital).delete()
+                                                            it1.uid).collection("favorites").document(city.name).delete()
                                                             .addOnSuccessListener {
                                                                 favorite = !favorite
                                                                 println("Document deleted successfully")

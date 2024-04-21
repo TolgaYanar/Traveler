@@ -29,4 +29,8 @@ interface ApiInterface {
                            @Query("filter") filter : String, //circle:32.83780387262269,39.92079185,10000
                            @Query("limit") limit : Int,
                            @Query("apiKey") apikey : String = "29d783588ad44be8963bd1789aef538f"): TourismResponse
+
+    @GET("v1/city")
+    suspend fun getCity(@Query("name") city: String,
+                         @Header("X-Api-Key") apiKey: String = "oPlX/8X8XjPrh2QuPVaXUw==neGkbPWltwyA85SQ"): List<City>
 }

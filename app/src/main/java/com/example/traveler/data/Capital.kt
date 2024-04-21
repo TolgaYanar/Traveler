@@ -47,3 +47,20 @@ data class latLng(
     @SerializedName("country")
     val country: List<Double>
 ): Parcelable
+
+@Parcelize
+data class City(
+    @SerializedName("name")
+    val name: String = "",
+    @SerializedName("latitude")
+    val latitude: Double = 0.0,
+    @SerializedName("longitude")
+    val longitude: Double = 0.0,
+    @SerializedName("country")
+    val country: String = "",
+    @SerializedName("population")
+    val population: Int = 0,
+    @SerializedName("is_capital")
+    val is_capital: Boolean = false,
+    var imageUrl: String = "",
+): Parcelable

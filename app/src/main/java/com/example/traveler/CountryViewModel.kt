@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traveler.data.ApiClient
+import com.example.traveler.data.City
 import com.example.traveler.data.Country
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,8 +18,10 @@ class CountryViewModel : ViewModel() {
 
     val countryList = mutableStateListOf<Country>()
 
+    val cityList = mutableStateListOf<City>()
+
     init {
-        listFetchData()
+        listCityFetchData()
     }
 
     private fun fetchData() {
@@ -42,6 +45,24 @@ class CountryViewModel : ViewModel() {
                     val image = ApiClient.apiServiceImage.getImage(countryName).photos.get(0).src.original
                     country.id.imageUrl = image
                     countryList.add(country.id)
+                } catch (e: Exception) {
+                    // Handle error, such as logging or showing a toast
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    private fun listCityFetchData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val citiesToFetch = listOf("ankara", "berlin", "tokyo", "london","canberra","Washington", "kabul","amsterdam","moscow","brussels",
+                "paris", "istanbul", "madrid", "barcelona", "manchester", "san francisco", "eskisehir", "kars", "dubai")
+            for (cityName in citiesToFetch) {
+                try {
+                    val city = ApiClient.apiServiceCity.getCity(cityName)
+                    val image = ApiClient.apiServiceImage.getImage(cityName).photos.get(0).src.original
+                    city.get(0).imageUrl = image
+                    cityList.add(city.get(0))
                 } catch (e: Exception) {
                     // Handle error, such as logging or showing a toast
                     e.printStackTrace()

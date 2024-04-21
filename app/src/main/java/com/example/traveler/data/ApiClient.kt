@@ -14,6 +14,18 @@ object ApiClient {
     val apiServiceCountry: ApiInterface = retrofitCountry.create(ApiInterface::class.java)
 
 
+
+    private const val BASE_URL_CITY = "https://api.api-ninjas.com/"
+
+    private val retrofitCity = Retrofit.Builder()
+        .baseUrl(BASE_URL_CITY)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    val apiServiceCity: ApiInterface = retrofitCity.create(ApiInterface::class.java)
+
+
+
     private const val BASE_URL_IMAGE = "https://api.pexels.com/v1/"
 
     private val retrofitImage = Retrofit.Builder()

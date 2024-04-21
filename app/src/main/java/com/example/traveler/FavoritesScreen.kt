@@ -43,9 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.traveler.data.Country
 import com.example.traveler.data.Injection
-import com.example.traveler.data.latLng
 
 @Composable
 fun FavoritesScreen(navController: NavController, profileViewModel: ProfileViewModel = viewModel()) {
@@ -108,7 +106,7 @@ fun FavoritesScreen(navController: NavController, profileViewModel: ProfileViewM
 
                 if(it != null){
 
-                    items(it){country->
+                    items(it){city->
 
                         Card(
                             modifier = Modifier
@@ -118,26 +116,23 @@ fun FavoritesScreen(navController: NavController, profileViewModel: ProfileViewM
                                 .padding(8.dp)
                                 .padding(horizontal = 8.dp)
                                 .clickable {
-                                    val countryInfo = Country(latlng = latLng(
-                                        capital = listOf(country["lat"].toString().toDouble(),country["lon"].toString().toDouble()), country = listOf(country["lat"].toString().toDouble(),country["lon"].toString().toDouble())),
-                                        capital = country.get("capital").toString())
                                     navController.currentBackStackEntry?.savedStateHandle?.set(
-                                        key = "country",
-                                        value = countryInfo
+                                        key = "city",
+                                        value = city
                                     )
                                     navController.navigate(Screen.CityInformationScreen.route)
                                 }
                         ) {
                             Box(modifier = Modifier.background(Color.Transparent)){
 
-                                AsyncImage(model = country["imageUrl"], contentDescription = null,
+                                AsyncImage(model = city.imageUrl, contentDescription = null,
                                     contentScale = ContentScale.Crop)
                                 Box(modifier = Modifier
                                     .fillMaxSize()
                                     .padding(8.dp)
                                     .background(Color.Transparent),
                                     contentAlignment = Alignment.BottomStart){
-                                    Text(text = country["capital"].toString(), fontWeight = FontWeight.Bold, color = Color.White, fontSize = 20.sp)
+                                    Text(text = city.name, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 20.sp)
                                 }
                                 var favorite by remember {
                                     mutableStateOf(true)
@@ -154,7 +149,7 @@ fun FavoritesScreen(navController: NavController, profileViewModel: ProfileViewM
                                             modifier = Modifier.clickable {
                                             profileViewModel.currentUser.value?.let { user ->
                                                 Injection.instance().collection("users").document(
-                                                    user.uid).collection("favorites").document(country["capital"].toString()).delete()
+                                                    user.uid).collection("favorites").document(city.name).delete()
                                                     .addOnSuccessListener {
                                                         favorite = !favorite
                                                         println("Document deleted successfully")

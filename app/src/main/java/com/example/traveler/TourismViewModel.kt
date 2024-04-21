@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traveler.data.ApiClient
+import com.example.traveler.data.City
 import com.example.traveler.data.Country
 import com.example.traveler.data.Tourism
 import kotlinx.coroutines.launch
@@ -17,10 +18,10 @@ class TourismViewModel : ViewModel() {
     private val _restaurantData = MutableLiveData<List<Tourism>>()
     val restaurantData : LiveData<List<Tourism>> get() = _restaurantData
 
-    fun fetchData(country: Country) {
+    fun fetchData(city : City) {
         viewModelScope.launch{
             //circle:32.83780387262269,39.92079185,10000
-            val filter = "circle:${country.latlng.capital[1]},${country.latlng.capital[0]},5000"
+            val filter = "circle:${city.longitude},${city.latitude},5000"
             try {
                 val tourism_response = ApiClient.apiServiceTourism.getTourist(filter = filter, categories = "tourism",
                     limit = 10)

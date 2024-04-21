@@ -51,6 +51,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.example.traveler.data.City
 import com.example.traveler.data.Country
 import com.example.traveler.data.Flag
 import com.example.traveler.data.Injection
@@ -67,7 +68,7 @@ import java.util.Calendar
 import java.util.Locale
 
 @Composable
-fun CityInformationScreen(country: Country,
+fun CityInformationScreen(city: City,
                           navController: NavController,
                           tourismViewModel: TourismViewModel = viewModel(),
                           weatherViewModel: WeatherViewModel = viewModel(),
@@ -75,8 +76,8 @@ fun CityInformationScreen(country: Country,
                           ){
 
     LaunchedEffect(key1 = true){
-        tourismViewModel.fetchData(country)
-        weatherViewModel.fetchData(country)
+        tourismViewModel.fetchData(city)
+        weatherViewModel.fetchData(city)
     }
 
     val tourism_data by tourismViewModel.tourismData.observeAsState(emptyList())
@@ -86,7 +87,7 @@ fun CityInformationScreen(country: Country,
     val otherUsers =  remember { mutableListOf<User>() }
 
     LaunchedEffect(key1 = true){
-        journalPropertiesViewModel.getRandomUsersWithMatchingLocation(1,country.capital,otherUsers)
+        journalPropertiesViewModel.getRandomUsersWithMatchingLocation(1,city.name,otherUsers)
     }
 
     Scaffold(
@@ -100,7 +101,7 @@ fun CityInformationScreen(country: Country,
                             modifier = Modifier.size(40.dp)
                         )
                     }
-                }, title = { Text(text = country.capital, fontSize = 24.sp, fontWeight = FontWeight.Bold)},
+                }, title = { Text(text = city.name, fontSize = 24.sp, fontWeight = FontWeight.Bold)},
                 backgroundColor = colorResource(id = R.color.app_bar_color)
             )
         }
@@ -236,12 +237,12 @@ fun CityInformationScreen(country: Country,
     }
 }
 
-@Preview
-@Composable
-fun previ(){
-    CityInformationScreen(country = Country("","",
-        Flag("","",""),"","", latLng(listOf(0.0,0.0), listOf(0.0,0.0))), navController = rememberNavController())
-}
+//@Preview
+//@Composable
+//fun previ(){
+//    CityInformationScreen(city = City("","",
+//        Flag("","",""),"","", latLng(listOf(0.0,0.0), listOf(0.0,0.0))), navController = rememberNavController())
+//}
 
 private fun formattedDouble(doubleValue: Double?): String {
     return String.format(Locale.getDefault(), "%.1f", doubleValue)
