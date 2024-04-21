@@ -385,7 +385,7 @@ fun notificationCard(deleteMode : Boolean, deleteFolder : MutableList<AlarmItem>
 
         Card(
             modifier = Modifier
-                .width(350.dp)
+                .fillMaxWidth()
                 .wrapContentSize()
                 .padding(10.dp),
             colors = CardDefaults.cardColors(

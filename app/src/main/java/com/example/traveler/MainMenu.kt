@@ -117,122 +117,128 @@ fun MainMenu(profileViewModel: ProfileViewModel = viewModel(), navController: Na
             }
         }
     ) {
-        LazyColumn(modifier = Modifier
-            .fillMaxSize()
+        Column(modifier = Modifier
             .background(Color.White)
             .padding(it)
             .padding(vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top)
         {
 
-            item {
-                if(countryViewModel.cityList.isNotEmpty()){
-                    Image(painter = painterResource(id = R.drawable.specialofferimage), contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp)
-                            .padding(horizontal = 40.dp)
-                            .size(250.dp))
+            Image(painter = painterResource(id = R.drawable.specialofferimage), contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+                    .padding(horizontal = 20.dp),
+                contentScale = ContentScale.Crop)
 
-                    Row(modifier = Modifier
-                        .padding(20.dp)
-                        .fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                        Text(text = "Explore Cities", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.alpha(0.6f))
-                    }
+            LazyColumn(modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center)
+            {
+
+                item {
+                    if(countryViewModel.cityList.isNotEmpty()){
+
+                        Row(modifier = Modifier
+                            .padding(20.dp)
+                            .fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+                            Text(text = "Explore Cities", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.alpha(0.6f))
+                        }
 
 
-                    LazyRow {
-                        items(countryViewModel.cityList){city->
+                        LazyRow {
+                            items(countryViewModel.cityList){city->
 
-                            Card(
-                                backgroundColor = Color.Transparent,
-                                modifier = Modifier
-                                    .width(160.dp)
-                                    .height(140.dp)
-                                    .padding(8.dp)
-                                    .padding(horizontal = 8.dp)
-                                    .clickable {
-                                        navController.currentBackStackEntry?.savedStateHandle?.set(
-                                            key = "city",
-                                            value = city
-                                        )
-                                        navController.navigate(Screen.CityInformationScreen.route)
-                                    },
-                                elevation = 20.dp
-                            ) {
-                                Box(modifier = Modifier.background(Color.Transparent)){
-
-                                    AsyncImage(model = city.imageUrl, contentDescription = null,
-                                        contentScale = ContentScale.Crop)
-
-                                    Box(modifier = Modifier
-                                        .fillMaxSize()
+                                Card(
+                                    backgroundColor = Color.Transparent,
+                                    modifier = Modifier
+                                        .width(160.dp)
+                                        .height(140.dp)
                                         .padding(8.dp)
-                                        .background(Color.Transparent),
-                                        contentAlignment = Alignment.BottomStart){
-                                        Text(text = city.name, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 20.sp)
-                                    }
+                                        .padding(horizontal = 8.dp)
+                                        .clickable {
+                                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                key = "city",
+                                                value = city
+                                            )
+                                            navController.navigate(Screen.CityInformationScreen.route)
+                                        },
+                                    elevation = 20.dp
+                                ) {
+                                    Box(modifier = Modifier.background(Color.Transparent)){
 
-                                    var favorite by remember {
-                                        mutableStateOf(false)
-                                    }
+                                        AsyncImage(model = city.imageUrl, contentDescription = null,
+                                            contentScale = ContentScale.Crop)
 
-                                    user?.let { it1 ->
-                                        firestore.collection("users").document(it1.uid)
-                                            .collection("favorites").document(city.name).get().addOnSuccessListener {
-                                                if(it.exists()) favorite = true
+                                        Box(modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(8.dp)
+                                            .background(Color.Transparent),
+                                            contentAlignment = Alignment.BottomStart){
+                                            Text(text = city.name, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 20.sp)
+                                        }
+
+                                        var favorite by remember {
+                                            mutableStateOf(false)
+                                        }
+
+                                        user?.let { it1 ->
+                                            firestore.collection("users").document(it1.uid)
+                                                .collection("favorites").document(city.name).get().addOnSuccessListener {
+                                                    if(it.exists()) favorite = true
+                                                }
+                                        }
+
+                                        val hashMapOfCountry = hashMapOf<String, Any>(
+                                            "name" to city.name,
+                                            "country" to city.country,
+                                            "latitude" to city.latitude,
+                                            "longitude" to city.longitude,
+                                            "imageUrl" to city.imageUrl
+                                        )
+                                        Box(modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(8.dp),
+                                            contentAlignment = Alignment.TopEnd){
+                                            if(favorite == false){
+                                                Icon(painter = painterResource(id = R.drawable.baseline_bookmark_border_24), contentDescription = null,
+                                                    modifier = Modifier.clickable {
+                                                        user?.let { it1 ->
+                                                            firestore.collection("users").document(
+                                                                it1.uid).collection("favorites").document(city.name).set(hashMapOfCountry, SetOptions.merge())
+                                                                .addOnSuccessListener {
+                                                                    favorite = !favorite
+                                                                    println("Document updated successfully")
+                                                                }
+                                                                .addOnFailureListener {
+                                                                    println("error occured while trying to add favorite country")
+                                                                }
+                                                        }
+                                                    })
+                                            }else{
+                                                Icon(painter = painterResource(id = R.drawable.baseline_bookmark_24), contentDescription = null,
+                                                    modifier = Modifier.clickable {
+                                                        user?.let { it1 ->
+                                                            firestore.collection("users").document(
+                                                                it1.uid).collection("favorites").document(city.name).delete()
+                                                                .addOnSuccessListener {
+                                                                    favorite = !favorite
+                                                                    println("Document deleted successfully")
+                                                                }
+                                                                .addOnFailureListener {
+                                                                    println("error occured while trying to delete favorite country")
+                                                                }
+                                                        }
+                                                    }, tint = Color.Yellow)
                                             }
-                                    }
-
-                                    val hashMapOfCountry = hashMapOf<String, Any>(
-                                        "name" to city.name,
-                                        "country" to city.country,
-                                        "latitude" to city.latitude,
-                                        "longitude" to city.longitude,
-                                        "imageUrl" to city.imageUrl
-                                    )
-                                    Box(modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        contentAlignment = Alignment.TopEnd){
-                                        if(favorite == false){
-                                            Icon(painter = painterResource(id = R.drawable.baseline_bookmark_border_24), contentDescription = null,
-                                                modifier = Modifier.clickable {
-                                                    user?.let { it1 ->
-                                                        firestore.collection("users").document(
-                                                            it1.uid).collection("favorites").document(city.name).set(hashMapOfCountry, SetOptions.merge())
-                                                            .addOnSuccessListener {
-                                                                favorite = !favorite
-                                                                println("Document updated successfully")
-                                                            }
-                                                            .addOnFailureListener {
-                                                                println("error occured while trying to add favorite country")
-                                                            }
-                                                    }
-                                                })
-                                        }else{
-                                            Icon(painter = painterResource(id = R.drawable.baseline_bookmark_24), contentDescription = null,
-                                                modifier = Modifier.clickable {
-                                                    user?.let { it1 ->
-                                                        firestore.collection("users").document(
-                                                            it1.uid).collection("favorites").document(city.name).delete()
-                                                            .addOnSuccessListener {
-                                                                favorite = !favorite
-                                                                println("Document deleted successfully")
-                                                            }
-                                                            .addOnFailureListener {
-                                                                println("error occured while trying to delete favorite country")
-                                                            }
-                                                    }
-                                                }, tint = Color.Yellow)
                                         }
                                     }
                                 }
                             }
                         }
+                    }else{
+                        CircularProgressIndicator()
                     }
-                }else{
-                    CircularProgressIndicator()
                 }
             }
         }

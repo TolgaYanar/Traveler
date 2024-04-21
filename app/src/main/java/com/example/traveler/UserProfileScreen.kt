@@ -297,6 +297,7 @@ fun UserProfileScreen(
                     Text(text = user.about, modifier = Modifier
                         .padding(10.dp)
                         .padding(start = 19.dp), maxLines = 3,)
+
                     Row {
                         Spacer(modifier = Modifier.width(20.dp))
                         Text(text = "Ongoing Trip", modifier = Modifier
@@ -452,8 +453,10 @@ fun UserProfileScreen(
                             .padding(25.dp)) {
                             Image(painter = painterResource(id = R.drawable.baseline_add_circle_outline_24), contentDescription = null,
                                 alignment = Alignment.BottomEnd, modifier = Modifier
-                                    .size(50.dp)
                                     .alpha(0.7f)
+                                    .size(70.dp)
+                                    .fillMaxWidth()
+                                    .padding(end = 20.dp).padding(bottom = 10.dp)
                                     .clickable {
                                         navController.navigate(Screen.AddJournalScreen.route)
                                     }
@@ -477,5 +480,20 @@ fun UserProfileScreen(
 @Preview
 @Composable
 fun prrreview(){
-    UserProfileScreen(navController = rememberNavController())
+    Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom, modifier = Modifier
+        .fillMaxSize()
+        .padding(25.dp)) {
+        Image(painter = painterResource(id = R.drawable.baseline_add_circle_outline_24), contentDescription = null,
+            alignment = Alignment.BottomEnd, modifier = Modifier
+                .alpha(0.7f)
+                .size(70.dp)
+                .fillMaxWidth()
+                .padding(end = 20.dp).padding(bottom = 10.dp)
+                .clickable {
+
+                }
+        )
+        Text(text = "Add Journal", fontWeight = FontWeight.Bold, fontSize = 16.sp,
+            textAlign = TextAlign.End)
+    }
 }

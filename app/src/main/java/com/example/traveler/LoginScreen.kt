@@ -75,8 +75,7 @@ fun LoginScreen(
             CenterAlignedTopAppBar(title = {
                 Text(text = "Welcome Back", color = colorResource(id = R.color.white),
                     modifier = Modifier
-                        .padding(start = 5.dp)
-                        .heightIn(max = 24.dp), fontWeight = FontWeight.Light)
+                        .padding(start = 5.dp), fontWeight = FontWeight.Light)
             },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = colorResource(id = R.color.app_bar_color))
             )
@@ -86,7 +85,8 @@ fun LoginScreen(
             .fillMaxSize()
             .padding(it)
             .background(Color(0XFFADD8E6)),
-            horizontalAlignment = Alignment.CenterHorizontally)
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center)
         {
 
             item {
