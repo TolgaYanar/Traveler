@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -125,18 +126,24 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.padding(20.dp))
                 Button(onClick = {
                     authenticationViewModel.signIn(email,password)
-                    when(result) {
-                        is Result.Success -> {navController.navigate(Screen.MainMenuScreen.route)}
-                        is Result.Fail ->{
-
-                        }
-                        else -> {
-
-                        }
-                    }
                 }, modifier = Modifier.size(200.dp,40.dp)) {
                     Text(text = "LOGIN", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
+
+                LaunchedEffect(result) {
+                    result?.let { result ->
+                        when (result) {
+                            is Result.Success -> navController.navigate(Screen.MainMenuScreen.route)
+                            is Result.Fail -> {
+                                // Handle failure case if needed
+                            }
+                            else -> {
+                                // Handle other cases if needed
+                            }
+                        }
+                    }
+                }
+
                 Text(text = "Or Sign in with", modifier = Modifier.padding(20.dp), fontSize = 16.sp, color = Color(0x80000000))
                 Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                     Image(painter = painterResource(id = R.drawable.google), contentDescription = null, modifier =  Modifier.padding(horizontal = 8.dp))
