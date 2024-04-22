@@ -361,7 +361,7 @@ class JournalPropertiesViewModel : ViewModel() {
 
         val difference = endDate - startDate
 
-        return (difference / (24*60*60*1000)).toInt() + 1
+        return (difference / (24*60*60*1000)).toInt()
     }
 
 

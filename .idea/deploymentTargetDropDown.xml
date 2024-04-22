@@ -2,13 +2,10 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="TripPlanJournalScreen">
+      <entry key="Preview">
         <State />
       </entry>
       <entry key="TripPlanTodaysPlanScreen">
-        <State />
-      </entry>
-      <entry key="UserProfileScreen">
         <State />
       </entry>
       <entry key="app">
@@ -24,7 +21,7 @@
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-04-16T19:49:13.805675300Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-04-21T11:56:53.576794200Z" />
           <runningDeviceTargetsSelectedWithDialog>
             <Target>
               <type value="RUNNING_DEVICE_TARGET" />
@@ -56,6 +53,9 @@
           </runningDeviceTargetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-04-16T19:34:26.506293600Z" />
         </State>
+      </entry>
+      <entry key="prrreview">
+        <State />
       </entry>
     </value>
   </component>

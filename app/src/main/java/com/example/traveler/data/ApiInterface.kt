@@ -32,5 +32,5 @@ interface ApiInterface {
 
     @GET("v1/city")
     suspend fun getCity(@Query("name") city: String,
-                         @Header("X-Api-Key") apiKey: String = "oPlX/8X8XjPrh2QuPVaXUw==neGkbPWltwyA85SQ"): List<City>
+                         @Header("X-Api-Key") apiKey: String = "QOjO5qbsSSVIAKhTDn1qJg==jgxl0Mb2U6yxVyMk"): List<City>
 }

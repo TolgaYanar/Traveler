@@ -27,6 +27,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Surface
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -77,6 +79,10 @@ fun UserProfileScreen(
     ){
 
     val currentUser by profileViewModel.currentUser.observeAsState()
+
+    val currentDate by remember {
+        mutableStateOf(Calendar.getInstance().time.time)
+    }
 
     val isOwnProfile by remember {
         mutableStateOf(user?.uid == currentUser?.uid)
@@ -366,13 +372,17 @@ fun UserProfileScreen(
                                                 .show()
                                         }
                                     }
-                                },backgroundColor = Color(ongoingJournal.value.color.toULong()), shape = RoundedCornerShape(20.dp)
+                                }, shape = RoundedCornerShape(20.dp)
                             ) {
                                 LaunchedEffect(key1 = ongoingJournal){
                                     profileViewModel.loadOngoingTrip(user, ongoingJournal)
                                 }
 
-                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
+                                Box(modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        Color(ongoingJournal.value.color.toULong()).copy(0.75f)
+                                    ), contentAlignment = Alignment.TopStart) {
                                     Text(text = ongoingJournal.value.title, modifier = Modifier.padding(10.dp))
                                 }
                                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomStart) {
@@ -386,11 +396,11 @@ fun UserProfileScreen(
                                 .fillMaxWidth()
                                 .height(50.dp),
                             verticalAlignment = Alignment.Top) {
-                            Text(text = "2 more days", modifier = Modifier
+                            Text(text = "${journalPropertiesViewModel.getDayDifference(currentDate, ongoingJournal.value.endDateInMillis)} more days", modifier = Modifier
                                 .alpha(0.6f),
                                 fontWeight = FontWeight.Bold, fontSize = 16.sp)
                             if(isOwnProfile){
-                                Spacer(modifier = Modifier.width(140.dp))
+                                Spacer(modifier = Modifier.width(130.dp))
                                 Button(onClick = { expanded = true }, modifier = Modifier
                                     .height(30.dp)
                                     .width(135.dp)) {
@@ -435,7 +445,6 @@ fun UserProfileScreen(
 
                             items(journals.value.reversed()) { journal ->
 
-                                val currentDate = Calendar.getInstance().time.time
                                 val journalEndDate = journal.endDateInMillis
                                 if(
                                     currentDate>journalEndDate
@@ -444,7 +453,6 @@ fun UserProfileScreen(
                                         Column {
                                             Card(
                                                 elevation = 20.dp,
-                                                backgroundColor = Color(journal.color.toULong()),
                                                 modifier = Modifier
                                                     .width(160.dp)
                                                     .height(140.dp)
@@ -462,15 +470,18 @@ fun UserProfileScreen(
                                                         navController.navigate(Screen.RecentTripScreen.route)
                                                     }
                                             ) {
-                                                Box(modifier = Modifier.fillMaxSize()) {
 
-                                                    Box(modifier = Modifier
-                                                        .fillMaxSize()
-                                                        .padding(8.dp)
-                                                        .background(Color.Transparent),
-                                                        contentAlignment = Alignment.BottomStart){
-                                                        Text(text = journal.location.toString(), fontWeight = FontWeight.Bold, color = Color.White, fontSize = 20.sp)
-                                                    }
+                                                Box(modifier = Modifier
+                                                    .background(
+                                                        Color(journal.color.toULong()).copy(
+                                                            0.75f
+                                                        )
+                                                    )
+                                                    .fillMaxSize()
+                                                    .padding(8.dp)
+                                                    .background(Color.Transparent),
+                                                    contentAlignment = Alignment.BottomStart){
+                                                    Text(text = journal.location, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                                                 }
                                             }
                                             Text(text = "${journalPropertiesViewModel.getDayDifference(journalEndDate,currentDate)} days ago...", fontWeight = FontWeight.Bold,
@@ -492,7 +503,8 @@ fun UserProfileScreen(
                                         .alpha(0.7f)
                                         .size(70.dp)
                                         .fillMaxWidth()
-                                        .padding(end = 20.dp).padding(bottom = 10.dp)
+                                        .padding(end = 20.dp)
+                                        .padding(bottom = 10.dp)
                                         .clickable {
                                             navController.navigate(Screen.AddJournalScreen.route)
                                         }
@@ -513,24 +525,16 @@ fun UserProfileScreen(
     
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun prrreview(){
-    Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom, modifier = Modifier
-        .fillMaxSize()
-        .padding(25.dp)) {
-        Image(painter = painterResource(id = R.drawable.baseline_add_circle_outline_24), contentDescription = null,
-            alignment = Alignment.BottomEnd, modifier = Modifier
-                .alpha(0.7f)
-                .size(70.dp)
-                .fillMaxWidth()
-                .padding(end = 20.dp)
-                .padding(bottom = 10.dp)
-                .clickable {
+fun prrreview(journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
 
-                }
-        )
-        Text(text = "Add Journal", fontWeight = FontWeight.Bold, fontSize = 16.sp,
-            textAlign = TextAlign.End)
+    val currentDate = Calendar.getInstance().time.time
+
+    val endDate = 1713657600000
+
+    Column {
+        Text(text = journalPropertiesViewModel.getDayDifference(currentDate, endDate).toString())
+        Text(text = journalPropertiesViewModel.getDayDifference(endDate, currentDate).toString())
     }
 }

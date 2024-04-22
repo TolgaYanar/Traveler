@@ -290,12 +290,12 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                                                     Divider(modifier = Modifier
                                                         .padding(start = 8.dp)
                                                         .width(3.dp)
-                                                        .height(120.dp)
+                                                        .fillMaxHeight()
                                                         .padding(top = 11.dp))
                                                 }
                                                 Column(modifier  = Modifier
                                                     .padding(10.dp)
-                                                    .width(150.dp)) {
+                                                    .width(190.dp)) {
                                                     Text(text = it.title, fontSize = 18.sp, fontWeight = FontWeight.Bold,
                                                         color = Color.Black)
                                                     Spacer(modifier = Modifier.height(10.dp))
@@ -375,7 +375,77 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
 
 @Preview
 @Composable
-fun Preview(){
-    TripPlanTodaysPlanScreen(navController = rememberNavController(),
-        journal = Journal())
+fun Preview(journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
+    Card(modifier = Modifier
+        .height(120.dp)
+        .fillMaxWidth()
+    )
+    {
+        Row {
+            Box(modifier = Modifier
+                .background(Color.Transparent)
+                .padding(horizontal = 10.dp)
+                .padding(top = 10.dp)) {
+                Text(text = journalPropertiesViewModel.longToTime(8899),
+                    fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            }
+            Column(modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .padding(top = 10.dp)) {
+
+                Canvas(modifier = Modifier
+                    .padding(top = 10.dp)
+                    .padding(horizontal = 10.dp),
+                    onDraw = {
+                        drawCircle(Color.Black, radius = 30f)
+                    })
+                Divider(modifier = Modifier
+                    .padding(start = 8.dp)
+                    .width(3.dp)
+                    .fillMaxHeight()
+                    .padding(top = 11.dp))
+            }
+            Column(modifier  = Modifier
+                .fillMaxHeight()
+                .padding(10.dp)
+                .width(190.dp)) {
+                Text(text = "it.title", fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                    color = Color.Black)
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(text = "it.notes", color = Color(0xFF5581F1))
+            }
+
+            if(true){
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(40.dp)
+                            .background(Color.Gray)
+                            .clickable {
+
+                            }
+                    ) {
+                        Icon(imageVector = Icons.Filled.Edit, contentDescription = null)
+                    }
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(40.dp)
+                            .background(Color.Red)
+                            .clickable {
+
+                            }
+                    ) {
+                        Icon(imageVector = Icons.Filled.Delete, contentDescription = null)
+                    }
+                }
+            }
+        }
+    }
 }
