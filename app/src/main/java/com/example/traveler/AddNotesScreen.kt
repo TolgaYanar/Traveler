@@ -64,7 +64,7 @@ import java.util.UUID
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddNotesScreen(navController: NavController, journal: Journal,
-                   journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
+                   journalPropertiesViewModel: JournalPropertiesViewModel){
 
     val context = LocalContext.current
 
@@ -248,8 +248,8 @@ fun AddNotesScreen(navController: NavController, journal: Journal,
     }
 }
 
-@Preview
-@Composable
-fun addnotespreview(){
-    AddNotesScreen(navController = rememberNavController(), journal = Journal())
-}
+//@Preview
+//@Composable
+//fun addnotespreview(){
+//    AddNotesScreen(navController = rememberNavController(), journal = Journal())
+//}

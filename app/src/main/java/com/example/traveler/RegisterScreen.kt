@@ -44,6 +44,7 @@ import com.example.traveler.data.Result
 fun RegisterScreen(
     navController: NavController,
     authenticationViewModel: AuthenticationViewModel,
+    profileViewModel: ProfileViewModel,
     context: Context
 ){
 
@@ -143,6 +144,7 @@ fun RegisterScreen(
                             name = ""
                             password = ""
                             confirmPassword = ""
+                            profileViewModel.loadCurrentUser()
                             navController.navigate(Screen.MainMenuScreen.route)
                         }catch (e : Exception){
                             Toast.makeText(context, "Error occurred!", Toast.LENGTH_LONG).show()

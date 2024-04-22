@@ -69,8 +69,8 @@ import java.util.TimeZone
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddJournal(navController: NavController,
-               profileViewModel: ProfileViewModel = viewModel(),
-               journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
+               profileViewModel: ProfileViewModel,
+               journalPropertiesViewModel: JournalPropertiesViewModel){
 
     var title by remember {
         mutableStateOf("")
@@ -289,9 +289,9 @@ fun AddJournal(navController: NavController,
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview
-@Composable
-fun preview(){
-    AddJournal(navController = rememberNavController())
-}
+//@RequiresApi(Build.VERSION_CODES.O)
+//@Preview
+//@Composable
+//fun preview(){
+//    AddJournal(navController = rememberNavController())
+//}

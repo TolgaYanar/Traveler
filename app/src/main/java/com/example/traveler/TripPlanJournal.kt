@@ -75,8 +75,8 @@ import kotlinx.coroutines.tasks.await
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripPlanJournalScreen(navController: NavController, journal: Journal,
-                          profileViewModel: ProfileViewModel = viewModel(),
-                          journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
+                          profileViewModel: ProfileViewModel,
+                          journalPropertiesViewModel: JournalPropertiesViewModel){
 
     val user by profileViewModel.currentUser.observeAsState()
 

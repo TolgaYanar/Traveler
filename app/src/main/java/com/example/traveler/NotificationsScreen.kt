@@ -83,7 +83,7 @@ import java.util.TimeZone
 
 @Composable
 fun NotificationsScreen(navController: NavController,
-                        journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()) {
+                        journalPropertiesViewModel: JournalPropertiesViewModel) {
 
     val bottomNavClass = BottomNavigationClass()
     bottomNavClass.selectedItemIndex = 2

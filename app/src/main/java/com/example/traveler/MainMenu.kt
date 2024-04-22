@@ -58,8 +58,8 @@ import kotlinx.coroutines.tasks.await
 
 
 @Composable
-fun MainMenu(profileViewModel: ProfileViewModel = viewModel(), navController: NavController,
-             countryViewModel: CountryViewModel = viewModel()){
+fun MainMenu(profileViewModel: ProfileViewModel, navController: NavController,
+             countryViewModel: CountryViewModel){
 
     val bottomNavClass = BottomNavigationClass()
 

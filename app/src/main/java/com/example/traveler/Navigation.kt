@@ -19,6 +19,11 @@ import com.example.traveler.data.User
 fun Navigation(
     navController: NavHostController = rememberNavController(),
     authenticationViewModel: AuthenticationViewModel = viewModel(),
+    weatherViewModel: WeatherViewModel = viewModel(),
+    countryViewModel: CountryViewModel = viewModel(),
+    profileViewModel: ProfileViewModel = viewModel(),
+    tourismViewModel: TourismViewModel = viewModel(),
+    journalPropertiesViewModel: JournalPropertiesViewModel = viewModel(),
     context: Context
 ){
     NavHost(navController = navController, startDestination = "login_flow"){
@@ -28,25 +33,31 @@ fun Navigation(
                 LoadingScreen(navController)
             }
             composable(Screen.RegisterScreen.route){
-                RegisterScreen(navController, authenticationViewModel, context)
+                RegisterScreen(navController, authenticationViewModel, context = context,
+                    profileViewModel = profileViewModel)
             }
 
             composable(Screen.LoginScreen.route){
-                LoginScreen(navController, authenticationViewModel)
+                LoginScreen(navController, authenticationViewModel, profileViewModel)
             }
         }
 
         composable(Screen.MainMenuScreen.route){
-            MainMenu(navController = navController)
+            MainMenu(navController = navController, profileViewModel = profileViewModel,
+                countryViewModel = countryViewModel)
         }
 
         composable(Screen.UserProfileScreen.route){
             val result = navController.previousBackStackEntry?.savedStateHandle?.get<User>("user")
             if(result != null){
-                UserProfileScreen(navController, user = result)
+                UserProfileScreen(navController, user = result, authenticationViewModel = authenticationViewModel,
+                    journalPropertiesViewModel = journalPropertiesViewModel,
+                    profileViewModel = profileViewModel)
             }
             else{
-                UserProfileScreen(navController)
+                UserProfileScreen(navController, authenticationViewModel = authenticationViewModel,
+                    journalPropertiesViewModel = journalPropertiesViewModel,
+                    profileViewModel = profileViewModel)
             }
         }
 
@@ -54,39 +65,45 @@ fun Navigation(
             val result = navController.previousBackStackEntry?.savedStateHandle?.get<Journal>("journal")
             val user = navController.previousBackStackEntry?.savedStateHandle?.get<User>("user")
             if (result != null && user != null) {
-                RecentTripScreen(navController = navController, journal = result, user = user)
+                RecentTripScreen(navController = navController, journal = result, user = user,
+                    journalPropertiesViewModel)
             }
         }
         
         composable(Screen.EditProfileScreen.route){
-            EditProfileScreen(navController = navController)
+            EditProfileScreen(navController = navController, authenticationViewModel = authenticationViewModel,
+                profileViewModel = profileViewModel)
         }
         
         composable(Screen.FavoritesScreen.route){
-            FavoritesScreen(navController)
+            FavoritesScreen(navController, profileViewModel)
         }
 
         composable(Screen.NotificationsScreen.route){
-            NotificationsScreen(navController = navController)
+            NotificationsScreen(navController = navController, journalPropertiesViewModel = journalPropertiesViewModel)
         }
 
         composable(Screen.TripPlanTodaysPlanScreen.route){
             val result = navController.previousBackStackEntry?.savedStateHandle?.get<Journal>("journal")
             if(result != null)
-                TripPlanTodaysPlanScreen(journal = result, navController = navController)
+                TripPlanTodaysPlanScreen(journal = result, navController = navController,
+                    journalPropertiesViewModel = journalPropertiesViewModel)
         }
 
         composable(Screen.TripPlanJournalScreen.route){
             val result = navController.previousBackStackEntry?.savedStateHandle?.get<Journal>("journal")
             if (result != null) {
-                TripPlanJournalScreen(navController = navController, journal = result)
+                TripPlanJournalScreen(navController = navController, journal = result,
+                    journalPropertiesViewModel = journalPropertiesViewModel,
+                    profileViewModel = profileViewModel)
             }
         }
 
         composable(Screen.AddNotesScreen.route){
             val result = navController.previousBackStackEntry?.savedStateHandle?.get<Journal>("journal")
             if (result != null) {
-                AddNotesScreen(navController = navController, journal = result)
+                AddNotesScreen(navController = navController, journal = result,
+                    journalPropertiesViewModel = journalPropertiesViewModel)
             }
         }
         
@@ -97,19 +114,23 @@ fun Navigation(
 
             if (journal != null && thatDay != null && dayNum != null) {
                 AddTaskScreen(navController = navController, thatDay = thatDay, journal = journal,
-                    dayNumber = dayNum)
+                    dayNumber = dayNum, journalPropertiesViewModel = journalPropertiesViewModel)
             }
         }
 
         composable(Screen.AddJournalScreen.route){
-            AddJournal(navController = navController)
+            AddJournal(navController = navController, journalPropertiesViewModel = journalPropertiesViewModel,
+                profileViewModel = profileViewModel)
         }
 
         composable(Screen.CityInformationScreen.route){
             val result = navController.previousBackStackEntry?.savedStateHandle?.get<City>("city")
 
             if (result != null) {
-                CityInformationScreen(city = result, navController = navController)
+                CityInformationScreen(city = result, navController = navController,
+                    journalPropertiesViewModel = journalPropertiesViewModel,
+                    tourismViewModel = tourismViewModel,
+                    weatherViewModel = weatherViewModel)
             }
         }
     }

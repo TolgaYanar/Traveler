@@ -65,7 +65,7 @@ import kotlin.random.Random
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Long, dayNumber : Int,
-                  journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
+                  journalPropertiesViewModel: JournalPropertiesViewModel){
 
     var title by remember {
         mutableStateOf("TITLE")

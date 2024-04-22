@@ -67,7 +67,7 @@ class ProfileViewModel : ViewModel() {
         loadCurrentUser()
     }
 
-    private fun loadCurrentUser() {
+    fun loadCurrentUser() {
         viewModelScope.launch {
             when(val result = _userRepository.getCurrentUser()){
                 is Result.Success ->{

@@ -73,9 +73,10 @@ import java.util.Calendar
 
 @Composable
 fun UserProfileScreen(
-    navController: NavController, profileViewModel: ProfileViewModel = viewModel(),
+    navController: NavController, profileViewModel: ProfileViewModel,
     user: User? = profileViewModel.currentUser.value,
-    journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()
+    journalPropertiesViewModel: JournalPropertiesViewModel,
+    authenticationViewModel: AuthenticationViewModel
     ){
 
     val currentUser by profileViewModel.currentUser.observeAsState()
@@ -148,8 +149,8 @@ fun UserProfileScreen(
             }, title = {}, backgroundColor = colorResource(id = R.color.app_bar_color),
                 actions = {
                     IconButton(onClick = {
-                        FirebaseAuth.getInstance().signOut()
-                        navController.navigate(Screen.LoginScreen.route)
+                        authenticationViewModel.signOut()
+                        navController.navigate(Screen.RegisterScreen.route)
                     }) {
                         Icon(painter = painterResource(id = R.drawable.baseline_logout_24), contentDescription = null)
                     }
@@ -247,6 +248,7 @@ fun UserProfileScreen(
                                                         followersNum = followersNum!! + 1
                                                         user.followers++
                                                         println("User followed successfully")
+                                                        profileViewModel.currentUser.value!!.following++
                                                     }
                                                     .addOnFailureListener {
                                                         println("User couldn't followed. Error.")
@@ -283,6 +285,7 @@ fun UserProfileScreen(
                                                         followersNum = followersNum!! - 1
                                                         user.followers--
                                                         println("User unfollowed successfully")
+                                                        profileViewModel.currentUser.value!!.following--
                                                     }
                                                     .addOnFailureListener {
                                                         println("User couldn't unfollowed. Error.")
@@ -321,7 +324,7 @@ fun UserProfileScreen(
                         if (isOwnProfile) {
                             Image(painter = painterResource(id = R.drawable.baseline_edit_24),
                                 contentDescription = null,
-                                alpha = 0.5f,
+                                alpha = 0.7f,
                                 modifier = Modifier
                                     .size(18.dp)
                                     .clickable { navController.navigate(Screen.EditProfileScreen.route) })
@@ -417,6 +420,7 @@ fun UserProfileScreen(
                                     ongoingJournal.value = journal
                                     Injection.instance().collection("users").document(user.uid)
                                         .update("ongoing_trip", journal.title).addOnSuccessListener {
+                                            profileViewModel.currentUser.value!!.ongoing_trip = journal.title
                                             println("ongoing trip updated.")
                                         }.addOnFailureListener {
                                             println("ongoing trip couldn't updated.")

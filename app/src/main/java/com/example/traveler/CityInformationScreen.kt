@@ -70,9 +70,9 @@ import java.util.Locale
 @Composable
 fun CityInformationScreen(city: City,
                           navController: NavController,
-                          tourismViewModel: TourismViewModel = viewModel(),
-                          weatherViewModel: WeatherViewModel = viewModel(),
-                          journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()
+                          tourismViewModel: TourismViewModel,
+                          weatherViewModel: WeatherViewModel,
+                          journalPropertiesViewModel: JournalPropertiesViewModel
                           ){
 
     LaunchedEffect(key1 = true){

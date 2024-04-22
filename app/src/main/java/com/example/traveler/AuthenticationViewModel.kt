@@ -46,6 +46,12 @@ class AuthenticationViewModel: ViewModel() {
         }
     }
 
+    fun signOut() {
+        viewModelScope.launch {
+            _authResult.value = _userRepository.signOut()
+        }
+    }
+
     fun reauthentication(user: FirebaseUser?, currentPassword: String, newPassword: String, context: Context){
 
         GlobalScope.launch {

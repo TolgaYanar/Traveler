@@ -75,7 +75,8 @@ import java.util.UUID
 
 @Composable
 fun EditProfileScreen(navController: NavController,
-                      authenticationViewModel: AuthenticationViewModel = viewModel()){
+                      authenticationViewModel: AuthenticationViewModel,
+                      profileViewModel: ProfileViewModel){
 
     val auth = FirebaseAuth.getInstance()
     val currentUser = auth.currentUser
@@ -278,7 +279,10 @@ fun EditProfileScreen(navController: NavController,
                                     navController.navigate(Screen.EditProfileScreen.route)
                                 }
                                 else{
+
                                     Injection.instance().collection("users").document(user!!.uid).set(user!!)
+                                    profileViewModel.currentUser.value = user
+
                                     if(newPassword.isNotEmpty() && currentPassword.isNotEmpty()) {
                                         authenticationViewModel.reauthentication(
                                             user = currentUser,

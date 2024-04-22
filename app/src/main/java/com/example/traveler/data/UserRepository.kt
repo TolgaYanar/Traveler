@@ -73,4 +73,13 @@ class UserRepository(
             return Result.Fail(Exception("User not authenticated"))
         }
     }
+
+    fun signOut(): Result<Boolean> =
+        try {
+            auth.signOut()
+            Result.Success(false)
+        }catch (e: Exception){
+            Result.Fail(e)
+        }
+
 }

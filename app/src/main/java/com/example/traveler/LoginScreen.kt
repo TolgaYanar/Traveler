@@ -55,7 +55,8 @@ import com.example.traveler.data.Result
 @Composable
 fun LoginScreen(
     navController: NavController,
-    authenticationViewModel: AuthenticationViewModel
+    authenticationViewModel: AuthenticationViewModel,
+    profileViewModel: ProfileViewModel
 ){
 
     var email by remember {
@@ -132,8 +133,14 @@ fun LoginScreen(
 
                 LaunchedEffect(result) {
                     result?.let { result ->
+                        println(result)
                         when (result) {
-                            is Result.Success -> navController.navigate(Screen.MainMenuScreen.route)
+                            is Result.Success -> {
+                                if(result.data){
+                                    profileViewModel.loadCurrentUser()
+                                    navController.navigate(Screen.MainMenuScreen.route)
+                                }
+                            }
                             is Result.Fail -> {
                                 // Handle failure case if needed
                             }

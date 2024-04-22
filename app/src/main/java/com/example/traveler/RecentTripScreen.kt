@@ -59,7 +59,7 @@ import com.google.firebase.firestore.SetOptions
 
 @Composable
 fun RecentTripScreen(navController: NavController, journal: Journal, user: User,
-                     journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
+                     journalPropertiesViewModel: JournalPropertiesViewModel){
 
     val notes by remember {
         mutableStateOf(mutableStateOf(emptyList<Notes>()))
@@ -187,8 +187,9 @@ fun RecentTripScreen(navController: NavController, journal: Journal, user: User,
 
 
 
-@Preview
-@Composable
-fun preeeview(){
-    RecentTripScreen(navController = rememberNavController(), journal = Journal(), User())
-}
+//@Preview
+//@Composable
+//fun preeeview(){
+//    RecentTripScreen(navController = rememberNavController(), journal = Journal(), User(),
+//        journalPropertiesViewModel = )
+//}

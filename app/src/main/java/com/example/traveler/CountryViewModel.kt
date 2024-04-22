@@ -6,12 +6,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traveler.data.ApiClient
+import com.example.traveler.data.ApiKey
 import com.example.traveler.data.City
 import com.example.traveler.data.Country
 import com.example.traveler.data.Injection
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import retrofit2.HttpException
 import javax.inject.Inject
 
 class CountryViewModel : ViewModel() {
@@ -76,6 +78,10 @@ class CountryViewModel : ViewModel() {
                 } catch (e: Exception) {
                     // Handle error, such as logging or showing a toast
                     e.printStackTrace()
+                    if (e is HttpException && e.code() == 401) {
+                        ApiKey.rotateCityApiKey()
+                        listCityFetchData()
+                    }
                 }
             }
         }

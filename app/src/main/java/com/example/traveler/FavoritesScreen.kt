@@ -47,7 +47,7 @@ import coil.compose.AsyncImage
 import com.example.traveler.data.Injection
 
 @Composable
-fun FavoritesScreen(navController: NavController, profileViewModel: ProfileViewModel = viewModel()) {
+fun FavoritesScreen(navController: NavController, profileViewModel: ProfileViewModel) {
 
     val bottomNavClass = BottomNavigationClass()
     bottomNavClass.selectedItemIndex = 1

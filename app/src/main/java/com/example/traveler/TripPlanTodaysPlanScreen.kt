@@ -91,7 +91,7 @@ import java.util.concurrent.TimeUnit
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
-                             journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
+                             journalPropertiesViewModel: JournalPropertiesViewModel){
 
 
     val journalDuration = journalPropertiesViewModel.getDayDifference(
