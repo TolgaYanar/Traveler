@@ -39,6 +39,7 @@ import androidx.navigation.NavController
 
 @Composable
 fun LoadingScreen(navController: NavController){
+
     LazyColumn(modifier = Modifier
         .fillMaxSize()
         .background(Color(0xFF018786)),

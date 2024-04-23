@@ -311,5 +311,4 @@ fun EditProfileScreen(navController: NavController,
             }
         }
     }
-
 }

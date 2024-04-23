@@ -4,16 +4,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
-    private const val BASE_URL_COUNTRY = "https://countryapi.io/api/"
-
-    private val retrofitCountry = Retrofit.Builder()
-        .baseUrl(BASE_URL_COUNTRY)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    val apiServiceCountry: ApiInterface = retrofitCountry.create(ApiInterface::class.java)
-
-
 
     private const val BASE_URL_CITY = "https://api.api-ninjas.com/"
 

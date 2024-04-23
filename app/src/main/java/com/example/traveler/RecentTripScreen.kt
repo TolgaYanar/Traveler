@@ -181,15 +181,4 @@ fun RecentTripScreen(navController: NavController, journal: Journal, user: User,
             }
         }
     }
-
 }
-
-
-
-
-//@Preview
-//@Composable
-//fun preeeview(){
-//    RecentTripScreen(navController = rememberNavController(), journal = Journal(), User(),
-//        journalPropertiesViewModel = )
-//}

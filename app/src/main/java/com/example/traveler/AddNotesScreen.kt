@@ -247,9 +247,3 @@ fun AddNotesScreen(navController: NavController, journal: Journal,
         }
     }
 }
-
-//@Preview
-//@Composable
-//fun addnotespreview(){
-//    AddNotesScreen(navController = rememberNavController(), journal = Journal())
-//}

@@ -288,10 +288,3 @@ fun AddJournal(navController: NavController,
         }
     }
 }
-
-//@RequiresApi(Build.VERSION_CODES.O)
-//@Preview
-//@Composable
-//fun preview(){
-//    AddJournal(navController = rememberNavController())
-//}

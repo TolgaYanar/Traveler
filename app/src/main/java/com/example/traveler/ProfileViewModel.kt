@@ -53,12 +53,6 @@ class ProfileViewModel : ViewModel() {
     private val _favoriteCountries = MutableLiveData<List<City>>()
     val favoriteCountries : MutableLiveData<List<City>> get() = _favoriteCountries
 
-//    private val _journals = MutableLiveData<List<Map<String, Any>>>()
-//    val journals : MutableLiveData<List<Map<String, Any>>> get() = _journals
-
-    private val _tasks = MutableLiveData<List<Map<String, Any>>>()
-    val tasks : MutableLiveData<List<Map<String, Any>>> get() = _tasks
-
     init {
         _userRepository = UserRepository(
             FirebaseAuth.getInstance(),
@@ -112,28 +106,6 @@ class ProfileViewModel : ViewModel() {
             }
         }
     }
-
-//    fun loadTasksOfUser(journal: Journal, dayNumber: Int) {
-//        viewModelScope.launch {
-//            val user = FirebaseAuth.getInstance().currentUser
-//            val firestore = Injection.instance()
-//
-//            val collectionRef = user?.let {
-//                firestore.collection("users")
-//                    .document(it.uid).collection("journals").document(journal.title)
-//                    .collection("days").document("day$dayNumber")
-//                    .collection("tasks")
-//            }
-//            val snapshot = collectionRef?.get()?.await()
-//            val itemList = snapshot?.documents?.mapNotNull { document ->
-//                document.data?.toMutableMap()?.apply {
-//                    // including the document ID in the map to access along with its fields later
-//                    put("documentId", document.id)
-//                }
-//            }
-//            _tasks.value = itemList
-//        }
-//    }
 
     fun loadOngoingTrip(user: User, journal: MutableState<Journal>){
         viewModelScope.launch {

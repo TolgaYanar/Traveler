@@ -1,13 +1,11 @@
 package com.example.traveler
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traveler.data.ApiClient
 import com.example.traveler.data.City
-import com.example.traveler.data.Country
 import com.example.traveler.data.WeatherResponse
 import kotlinx.coroutines.launch
 

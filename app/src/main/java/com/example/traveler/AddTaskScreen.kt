@@ -190,7 +190,7 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                             })
                     })
                 journalPropertiesViewModel.DropDownMenu(
-                    list = listOf("5", "10", "15", "30"),
+                    list = listOf("5", "10", "15", "30", "45", "60"),
                     expanded = reminderExpanded,
                     onDismissRequest = { reminderExpanded = false },
                     onClick = {item->

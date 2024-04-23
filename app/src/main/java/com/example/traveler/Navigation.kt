@@ -1,8 +1,6 @@
 package com.example.traveler
 
 import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -11,7 +9,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.example.traveler.data.City
-import com.example.traveler.data.Country
 import com.example.traveler.data.Journal
 import com.example.traveler.data.User
 
