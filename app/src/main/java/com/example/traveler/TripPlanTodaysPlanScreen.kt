@@ -295,7 +295,7 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                                                 }
                                                 Column(modifier  = Modifier
                                                     .padding(10.dp)
-                                                    .width(190.dp)) {
+                                                    .width(160.dp)) {
                                                     Text(text = it.title, fontSize = 18.sp, fontWeight = FontWeight.Bold,
                                                         color = Color.Black)
                                                     Spacer(modifier = Modifier.height(10.dp))
@@ -311,7 +311,7 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                                                             contentAlignment = Alignment.Center,
                                                             modifier = Modifier
                                                                 .fillMaxHeight()
-                                                                .width(40.dp)
+                                                                .width(35.dp)
                                                                 .background(Color.Gray)
                                                                 .clickable {
 
@@ -323,7 +323,7 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                                                             contentAlignment = Alignment.Center,
                                                             modifier = Modifier
                                                                 .fillMaxHeight()
-                                                                .width(40.dp)
+                                                                .width(35.dp)
                                                                 .background(Color.Red)
                                                                 .clickable {
                                                                     journalPropertiesViewModel.deleteTask(

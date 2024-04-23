@@ -150,7 +150,7 @@ fun UserProfileScreen(
                 actions = {
                     IconButton(onClick = {
                         authenticationViewModel.signOut()
-                        navController.navigate(Screen.RegisterScreen.route)
+                            navController.navigate(Screen.LoginScreen.route)
                     }) {
                         Icon(painter = painterResource(id = R.drawable.baseline_logout_24), contentDescription = null)
                     }

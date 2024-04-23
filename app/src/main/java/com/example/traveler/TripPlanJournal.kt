@@ -118,7 +118,7 @@ fun TripPlanJournalScreen(navController: NavController, journal: Journal,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp), verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.Absolute.SpaceEvenly
                 )
                 {
                     Card(
