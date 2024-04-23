@@ -47,8 +47,8 @@ class ProfileViewModel : ViewModel() {
 
     private val _userRepository: UserRepository
 
-    private val _currentUser = MutableLiveData<User>()
-    val currentUser : MutableLiveData<User> get() = _currentUser
+    private val _currentUser = MutableLiveData<User?>()
+    val currentUser : MutableLiveData<User?> get() = _currentUser
 
     private val _favoriteCountries = MutableLiveData<List<City>>()
     val favoriteCountries : MutableLiveData<List<City>> get() = _favoriteCountries

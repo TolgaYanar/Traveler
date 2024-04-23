@@ -21,7 +21,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.traveler.data.Result
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
@@ -66,6 +69,8 @@ fun RegisterScreen(
     var showPassword2 by remember {
         mutableStateOf(false)
     }
+
+    val result by authenticationViewModel.authResult.observeAsState()
 
     LazyColumn(modifier = Modifier
         .fillMaxSize()
@@ -144,8 +149,6 @@ fun RegisterScreen(
                             name = ""
                             password = ""
                             confirmPassword = ""
-                            profileViewModel.loadCurrentUser()
-                            navController.navigate(Screen.MainMenuScreen.route)
                         }catch (e : Exception){
                             Toast.makeText(context, "Error occurred!", Toast.LENGTH_LONG).show()
                             println("${e.cause} ${e.message}")
@@ -157,11 +160,33 @@ fun RegisterScreen(
                 }else{
                     Toast.makeText(context,"Please fill all the blanks.", Toast.LENGTH_LONG).show()
                 }
-            }, modifier = Modifier.padding(16.dp), shape = RoundedCornerShape(20.dp)) {
+            }, modifier = Modifier.padding(16.dp), shape = RoundedCornerShape(20.dp)
+            ) {
                 Text(text = "Create an Account",fontSize = 20.sp,
                     modifier = Modifier.padding(7.dp),
                     fontWeight = FontWeight.Bold, color = Color.White)
             }
+
+            LaunchedEffect(result) {
+                result?.let { result ->
+                    println(result)
+                    when (result) {
+                        is Result.Success -> {
+                            if(result.data){
+                                profileViewModel.loadCurrentUser()
+                                navController.navigate(Screen.MainMenuScreen.route)
+                            }
+                        }
+                        is Result.Fail -> {
+                            // Handle failure case if needed
+                        }
+                        else -> {
+                            // Handle other cases if needed
+                        }
+                    }
+                }
+            }
+
             Row {
                 Divider(modifier = Modifier
                     .width(80.dp)
