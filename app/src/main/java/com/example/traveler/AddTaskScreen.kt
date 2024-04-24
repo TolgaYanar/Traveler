@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,11 +42,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -153,7 +157,7 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                 )
 
                 if (timePickerExpanded){
-                    TimePicker(onDismissRequest = { timePickerExpanded = false },
+                    journalPropertiesViewModel.TimePicker(onDismissRequest = { timePickerExpanded = false },
                         onTimeSelected = { start, end ->
                             startTime = start
                             endTime = end
@@ -167,38 +171,42 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                 Spacer(modifier = Modifier.height(30.dp))
                 TextField(value = repeat, onValueChange = {},
                     trailingIcon = {
-                        Image(painter = painterResource(id = R.drawable.baseline_repeat_on_24), contentDescription = null,
-                            modifier = Modifier.clickable {
-                                repeatExpanded = !repeatExpanded
-                            })
+                        IconButton(onClick = { repeatExpanded = !repeatExpanded }) {
+                            Icon(painter = painterResource(id = R.drawable.baseline_repeat_on_24),
+                                contentDescription = null)
+                        }
+                        journalPropertiesViewModel.DropDownMenu(
+                            list = listOf("Once", "Often", "Always"),
+                            expanded = repeatExpanded,
+                            onDismissRequest = { repeatExpanded = false },
+                            onClick = {item->
+                                repeat = item.toString()
+                                repeatExpanded = false
+                            }
+                        )
                     })
-                journalPropertiesViewModel.DropDownMenu(
-                    list = listOf("Once", "Often", "Always"),
-                    expanded = repeatExpanded,
-                    onDismissRequest = { repeatExpanded = false },
-                    onClick = {item->
-                        repeat = item.toString()
-                        repeatExpanded = false
-                    }
-                )
+
                 Spacer(modifier = Modifier.height(30.dp))
+
                 TextField(value = "$reminder minutes", onValueChange = {},
                     trailingIcon = {
-                        Image(painter = painterResource(id = R.drawable.baseline_access_time_24), contentDescription = null,
-                            modifier = Modifier.clickable {
-                                reminderExpanded = !repeatExpanded
-                            })
+                        IconButton(onClick = { reminderExpanded = !repeatExpanded }) {
+                            Icon(painter = painterResource(id = R.drawable.baseline_access_time_24),
+                                contentDescription = null)
+                        }
+                        journalPropertiesViewModel.DropDownMenu(
+                            list = listOf("5", "10", "15", "30", "45", "60"),
+                            expanded = reminderExpanded,
+                            onDismissRequest = { reminderExpanded = false },
+                            onClick = {item->
+                                reminder = item.toString()
+                                reminderExpanded = false
+                            }
+                        )
                     })
-                journalPropertiesViewModel.DropDownMenu(
-                    list = listOf("5", "10", "15", "30", "45", "60"),
-                    expanded = reminderExpanded,
-                    onDismissRequest = { reminderExpanded = false },
-                    onClick = {item->
-                        reminder = item.toString()
-                        reminderExpanded = false
-                    }
-                )
+
                 Spacer(modifier = Modifier.height(50.dp))
+
                 OutlinedTextField(value = notes, onValueChange = {notes = it},
                     colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Gray, focusedContainerColor = Color.Gray),
                     placeholder = {
@@ -208,6 +216,7 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                         Text(text = "Notes")
                     }
                 )
+
                 Row(modifier = Modifier
                     .fillMaxWidth()
                     .padding(20.dp), horizontalArrangement = Arrangement.End) {
@@ -235,95 +244,6 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
             }
         }
 
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TimePicker(onDismissRequest: () -> Unit,
-               onTimeSelected: (String, String) -> Unit)
-{
-
-    val startTimeDialog = rememberTimePickerState()
-    val endTimeDialog = rememberTimePickerState()
-
-    var startHour by remember {
-        mutableStateOf(startTimeDialog.hour)
-    }
-    var startMin by remember {
-        mutableStateOf(startTimeDialog.minute)
-    }
-    var endHour by remember {
-        mutableStateOf(endTimeDialog.hour)
-    }
-    var endMin by remember {
-        mutableStateOf(endTimeDialog.minute)
-    }
-
-    var startTime by remember {
-        mutableStateOf("")
-    }
-    var endTime by remember {
-        mutableStateOf("")
-    }
-
-    Dialog(onDismissRequest = { onDismissRequest() })
-    {
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            elevation = 6.dp
-        ) {
-            Column(
-                modifier = Modifier.padding(8.dp)
-            ) {
-
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .background(Color.Gray),
-                    contentAlignment = Alignment.Center
-                ){
-                    TimeInput(state = startTimeDialog,
-                        modifier = Modifier.fillMaxSize())
-                }
-
-                Text(text = "Starting Time : ${startTimeDialog.hour}:${startTimeDialog.minute}")
-
-                Spacer(modifier = Modifier.height(25.dp))
-
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .background(Color.Gray),
-                    contentAlignment = Alignment.Center
-                ){
-                    TimeInput(state = endTimeDialog,
-                        modifier = Modifier.fillMaxSize())
-                }
-
-                Text(text = "Ending Time : ${endTimeDialog.hour}:${endTimeDialog.minute}")
-
-                Spacer(modifier = Modifier.height(25.dp))
-
-                Button(onClick = {
-                    startHour = startTimeDialog.hour
-                    startMin = startTimeDialog.minute
-                    endHour = endTimeDialog.hour
-                    endMin = endTimeDialog.minute
-                    startTime = "${startHour}:$startMin"
-                    endTime = "${endHour}:$endMin"
-                    if(startTime != ":" || endTime != ":"){
-                        onTimeSelected(startTime, endTime)
-                        onDismissRequest()
-                    }
-                     },
-                    modifier = Modifier.fillMaxWidth()
-
-                ) {
-                    Text(text = "Select")
-                }
-            }
-        }
     }
 }
 

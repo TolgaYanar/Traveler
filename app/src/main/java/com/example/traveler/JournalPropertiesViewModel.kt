@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,8 +20,11 @@ import androidx.compose.material.Slider
 import androidx.compose.material.Surface
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimeInput
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -29,9 +33,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -116,6 +123,95 @@ class JournalPropertiesViewModel : ViewModel() {
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun TimePicker(onDismissRequest: () -> Unit,
+                   onTimeSelected: (String, String) -> Unit)
+    {
+
+        val startTimeDialog = rememberTimePickerState()
+        val endTimeDialog = rememberTimePickerState()
+
+        var startHour by remember {
+            mutableStateOf(startTimeDialog.hour)
+        }
+        var startMin by remember {
+            mutableStateOf(startTimeDialog.minute)
+        }
+        var endHour by remember {
+            mutableStateOf(endTimeDialog.hour)
+        }
+        var endMin by remember {
+            mutableStateOf(endTimeDialog.minute)
+        }
+
+        var startTime by remember {
+            mutableStateOf("")
+        }
+        var endTime by remember {
+            mutableStateOf("")
+        }
+
+        Dialog(onDismissRequest = { onDismissRequest() })
+        {
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                elevation = 6.dp
+            ) {
+                Column(
+                    modifier = Modifier.padding(8.dp)
+                ) {
+
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .background(Color.Gray),
+                        contentAlignment = Alignment.Center
+                    ){
+                        TimeInput(state = startTimeDialog,
+                            modifier = Modifier.fillMaxSize())
+                    }
+
+                    Text(text = "Starting Time : ${startTimeDialog.hour}:${startTimeDialog.minute}")
+
+                    Spacer(modifier = Modifier.height(25.dp))
+
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .background(Color.Gray),
+                        contentAlignment = Alignment.Center
+                    ){
+                        TimeInput(state = endTimeDialog,
+                            modifier = Modifier.fillMaxSize())
+                    }
+
+                    Text(text = "Ending Time : ${endTimeDialog.hour}:${endTimeDialog.minute}")
+
+                    Spacer(modifier = Modifier.height(25.dp))
+
+                    Button(onClick = {
+                        startHour = startTimeDialog.hour
+                        startMin = startTimeDialog.minute
+                        endHour = endTimeDialog.hour
+                        endMin = endTimeDialog.minute
+                        startTime = "${startHour}:$startMin"
+                        endTime = "${endHour}:$endMin"
+                        if(startTime != ":" || endTime != ":"){
+                            onTimeSelected(startTime, endTime)
+                            onDismissRequest()
+                        }
+                    },
+                        modifier = Modifier.fillMaxWidth()
+
+                    ) {
+                        Text(text = "Select")
+                    }
+                }
+            }
+        }
+    }
+
     fun longToDate(longDate: Long?): String? {
         val date = longDate?.let { Date(it) }
         val dateFormat = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault())
@@ -166,8 +262,8 @@ class JournalPropertiesViewModel : ViewModel() {
     fun DropDownMenu(list : List<Any>, expanded : Boolean,
                      onDismissRequest: () -> Unit, onClick: (Any) -> Unit){
 
-        DropdownMenu(expanded = expanded, onDismissRequest = { onDismissRequest() }) {
-
+        DropdownMenu(expanded = expanded, onDismissRequest = { onDismissRequest() }
+        ){
             list.forEach {item->
                 DropdownMenuItem(onClick = { onClick(item) }) {
                     Text(text = item.toString(), fontSize = 16.sp, modifier = Modifier.fillMaxSize(),
