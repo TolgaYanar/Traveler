@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.traveler.data.AlarmItem
 import com.example.traveler.data.AndroidAlarmSchedular
@@ -360,7 +361,7 @@ class JournalPropertiesViewModel : ViewModel() {
     @OptIn(DelicateCoroutinesApi::class)
     fun getRandomUsersWithMatchingLocation(number : Int, location : String, list : MutableList<User>){
 
-        GlobalScope.launch {
+        viewModelScope.launch {
 
             val usersID = mutableListOf<String>()
             val users = mutableListOf<String>()
@@ -407,7 +408,7 @@ class JournalPropertiesViewModel : ViewModel() {
     @OptIn(DelicateCoroutinesApi::class)
     fun getNotifications(notificationList : MutableState<List<AlarmItem>>){
 
-        GlobalScope.launch {
+        viewModelScope.launch {
             val firestore = Injection.instance()
             val userID = FirebaseAuth.getInstance().uid
 
@@ -424,7 +425,7 @@ class JournalPropertiesViewModel : ViewModel() {
     @OptIn(DelicateCoroutinesApi::class)
     fun deleteNotification(id : String){
 
-        GlobalScope.launch {
+        viewModelScope.launch {
             val firestore = Injection.instance()
             val userID = FirebaseAuth.getInstance().uid
 
@@ -438,7 +439,7 @@ class JournalPropertiesViewModel : ViewModel() {
 
     fun getNotes(journal : Journal, list : MutableState<List<Notes>>, user : User?){
 
-        GlobalScope.launch {
+        viewModelScope.launch {
             val firestore = Injection.instance()
             val notesCollection = user?.let {
                 firestore.collection("users").document(it.uid)
@@ -453,6 +454,24 @@ class JournalPropertiesViewModel : ViewModel() {
 
     }
 
+    fun deleteNote(journal: Journal, note: Notes, user: User?){
+
+        viewModelScope.launch {
+            val firestore = Injection.instance()
+            val notesCollection = user?.let {
+                firestore.collection("users").document(it.uid)
+                    .collection("journals").document(journal.title).collection("notes")
+            }
+            val noteSnapshot = notesCollection?.document(note.added.toString())?.delete()
+                ?.addOnSuccessListener {
+                    println("Note deleted successfully.")
+                }
+                ?.addOnFailureListener {
+                    println("Note couldn't deleted successfully.")
+                }
+        }
+    }
+
     fun getDayDifference(startDate : Long, endDate : Long) : Int{
 
         val difference = endDate - startDate
@@ -464,7 +483,7 @@ class JournalPropertiesViewModel : ViewModel() {
     @OptIn(DelicateCoroutinesApi::class)
     fun loadTasksOfDay(journal: Journal, day: String, tasks : MutableList<Task>){
 
-        GlobalScope.launch{
+        viewModelScope.launch{
             try {
                 val user = FirebaseAuth.getInstance().currentUser
                 val firestore = Injection.instance()

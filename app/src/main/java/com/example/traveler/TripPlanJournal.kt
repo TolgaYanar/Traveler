@@ -19,10 +19,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -84,6 +86,14 @@ fun TripPlanJournalScreen(navController: NavController, journal: Journal,
         mutableStateOf(mutableStateOf(emptyList<Notes>()))
     }
 
+    var deleteMode by remember {
+        mutableStateOf(false)
+    }
+
+    val deleteFolder by remember {
+        mutableStateOf(mutableListOf<Notes>())
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(title = { Text(text = "Trip Plan") },
@@ -95,12 +105,18 @@ fun TripPlanJournalScreen(navController: NavController, journal: Journal,
                     }
                 },
                 actions = {
-                          IconButton(onClick = {
-                              navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
-                              navController.navigate(Screen.AddNotesScreen.route)
-                          }) {
-                              Icon(imageVector = Icons.Default.Edit, contentDescription = null)
-                          }
+                    IconButton(onClick = {
+                        navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
+                        navController.navigate(Screen.AddNotesScreen.route)
+                    }) {
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+                    }
+
+                    IconButton(onClick = {
+                        deleteMode = !deleteMode
+                    }) {
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                    }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.White)
@@ -164,25 +180,69 @@ fun TripPlanJournalScreen(navController: NavController, journal: Journal,
                     verticalArrangement = Arrangement.Top
                 ) {
 
-                    items(notes.value) {
-                        if(it.note.startsWith("https://firebasestorage.googleapis.com/v0/b/traveller-4d4df.appspot.com/o/images")){
-                            Card(
-                                modifier = Modifier
-                                    .height(250.dp)
-                                    .width(250.dp)
-                                    .padding(20.dp)
-                            ) {
-                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                                    Image(painter = rememberAsyncImagePainter(model = it.note,
-                                        contentScale = ContentScale.Crop), contentDescription = null,
-                                        contentScale = ContentScale.Crop)
+                    items(notes.value) {note->
+
+                        Row{
+                            if (deleteMode){
+                                var checked by remember {
+                                    mutableStateOf(false)
+                                }
+
+                                Column(verticalArrangement = Arrangement.Center,
+                                    modifier = Modifier.height(100.dp))
+                                {
+                                    Checkbox(checked = checked, onCheckedChange = {
+                                        checked = !checked
+                                        if(checked){
+                                            deleteFolder.add(note)
+                                        }else{
+                                            deleteFolder.remove(note)
+                                        }
+                                    })
                                 }
                             }
+
+                            if(note.note.startsWith("https://firebasestorage.googleapis.com/v0/b/traveller-4d4df.appspot.com/o/images")){
+                                Card(
+                                    modifier = Modifier
+                                        .height(250.dp)
+                                        .width(250.dp)
+                                        .padding(20.dp)
+                                ) {
+                                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                                        Image(painter = rememberAsyncImagePainter(model = note.note,
+                                            contentScale = ContentScale.Crop), contentDescription = null,
+                                            contentScale = ContentScale.Crop)
+                                    }
+                                }
+                            }
+                            else{
+                                Text(text = note.note, modifier = Modifier
+                                    .width(325.dp)
+                                    .padding(20.dp))
+                            }
                         }
-                        else{
-                            Text(text = it.note, modifier = Modifier
-                                .width(325.dp)
-                                .padding(20.dp))
+                    }
+
+                    if(deleteMode){
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                Button(onClick = {
+                                    deleteFolder.forEach {
+                                        journalPropertiesViewModel.deleteNote(journal, it, user)
+                                    }
+                                    navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
+                                    navController.navigate(Screen.TripPlanJournalScreen.route)
+                                }) {
+                                    Text(text = "Delete", fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold)
+                                }
+                            }
                         }
                     }
                 }
