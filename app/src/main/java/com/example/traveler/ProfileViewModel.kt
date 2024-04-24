@@ -1,19 +1,29 @@
 package com.example.traveler
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.Surface
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,12 +32,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil.compose.rememberAsyncImagePainter
 import com.example.traveler.data.City
 import com.example.traveler.data.Injection
 import com.example.traveler.data.Journal
@@ -52,6 +66,14 @@ class ProfileViewModel : ViewModel() {
 
     private val _favoriteCountries = MutableLiveData<List<City>>()
     val favoriteCountries : MutableLiveData<List<City>> get() = _favoriteCountries
+
+    private val _followings = MutableLiveData<MutableList<User?>>()
+    val followings : MutableLiveData<MutableList<User?>> get() = _followings
+
+    private val _followers = MutableLiveData<MutableList<User?>>()
+    val followers : MutableLiveData<MutableList<User?>> get() = _followers
+
+
 
     init {
         _userRepository = UserRepository(
@@ -81,13 +103,63 @@ class ProfileViewModel : ViewModel() {
             val user = FirebaseAuth.getInstance().currentUser
             val firestore = Injection.instance()
 
-            val collectionRef = firestore.collection("users")
+            val favoritesCollectionRef = firestore.collection("users")
                     .document(user!!.uid).collection("favorites")
 
-            val snapshot = collectionRef.get().await()
-            val itemList = snapshot.toObjects<City>()
-
+            val favoritesSnapshot = favoritesCollectionRef.get().await()
+            val itemList = favoritesSnapshot.toObjects<City>()
             _favoriteCountries.value = itemList
+        }
+    }
+
+    fun followingsOfUser(){
+        viewModelScope.launch {
+            val user = FirebaseAuth.getInstance().currentUser
+            val firestore = Injection.instance()
+
+            val followingList = mutableListOf<User?>()
+
+            val usersCollection = firestore.collection("users")
+
+            val followingCollection = usersCollection.document(user!!.uid)
+                .collection("following")
+
+            val followingsSnapshot = followingCollection.get().await()
+            followingsSnapshot.documents.forEach {document->
+
+                val snapshotUser = usersCollection.document(document.id).get().await()
+                followingList.add(snapshotUser.toObject(User::class.java))
+            }
+            _followings.value = followingList
+
+            println(followings.value)
+        }
+    }
+
+    fun followersOfUser(){
+        viewModelScope.launch {
+            val user = FirebaseAuth.getInstance().currentUser
+            val firestore = Injection.instance()
+
+            val followersList = mutableListOf<User?>()
+
+            val usersCollection = firestore.collection("users")
+
+            val followersSnapshot = usersCollection.get().await()
+            followersSnapshot.documents.forEach {document->
+                val documentsFollowingCol = document.reference.collection("following")
+                val documentsFollowingSnap = documentsFollowingCol.get().await()
+
+                documentsFollowingSnap.documents.forEach {possibleFollower->
+                    if(possibleFollower.id == user!!.uid){
+                        val snapshotUser = usersCollection.document(document.id).get().await()
+                        followersList.add(snapshotUser.toObject(User::class.java))
+                    }
+                }
+            }
+            _followers.value = followersList
+
+            println(followers.value)
         }
     }
 
@@ -155,7 +227,8 @@ class ProfileViewModel : ViewModel() {
 
     @Composable
     fun UpdateJournal(journals : MutableState<List<Journal>>, onDismissRequest: () -> Unit,
-                      onSuccessRequest: (Journal) -> Unit ){
+                      onSuccessRequest: (Journal) -> Unit )
+    {
         var title by remember {
             mutableStateOf("")
         }
@@ -189,7 +262,6 @@ class ProfileViewModel : ViewModel() {
             ) {
 
                 LazyColumn(modifier = Modifier
-                    .padding(8.dp)
                     .fillMaxSize(0.75f),
                     verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally)
                 {
@@ -238,6 +310,212 @@ class ProfileViewModel : ViewModel() {
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    fun Followings(
+        followingsOrFollowers: MutableList<User?>,
+        onClickProfile: (User) -> Unit,
+        onDismissRequest: () -> Unit,
+        onFollowBoxClick: (User, MutableState<String?>) -> Unit
+    ){
+
+        Dialog(onDismissRequest = { onDismissRequest() }) {
+
+            Surface(
+                modifier = Modifier.fillMaxHeight(0.5f),
+                shape = RectangleShape,
+                elevation = 6.dp
+            ) {
+
+                LazyColumn(modifier = Modifier
+                    .fillMaxSize(),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally)
+                {
+
+                    items(followingsOrFollowers){ user->
+
+                        println(user)
+                        
+                        val isFollowing by remember {
+                            mutableStateOf(mutableStateOf<Boolean?>(null))
+                        }
+
+                        val followingBox by remember {
+                            mutableStateOf(mutableStateOf<String?>(null))
+                        }
+
+                        LaunchedEffect(key1 = user){
+                            isFollowing(user!!, isFollowing, followingBox)
+                        }
+
+                        Card(
+                            border = BorderStroke(2.dp, Color.Black),
+                            backgroundColor = Color.Red,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(80.dp)
+                                .clickable {
+                                    onClickProfile(user!!)
+                                }
+                        ) {
+                            Box(modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.CenterStart)
+                            {
+                                Row(modifier = Modifier.fillMaxSize().padding(3.dp),
+                                    verticalAlignment = Alignment.CenterVertically)
+                                {
+                                    Card(
+                                        modifier = Modifier
+                                            .size(60.dp)
+                                            .padding(3.dp),
+                                        shape = CircleShape
+                                    )
+                                    {
+                                        Image(painter = rememberAsyncImagePainter(model = user!!.profile_image),
+                                            contentDescription = null, contentScale = ContentScale.Crop)
+                                    }
+
+                                    Column(modifier = Modifier.padding(3.dp)) {
+                                        Text(text = user!!.fullName, fontSize = 18.sp)
+                                        Text(text = if(user.about.length>=38){
+                                            user.about.substring(0,38) + if(user.about.length>38) "..." else ""
+                                            }
+                                            else user.about,
+                                            fontSize = 12.sp)
+                                    }
+                                }
+                                Row(modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 10.dp)
+                                    .padding(vertical = 3.dp),
+                                    horizontalArrangement = Arrangement.End)
+                                {
+                                    Card(
+                                        modifier = Modifier
+                                            .padding(3.dp)
+                                            .width(80.dp)
+                                            .height(25.dp)
+                                            .clickable {
+                                                onFollowBoxClick(user!!, followingBox)
+                                            }
+                                    ) {
+                                        Box(modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(Color.LightGray),
+                                            contentAlignment = Alignment.Center)
+                                        {
+                                            Text(text = followingBox.value.toString(), fontSize = 14.sp)
+                                        }
+                                    }
+//                                Card(
+//                                    modifier = Modifier
+//                                        .padding(3.dp)
+//                                        .width(40.dp)
+//                                        .height(25.dp)
+//                                ) {
+//                                    Box(modifier = Modifier
+//                                        .fillMaxSize()
+//                                        .background(Color.LightGray),
+//                                        contentAlignment = Alignment.Center)
+//                                    {
+//                                        Icon(painter = painterResource(id = R.drawable.baseline_message_24), contentDescription = null)
+//                                    }
+//                                }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+
+        }
+    }
+
+    fun followAction(
+        followingBox: MutableState<String?>,
+        followed: User,
+        followingNum: MutableState<Int?>
+    ){
+
+        val firestore = Injection.instance()
+
+        if (followingBox.value == "Follow") {
+
+            firestore
+                .collection("users")
+                .document(
+                    currentUser.value!!.uid
+                )
+                .collection("following")
+                .document(followed.uid).set(followed)
+                .addOnSuccessListener {
+                    firestore
+                        .collection("users")
+                        .document(currentUser.value!!.uid)
+                        .update(
+                            "following",
+                            currentUser.value!!.following + 1
+                        )
+                    Injection
+                        .instance()
+                        .collection("users")
+                        .document(followed.uid)
+                        .update(
+                            "followers",
+                            followed.followers + 1
+                        )
+                    followingNum.value =
+                        followingNum.value!! + 1
+                    followed.followers++
+                    println("User followed successfully")
+                    currentUser.value!!.following++
+                }
+                .addOnFailureListener {
+                    println("User couldn't followed. Error.")
+                }
+        followingBox.value = "Following"
+        } else if (followingBox.value == "Following") {
+
+            Injection
+                .instance()
+                .collection("users")
+                .document(
+                    currentUser.value!!.uid
+                )
+                .collection("following")
+                .document(followed.uid)
+                .delete()
+                .addOnSuccessListener {
+                    Injection
+                        .instance()
+                        .collection("users")
+                        .document(currentUser.value!!.uid)
+                        .update(
+                            "following",
+                            currentUser.value!!.following - 1
+                        )
+                    Injection
+                        .instance()
+                        .collection("users")
+                        .document(followed.uid)
+                        .update(
+                            "followers",
+                            followed.followers - 1
+                        )
+                    followingNum.value =
+                        followingNum.value!! - 1
+                    followed.followers--
+                    println("User unfollowed successfully")
+                    currentUser.value!!.following--
+                }
+                .addOnFailureListener {
+                    println("User couldn't unfollowed. Error.")
+                }
+            followingBox.value = "Follow"
         }
     }
 }

@@ -4,7 +4,7 @@ object ApiKey {
 
     //city
     private var currentCityApiKeyIndex = 0
-    private val cityApiKeys = listOf("QOjO5qbsSSVIAKhTDn1qJg==jgxl0Mb2U6yxVyMk",
+    private val cityApiKeys = listOf(
         "AcSgjUaoDOyfo+zxZSfyLQ==Gpc49F8jYu0GSiU1",
         "I76m8UjXZC4T1S2qEBIeig==gDb5W0aGY0rzQ9ys",
         "niKcZF9Jy4rFEsthV1oRDA==SZnlzL6YPJngMstV",

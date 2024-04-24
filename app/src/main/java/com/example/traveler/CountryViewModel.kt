@@ -23,7 +23,9 @@ class CountryViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
 
             val citiesToFetch = listOf("miami","las vegas","moscow","brussels",
-                "paris", "istanbul", "madrid", "barcelona", "dubai")
+                "paris", "istanbul", "madrid", "barcelona", "dubai", "eskisehir", "hong kong",
+                "milano", "napoli", "cagliari", "toronto", "newcastle", "izmir", "antalya",
+                "rize")
             for (cityName in citiesToFetch) {
                 try {
                     val city = ApiClient.apiServiceCity.getCity(cityName)
@@ -33,9 +35,9 @@ class CountryViewModel : ViewModel() {
                 } catch (e: Exception) {
                     // Handle error, such as logging or showing a toast
                     e.printStackTrace()
-                    if (e is HttpException && e.code() == 401) {
+
+                    if (e is HttpException && (e.code() == 401 || e.code() == 400)) {
                         ApiKey.rotateCityApiKey()
-                        listCityFetchData()
                     }
                 }
             }

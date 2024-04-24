@@ -75,7 +75,10 @@ fun CityInformationScreen(city: City,
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+                    IconButton(onClick = {
+                        tourismViewModel.clearData()
+                        navController.navigateUp()
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Home,
                             contentDescription = null,
@@ -91,7 +94,7 @@ fun CityInformationScreen(city: City,
             .padding(it)
             .fillMaxSize())
         {
-           if(tourism_data.isNotEmpty() && catering_data.isNotEmpty()){
+           if(!tourism_data.isNullOrEmpty() && !catering_data.isNullOrEmpty()){
                Card(modifier = Modifier
                    .padding(30.dp)
                    .height(140.dp)
@@ -140,7 +143,7 @@ fun CityInformationScreen(city: City,
                        item {
                            Text(text = "Touristic Destinations", fontSize = 17.sp, fontWeight = FontWeight.Bold,
                                modifier = Modifier.padding(horizontal = 16.dp))
-                           for (destination in tourism_data){
+                           for (destination in tourism_data!!){
                                Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top, modifier = Modifier
                                    .fillMaxWidth()
                                    .padding(vertical = 4.dp)) {
@@ -153,7 +156,7 @@ fun CityInformationScreen(city: City,
                            }
                            Text(text = "Restaurants", fontSize = 17.sp, fontWeight = FontWeight.Bold,
                                modifier = Modifier.padding(horizontal = 16.dp))
-                           for (restaurant in catering_data){
+                           for (restaurant in catering_data!!){
                                Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top, modifier = Modifier
                                    .fillMaxWidth()
                                    .padding(vertical = 4.dp)) {

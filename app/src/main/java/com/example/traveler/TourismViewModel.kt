@@ -11,11 +11,11 @@ import kotlinx.coroutines.launch
 
 class TourismViewModel : ViewModel() {
 
-    private val _tourismData = MutableLiveData<List<Tourism>>()
-    val tourismData : LiveData<List<Tourism>> get() = _tourismData
+    private val _tourismData = MutableLiveData<List<Tourism>?>()
+    val tourismData : LiveData<List<Tourism>?> get() = _tourismData
 
-    private val _restaurantData = MutableLiveData<List<Tourism>>()
-    val restaurantData : LiveData<List<Tourism>> get() = _restaurantData
+    private val _restaurantData = MutableLiveData<List<Tourism>?>()
+    val restaurantData : LiveData<List<Tourism>?> get() = _restaurantData
 
     fun fetchData(city : City) {
         viewModelScope.launch{
@@ -32,6 +32,11 @@ class TourismViewModel : ViewModel() {
                 e.printStackTrace()
             }
         }
+    }
+
+    fun clearData(){
+        _tourismData.value = null
+        _restaurantData.value = null
     }
 
 }

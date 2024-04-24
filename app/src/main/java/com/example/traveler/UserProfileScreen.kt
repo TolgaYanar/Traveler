@@ -26,17 +26,12 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Button
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Surface
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -55,20 +50,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.traveler.data.Injection
 import com.example.traveler.data.Journal
 import com.example.traveler.data.User
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import okhttp3.internal.wait
 import java.util.Calendar
 
 @Composable
@@ -81,6 +68,10 @@ fun UserProfileScreen(
 
     val currentUser by profileViewModel.currentUser.observeAsState()
 
+    val followings by profileViewModel.followings.observeAsState()
+
+    val followers by profileViewModel.followers.observeAsState()
+
     val currentDate by remember {
         mutableStateOf(Calendar.getInstance().time.time)
     }
@@ -89,16 +80,24 @@ fun UserProfileScreen(
         mutableStateOf(user?.uid == currentUser?.uid)
     }
 
-    var followingNum by remember {
+    val followingNum by remember {
         mutableStateOf(
-            user?.following
+            mutableStateOf(user?.following)
         )
     }
 
-    var followersNum by remember {
+    var followingsExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    val followersNum by remember {
         mutableStateOf(
-            user?.followers
+            mutableStateOf(user?.followers)
         )
+    }
+
+    var followersExpanded by remember {
+        mutableStateOf(false)
     }
 
     val isFollowing by remember {
@@ -117,7 +116,7 @@ fun UserProfileScreen(
         }
     }
 
-    var expanded by remember {
+    var updateJournalExpanded by remember {
         mutableStateOf(false)
     }
 
@@ -160,8 +159,8 @@ fun UserProfileScreen(
         }
     ) {
         if(user != null && currentUser != null){
-            followingNum = user.following
-            followersNum = user.followers
+            followingNum.value = user.following
+            followersNum.value = user.followers
 
             LazyColumn(
                 modifier = Modifier
@@ -195,19 +194,83 @@ fun UserProfileScreen(
                         ) {
 
                             Row(modifier = Modifier.padding(end = 70.dp)) {
-                                Text(text = followingNum.toString(), fontWeight = FontWeight.Bold)
+                                Text(text = followingNum.value.toString(), fontWeight = FontWeight.Bold)
                                 Spacer(modifier = Modifier.width(70.dp))
-                                Text(text = followersNum.toString(), fontWeight = FontWeight.Bold)
+                                Text(text = followersNum.value.toString(), fontWeight = FontWeight.Bold)
                             }
                             Row(
                                 modifier = Modifier
                                     .padding(vertical = 5.dp, horizontal = 10.dp)
                                     .padding(end = 30.dp)
                             ) {
-                                Text(text = "Following")
+                                Text(text = "Following", modifier = Modifier.clickable {
+                                    followingsExpanded = true
+                                })
                                 Spacer(modifier = Modifier.width(20.dp))
-                                Text(text = "Followers")
+                                Text(text = "Followers", modifier = Modifier.clickable {
+                                    followersExpanded = true
+                                })
                             }
+
+                            if(followingsExpanded){
+
+                                LaunchedEffect(key1 = profileViewModel.followings){
+                                    profileViewModel.followingsOfUser()
+                                }
+
+                                followings?.let { followings ->
+                                    profileViewModel.Followings(
+                                        followingsOrFollowers = followings,
+                                        onClickProfile = { user->
+                                            navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
+                                            navController.navigate(Screen.UserProfileScreen.route)
+                                        },
+                                        onDismissRequest = {
+                                            followingsExpanded = false
+                                        }
+                                    ) { followed, followingBox ->
+                                        val nothing = mutableStateOf<Int?>(null)
+                                        profileViewModel.followAction(
+                                            followingBox = followingBox,
+                                            followed = followed,
+                                            followingNum =
+                                            if(isOwnProfile){
+                                                followingNum
+                                            }else nothing
+                                        )
+                                    }
+                                }
+                            } else if(followersExpanded){
+
+                                LaunchedEffect(key1 = profileViewModel.followers){
+                                    profileViewModel.followersOfUser()
+                                }
+
+                                followers?.let { followers ->
+                                    profileViewModel.Followings(
+                                        followingsOrFollowers = followers,
+                                        onClickProfile = { user->
+                                            navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
+                                            navController.navigate(Screen.UserProfileScreen.route)
+                                        },
+                                        onDismissRequest = {
+                                            followersExpanded = false
+                                        }
+                                    ) { follower, followingBox ->
+                                        val nothing = mutableStateOf<Int?>(null)
+                                        profileViewModel.followAction(
+                                            followingBox = followingBox,
+                                            followed = follower,
+                                            followingNum =
+                                            if(isOwnProfile){
+                                                followingNum
+                                            }else nothing
+                                        )
+                                    }
+                                }
+                            }
+
+
                             if (!isOwnProfile) {
                                 Row(
                                     horizontalArrangement = Arrangement.Center, modifier = Modifier
@@ -218,81 +281,14 @@ fun UserProfileScreen(
                                         .height(30.dp)
                                         .width(80.dp)
                                         .clickable {
-                                            if (followingBox.value == "Follow") {
-
-                                                Injection
-                                                    .instance()
-                                                    .collection("users")
-                                                    .document(
-                                                        currentUser!!.uid
-                                                    )
-                                                    .collection("following")
-                                                    .document(user.uid)
-                                                    .set(user)
-                                                    .addOnSuccessListener {
-                                                        Injection
-                                                            .instance()
-                                                            .collection("users")
-                                                            .document(currentUser!!.uid)
-                                                            .update(
-                                                                "following",
-                                                                currentUser!!.following + 1
-                                                            )
-                                                        Injection
-                                                            .instance()
-                                                            .collection("users")
-                                                            .document(user.uid)
-                                                            .update(
-                                                                "followers",
-                                                                user.followers + 1
-                                                            )
-                                                        followersNum = followersNum!! + 1
-                                                        user.followers++
-                                                        println("User followed successfully")
-                                                        profileViewModel.currentUser.value!!.following++
-                                                    }
-                                                    .addOnFailureListener {
-                                                        println("User couldn't followed. Error.")
-                                                    }
-                                                followingBox.value = "Following"
-                                            } else if (followingBox.value == "Following") {
-
-                                                Injection
-                                                    .instance()
-                                                    .collection("users")
-                                                    .document(
-                                                        currentUser!!.uid
-                                                    )
-                                                    .collection("following")
-                                                    .document(user.uid)
-                                                    .delete()
-                                                    .addOnSuccessListener {
-                                                        Injection
-                                                            .instance()
-                                                            .collection("users")
-                                                            .document(currentUser!!.uid)
-                                                            .update(
-                                                                "following",
-                                                                currentUser!!.following - 1
-                                                            )
-                                                        Injection
-                                                            .instance()
-                                                            .collection("users")
-                                                            .document(user.uid)
-                                                            .update(
-                                                                "followers",
-                                                                user.followers - 1
-                                                            )
-                                                        followersNum = followersNum!! - 1
-                                                        user.followers--
-                                                        println("User unfollowed successfully")
-                                                        profileViewModel.currentUser.value!!.following--
-                                                    }
-                                                    .addOnFailureListener {
-                                                        println("User couldn't unfollowed. Error.")
-                                                    }
-                                                followingBox.value = "Follow"
-                                            }
+                                            profileViewModel.followAction(
+                                                followingBox, user,
+                                                followingNum = if (isOwnProfile) {
+                                                    followingNum
+                                                } else {
+                                                    followersNum
+                                                }
+                                            )
                                         }
                                     ) {
 
@@ -349,7 +345,7 @@ fun UserProfileScreen(
                                 .fillMaxWidth()
                                 .padding(10.dp)
                                 .alpha(0.7f), fontWeight = FontWeight.ExtraBold,
-                                fontSize = 20.sp, textAlign = TextAlign.Start
+                                fontSize = 18.sp, textAlign = TextAlign.Start
                             )
                         }
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -404,8 +400,7 @@ fun UserProfileScreen(
                                 .alpha(0.6f),
                                 fontWeight = FontWeight.Bold, fontSize = 16.sp)
                             if(isOwnProfile){
-                                Spacer(modifier = Modifier.width(130.dp))
-                                Button(onClick = { expanded = true }, modifier = Modifier
+                                Button(onClick = { updateJournalExpanded = true }, modifier = Modifier
                                     .height(30.dp)
                                     .width(135.dp)) {
                                     Text(text = "Add Update", fontSize = 11.sp, fontWeight = FontWeight.Bold)
@@ -413,10 +408,10 @@ fun UserProfileScreen(
                             }
                         }
 
-                        if(expanded){
+                        if(updateJournalExpanded){
                             profileViewModel.UpdateJournal(
                                 journals = journals,
-                                onDismissRequest = { expanded = false },
+                                onDismissRequest = { updateJournalExpanded = false },
                                 onSuccessRequest = {journal->
                                     ongoingJournal.value = journal
                                     Injection.instance().collection("users").document(user.uid)
@@ -426,7 +421,7 @@ fun UserProfileScreen(
                                         }.addOnFailureListener {
                                             println("ongoing trip couldn't updated.")
                                         }
-                                    expanded = false
+                                    updateJournalExpanded = false
                                 }
                             )
                         }
