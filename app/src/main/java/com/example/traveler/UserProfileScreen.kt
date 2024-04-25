@@ -396,7 +396,7 @@ fun UserProfileScreen(
                                 .fillMaxWidth()
                                 .height(50.dp),
                             verticalAlignment = Alignment.Top) {
-                            Text(text = "${journalPropertiesViewModel.getDayDifference(currentDate, ongoingJournal.value.endDateInMillis)} more days", modifier = Modifier
+                            Text(text = "${journalPropertiesViewModel.getDayDifference(currentDate + 3 * 60 * 60 * 1000, ongoingJournal.value.endDateInMillis)} more days", modifier = Modifier
                                 .alpha(0.6f),
                                 fontWeight = FontWeight.Bold, fontSize = 16.sp)
                             if(isOwnProfile){
@@ -447,7 +447,7 @@ fun UserProfileScreen(
 
                                 val journalEndDate = journal.endDateInMillis
                                 if(
-                                    currentDate>journalEndDate
+                                    currentDate + 3 * 60 * 60 * 1000 > journalEndDate
                                 ){
                                     if(isOwnProfile || (!isOwnProfile && !journal.private))
                                         Column {
@@ -484,7 +484,7 @@ fun UserProfileScreen(
                                                     Text(text = journal.location, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                                                 }
                                             }
-                                            Text(text = "${journalPropertiesViewModel.getDayDifference(journalEndDate,currentDate)} days ago...", fontWeight = FontWeight.Bold,
+                                            Text(text = "${journalPropertiesViewModel.getDayDifference(journalEndDate,currentDate + 3 * 60 * 60 * 1000)} days ago...", fontWeight = FontWeight.Bold,
                                                 modifier = Modifier
                                                     .alpha(0.5f)
                                                     .padding(horizontal = 15.dp))

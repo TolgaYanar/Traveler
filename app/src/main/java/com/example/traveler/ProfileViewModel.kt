@@ -64,8 +64,8 @@ class ProfileViewModel : ViewModel() {
     private val _currentUser = MutableLiveData<User?>()
     val currentUser : MutableLiveData<User?> get() = _currentUser
 
-    private val _favoriteCountries = MutableLiveData<List<City>>()
-    val favoriteCountries : MutableLiveData<List<City>> get() = _favoriteCountries
+    private val _favoriteCities = MutableLiveData<List<City>>()
+    val favoriteCities : MutableLiveData<List<City>> get() = _favoriteCities
 
     private val _followings = MutableLiveData<MutableList<User?>>()
     val followings : MutableLiveData<MutableList<User?>> get() = _followings
@@ -108,7 +108,7 @@ class ProfileViewModel : ViewModel() {
 
             val favoritesSnapshot = favoritesCollectionRef.get().await()
             val itemList = favoritesSnapshot.toObjects<City>()
-            _favoriteCountries.value = itemList
+            _favoriteCities.value = itemList
         }
     }
 

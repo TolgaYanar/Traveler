@@ -54,7 +54,7 @@ class AuthenticationViewModel: ViewModel() {
 
     fun reauthentication(user: FirebaseUser?, currentPassword: String, newPassword: String, context: Context){
 
-        GlobalScope.launch {
+        viewModelScope.launch {
             if(user!= null){
                 val credential = EmailAuthProvider.getCredential(user.email!!, currentPassword)
                 user.reauthenticate(credential).addOnCompleteListener{completion ->

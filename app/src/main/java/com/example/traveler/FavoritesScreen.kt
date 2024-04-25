@@ -41,7 +41,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.traveler.data.Injection
@@ -105,7 +104,7 @@ fun FavoritesScreen(navController: NavController, profileViewModel: ProfileViewM
             .fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween,
             verticalArrangement = Arrangement.Top, columns = GridCells.Fixed(2))
         {
-            profileViewModel.favoriteCountries.value.let {
+            profileViewModel.favoriteCities.value.let {
 
                 if(it != null){
 
