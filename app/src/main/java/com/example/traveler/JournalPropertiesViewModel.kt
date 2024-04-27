@@ -488,8 +488,6 @@ class JournalPropertiesViewModel : ViewModel() {
             try {
                 val user = FirebaseAuth.getInstance().currentUser
                 val firestore = Injection.instance()
-                //val tasksList =  mutableListOf<Task>()
-                //val list: MutableList<Map<String, Any>> = mutableListOf()
 
                 val dayCollectionRef = firestore.collection("users")
                     .document(user!!.uid).collection("journals").document(journal.title)

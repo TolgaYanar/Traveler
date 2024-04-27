@@ -26,7 +26,9 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.Card
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -140,7 +142,8 @@ fun MainMenu(profileViewModel: ProfileViewModel, navController: NavController,
 
                     if(countryViewModel.cityList.isNotEmpty()){
 
-                        SearchField(onValueChange = {
+                        SearchField(countryViewModel = countryViewModel,
+                            onValueChange = {
                             search = it
                         })
 
@@ -256,6 +259,7 @@ fun MainMenu(profileViewModel: ProfileViewModel, navController: NavController,
 
 @Composable
 fun SearchField(
+    countryViewModel: CountryViewModel,
     onValueChange: (String) -> Unit
 ){
     var search by remember {
@@ -273,6 +277,13 @@ fun SearchField(
         },
         placeholder = {
             Text(text = "Search")
+        },
+        trailingIcon = {
+            IconButton(onClick = {
+                countryViewModel.fetchParticularCityData(search)
+            }) {
+                Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = null)
+            }
         }
     )
 }
