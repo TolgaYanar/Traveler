@@ -9,20 +9,27 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeightIn
+import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -31,17 +38,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.traveler.data.City
@@ -66,6 +78,10 @@ fun CityInformationScreen(city: City,
     val catering_data by tourismViewModel.restaurantData.observeAsState(emptyList())
 
     val otherUsers =  remember { mutableListOf<User>() }
+
+    var fiveDayForecast by remember {
+        mutableStateOf(false)
+    }
 
     LaunchedEffect(key1 = true){
         journalPropertiesViewModel.getRandomUsersWithMatchingLocation(1,city.name,otherUsers)
@@ -98,7 +114,10 @@ fun CityInformationScreen(city: City,
                Card(modifier = Modifier
                    .padding(30.dp)
                    .height(140.dp)
-                   .fillMaxWidth(),
+                   .fillMaxWidth()
+                   .clickable {
+                       fiveDayForecast = true
+                   },
                    border = BorderStroke(2.dp, Color.Black),
                    colors = CardDefaults.cardColors(
                        containerColor = Color.White
@@ -131,6 +150,16 @@ fun CityInformationScreen(city: City,
                        }
                    }
                }
+
+               if(fiveDayForecast){
+                   weatherViewModel.TenDayForecast(
+                       onDismissRequest = {
+                           fiveDayForecast = false
+                       },
+                       journalPropertiesViewModel
+                   )
+               }
+
                Card(modifier = Modifier
                    .padding(horizontal = 30.dp)
                    .height(325.dp)
@@ -221,19 +250,12 @@ fun CityInformationScreen(city: City,
     }
 }
 
-//@Preview
-//@Composable
-//fun previ(){
-//    CityInformationScreen(city = City("","",
-//        Flag("","",""),"","", latLng(listOf(0.0,0.0), listOf(0.0,0.0))), navController = rememberNavController())
-//}
-
 private fun formattedDouble(doubleValue: Double?): String {
     return String.format(Locale.getDefault(), "%.1f", doubleValue)
 }
 
 // Function to get the resource ID of an image based on its name
-private fun getDrawableResourceId(imageName: String): Int {
+fun getDrawableResourceId(imageName: String): Int {
     return try {
         val resId = R.drawable::class.java.getField(imageName).getInt(null)
         resId

@@ -34,3 +34,17 @@ data class Weather(
     //icon
     //val url : String = "https://openweathermap.org/img/wn/$icon@2x.png"
 )
+
+data class ForecastResponse(
+    @SerializedName("list")
+    val list: List<Forecast>,
+)
+
+data class Forecast(
+    @SerializedName("dt")
+    val dt: Long,
+    @SerializedName("dt_txt")
+    val dt_txt: String,
+    @SerializedName("weather")
+    val weather: List<Weather>
+)

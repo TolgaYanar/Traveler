@@ -19,6 +19,11 @@ interface ApiInterface {
                            @Query("lon") lon : Double,
                            @Query("appid") appid : String = ApiKey.getWeatherApiKey()): WeatherResponse
 
+    @GET("data/2.5/forecast")
+    suspend fun getTenDayForecast(@Query("lat") lat : Double,
+                            @Query("lon") lon : Double,
+                            @Query("appid") appid : String = ApiKey.getWeatherApiKey()): ForecastResponse
+
     //tourism api
     @GET("v2/places")
     suspend fun getTourist(@Query("categories") categories : String, //tourism, catering.restaurant
