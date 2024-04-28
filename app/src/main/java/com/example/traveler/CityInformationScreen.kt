@@ -80,7 +80,7 @@ fun CityInformationScreen(city: City,
     val otherUsers =  remember { mutableListOf<User>() }
 
     var fiveDayForecast by remember {
-        mutableStateOf(false)
+        mutableStateOf(mutableStateOf(false))
     }
 
     LaunchedEffect(key1 = true){
@@ -116,7 +116,7 @@ fun CityInformationScreen(city: City,
                    .height(140.dp)
                    .fillMaxWidth()
                    .clickable {
-                       fiveDayForecast = true
+                       fiveDayForecast.value = true
                    },
                    border = BorderStroke(2.dp, Color.Black),
                    colors = CardDefaults.cardColors(
@@ -151,12 +151,17 @@ fun CityInformationScreen(city: City,
                    }
                }
 
-               if(fiveDayForecast){
-                   weatherViewModel.TenDayForecast(
+               val allowedIndexes by remember {
+                   mutableStateOf(mutableListOf(0,8,16,24,32))
+               }
+
+               if(fiveDayForecast.value){
+                   weatherViewModel.FiveDayForecast(
                        onDismissRequest = {
-                           fiveDayForecast = false
+                           fiveDayForecast.value = false
                        },
-                       journalPropertiesViewModel
+                       allowedIndexes = allowedIndexes,
+                       fiveDayForecast
                    )
                }
 
