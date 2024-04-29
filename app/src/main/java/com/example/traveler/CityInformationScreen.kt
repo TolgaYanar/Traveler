@@ -152,7 +152,7 @@ fun CityInformationScreen(city: City,
                }
 
                val allowedIndexes by remember {
-                   mutableStateOf(mutableListOf(0,8,16,24,32))
+                   mutableStateOf(mutableListOf<Int>())
                }
 
                if(fiveDayForecast.value){

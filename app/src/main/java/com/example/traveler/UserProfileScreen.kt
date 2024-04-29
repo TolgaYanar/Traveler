@@ -148,9 +148,10 @@ fun UserProfileScreen(
             }, title = {}, backgroundColor = colorResource(id = R.color.app_bar_color),
                 actions = {
                     IconButton(onClick = {
-                        authenticationViewModel.signOut()
-                        profileViewModel.currentUser.value = null
-                        navController.navigate(Screen.LoginScreen.route)
+                        authenticationViewModel.signOut().also {
+                            profileViewModel.currentUser.value = null
+                            navController.navigate(Screen.LoginScreen.route)
+                        }
                     }) {
                         Icon(painter = painterResource(id = R.drawable.baseline_logout_24), contentDescription = null)
                     }

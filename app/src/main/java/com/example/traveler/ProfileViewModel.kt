@@ -295,11 +295,10 @@ class ProfileViewModel : ViewModel() {
                                     )
 
                                     onSuccessRequest(currentJournal)
-                                },
-                                backgroundColor = Color(journal.color.toULong())
+                                }
                             )
                             {
-                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
+                                Box(modifier = Modifier.fillMaxSize().background(Color(journal.color.toULong()).copy(0.75f)), contentAlignment = Alignment.TopStart) {
                                     Text(text = journal.title, modifier = Modifier.padding(10.dp))
                                 }
                                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomStart) {

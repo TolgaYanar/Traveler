@@ -82,6 +82,12 @@ class WeatherViewModel : ViewModel(){
 
                     if(_fiveDayForecastData.value != null){
 
+                        _fiveDayForecastData.value!!.forEachIndexed() { index, forecast ->
+                            if(forecast.dt_txt.endsWith("00:00:00") || index == 0){
+                                allowedIndexes.add(index)
+                            }
+                        }
+
                         itemsIndexed(_fiveDayForecastData.value!!){ index, forecast ->
 
                             if(allowedIndexes.contains(index)){
@@ -124,31 +130,30 @@ class WeatherViewModel : ViewModel(){
                                         .widthIn(max = 70.dp),
                                         fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
-                                    if(date.hour == 0){
+                                    if(date.hour == 0 || index == 0){
                                         IconButton(onClick = {
-                                            if(allowedIndexes.contains(index+1)){
-                                                allowedIndexes.removeAll(
-                                                    listOf(index+1,
-                                                        index+2,
-                                                        index+3,
-                                                        index+4,
-                                                        index+5,
-                                                        index+6,
-                                                        index+7
-                                                    )
-                                                )
+                                            var ind = index+1
+
+                                            if(allowedIndexes.contains(ind)){
+
+                                                while (ind < _fiveDayForecastData.value!!.size &&
+                                                    !_fiveDayForecastData.value!!.get(ind).dt_txt.endsWith("00:00:00"))
+                                                {
+                                                    allowedIndexes.remove(ind)
+                                                    ind += 1
+                                                }
+
                                             }else{
-                                                allowedIndexes.addAll(
-                                                    listOf(index+1,
-                                                        index+2,
-                                                        index+3,
-                                                        index+4,
-                                                        index+5,
-                                                        index+6,
-                                                        index+7
-                                                    )
-                                                )
+
+                                                while (ind < _fiveDayForecastData.value!!.size &&
+                                                    !_fiveDayForecastData.value!!.get(ind).dt_txt.endsWith("00:00:00"))
+                                                {
+                                                    allowedIndexes.add(ind)
+                                                    ind += 1
+                                                }
+
                                             }
+
                                             allowedIndexes.sortBy{
                                                 it
                                             }
