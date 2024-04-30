@@ -262,7 +262,11 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                                     .wrapContentSize(),
                                     horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top){
                                     var index = 0
-                                    items(selectedTasks){
+                                    items(selectedTasks){task->
+
+                                        var isUpdateTask by remember {
+                                            mutableStateOf(false)
+                                        }
 
                                         Card(modifier = Modifier
                                             .height(120.dp)
@@ -274,7 +278,7 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                                                     .background(Color.Transparent)
                                                     .padding(horizontal = 10.dp)
                                                     .padding(top = 10.dp)) {
-                                                    Text(text = journalPropertiesViewModel.longToTime(it.startTime),
+                                                    Text(text = journalPropertiesViewModel.longToTime(task.startTime),
                                                         fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                                                 }
                                                 Column(modifier = Modifier
@@ -296,10 +300,10 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                                                 Column(modifier  = Modifier
                                                     .padding(10.dp)
                                                     .width(160.dp)) {
-                                                    Text(text = it.title, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                                                    Text(text = task.title, fontSize = 18.sp, fontWeight = FontWeight.Bold,
                                                         color = Color.Black)
                                                     Spacer(modifier = Modifier.height(10.dp))
-                                                    Text(text = it.notes, color = Color(0xFF5581F1))
+                                                    Text(text = task.notes, color = Color(0xFF5581F1))
                                                 }
 
                                                 if(isEdit.value){
@@ -314,11 +318,25 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                                                                 .width(35.dp)
                                                                 .background(Color.Gray)
                                                                 .clickable {
-
+                                                                    isUpdateTask = !isUpdateTask
                                                                 }
                                                         ) {
                                                             Icon(imageVector = Icons.Filled.Edit, contentDescription = null)
                                                         }
+
+                                                        if(isUpdateTask){
+                                                            journalPropertiesViewModel.UpdateTask(
+                                                                task = task,
+                                                                journal = journal,
+                                                                thatDay = (journal.startDateInMillis + (selected*24*60*60*1000)),
+                                                                dayNum = selected+1,
+                                                                navController = navController,
+                                                                onDismissRequest = {
+                                                                    isUpdateTask = false
+                                                                }
+                                                            )
+                                                        }
+
                                                         Box(
                                                             contentAlignment = Alignment.Center,
                                                             modifier = Modifier
@@ -329,7 +347,7 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                                                                     journalPropertiesViewModel.deleteTask(
                                                                         selectedDay!!,
                                                                         navController,
-                                                                        it,
+                                                                        task,
                                                                         journal,
                                                                         context
                                                                     )

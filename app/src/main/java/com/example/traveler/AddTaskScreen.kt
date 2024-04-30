@@ -166,9 +166,8 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                     )
                 }
 
-
-
                 Spacer(modifier = Modifier.height(30.dp))
+
                 TextField(value = repeat, onValueChange = {},
                     trailingIcon = {
                         IconButton(onClick = { repeatExpanded = !repeatExpanded }) {
