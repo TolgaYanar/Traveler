@@ -597,7 +597,7 @@ class JournalPropertiesViewModel : ViewModel() {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
 
-                    Text(text = "Update Journal", fontSize = 20.sp, fontWeight = FontWeight.Bold,
+                    Text(text = "Update Task", fontSize = 20.sp, fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(vertical = 20.dp))
 
                     TextField(value = title, onValueChange = {title = it}, modifier = Modifier.padding(vertical = 5.dp))

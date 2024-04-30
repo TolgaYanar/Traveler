@@ -1,6 +1,9 @@
 package com.example.traveler
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -56,7 +59,10 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.traveler.data.Injection
 import com.example.traveler.data.Journal
 import com.example.traveler.data.User
+import com.google.firebase.Firebase
+import com.google.firebase.storage.storage
 import java.util.Calendar
+import java.util.UUID
 
 @Composable
 fun UserProfileScreen(
@@ -133,6 +139,48 @@ fun UserProfileScreen(
     }
 
     val context = LocalContext.current
+
+    val singlePhotoPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = {
+            Toast.makeText(context, "Please wait photo to be updated", Toast.LENGTH_SHORT).show()
+            val storage = Firebase.storage
+            val storageRef = storage.reference
+            var imagesRef = storageRef.child("images/${UUID.randomUUID()}")
+            val uploadImage = it?.let { it1 -> imagesRef.putFile(it1)
+                .addOnCompleteListener {
+                    println("Image uploaded successfully")
+                }.addOnFailureListener{
+                    println("Image couldn't uploaded")
+                }
+            }
+            val urlTask = uploadImage?.continueWithTask{ task->
+                if(!task.isSuccessful){
+                    task.exception?.let {exception->
+                        throw exception
+                    }
+                }else{
+                    imagesRef.downloadUrl
+                }
+            }?.addOnCompleteListener { task->
+                if(task.isSuccessful){
+                    ongoingJournal.value = ongoingJournal.value.copy(mostMemorialImage = task.result.toString())
+                    currentUser?.let { it1 ->
+                        Injection.instance().collection("users").document(it1.uid)
+                            .collection("journals").document(ongoingJournal.value.title)
+                            .update("mostMemorialImage", ongoingJournal.value.mostMemorialImage)
+                            .addOnSuccessListener {
+                                Toast.makeText(context, "Most memorial photo updated successfully", Toast.LENGTH_SHORT).show()
+                            }
+                    }
+                    profileViewModel.loadJournalsOfUser(user,"endDateInMillis",journals)
+                }else{
+                    println("URL couldn't downloaded even though its uploaded")
+                }
+            }
+
+        }
+    )
 
     Scaffold(
         topBar = {
@@ -304,9 +352,7 @@ fun UserProfileScreen(
                                                     fontWeight = FontWeight.Bold
                                                 )
                                             }
-
                                         }
-
                                     }
                                 }
                             }
@@ -379,15 +425,33 @@ fun UserProfileScreen(
                                     profileViewModel.loadOngoingTrip(user, ongoingJournal)
                                 }
 
+                                Image(painter = rememberAsyncImagePainter(model = ongoingJournal.value.mostMemorialImage), contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.FillBounds,
+                                    alpha = 0.75f)
+
                                 Box(modifier = Modifier
                                     .fillMaxSize()
                                     .background(
-                                        Color(ongoingJournal.value.color.toULong()).copy(0.75f)
+                                        if(ongoingJournal.value.mostMemorialImage.isEmpty()) Color(ongoingJournal.value.color.toULong()).copy(0.75f)
+                                        else Color.Transparent
                                     ), contentAlignment = Alignment.TopStart) {
                                     Text(text = ongoingJournal.value.title, modifier = Modifier.padding(10.dp))
                                 }
+
                                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomStart) {
                                     Text(text = ongoingJournal.value.location, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp))
+                                }
+
+                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopEnd) {
+                                    Icon(painter = painterResource(id = R.drawable.baseline_add_a_photo_24), contentDescription = null,
+                                        tint = Color.LightGray, modifier = Modifier
+                                            .clickable {
+                                                singlePhotoPicker.launch(
+                                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                                )
+                                            }
+                                            .padding(10.dp))
                                 }
                             }
                         }
@@ -472,11 +536,17 @@ fun UserProfileScreen(
                                                     }
                                             ) {
 
+                                                Image(painter = rememberAsyncImagePainter(model = journal.mostMemorialImage), contentDescription = null,
+                                                    modifier = Modifier.fillMaxSize(),
+                                                    contentScale = ContentScale.FillBounds,
+                                                    alpha = 0.75f)
+
                                                 Box(modifier = Modifier
                                                     .background(
-                                                        Color(journal.color.toULong()).copy(
-                                                            0.75f
-                                                        )
+                                                        if(journal.mostMemorialImage.isEmpty()){
+                                                            Color(journal.color.toULong()).copy(0.75f)
+                                                        }
+                                                        else Color.Transparent
                                                     )
                                                     .fillMaxSize()
                                                     .padding(8.dp)

@@ -253,6 +253,9 @@ class ProfileViewModel : ViewModel() {
         var notes by remember {
             mutableStateOf("")
         }
+        var mostMemorableImage by remember {
+            mutableStateOf("")
+        }
 
         Dialog(onDismissRequest = { onDismissRequest() }) {
 
@@ -282,6 +285,7 @@ class ProfileViewModel : ViewModel() {
                                     startDate = journal.startDate
                                     endDate = journal.endDate
                                     notes = journal.notes
+                                    mostMemorableImage = journal.mostMemorialImage
 
                                     val currentJournal = Journal(
                                         title = title,
@@ -291,14 +295,28 @@ class ProfileViewModel : ViewModel() {
                                         endDateInMillis = endDateInMillis,
                                         endDate = endDate,
                                         startDate = startDate,
-                                        notes = notes
+                                        notes = notes,
+                                        mostMemorialImage = mostMemorableImage
                                     )
 
                                     onSuccessRequest(currentJournal)
                                 }
                             )
                             {
-                                Box(modifier = Modifier.fillMaxSize().background(Color(journal.color.toULong()).copy(0.75f)), contentAlignment = Alignment.TopStart) {
+
+                                Image(painter = rememberAsyncImagePainter(model = journal.mostMemorialImage), contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.FillBounds,
+                                    alpha = 0.75f)
+
+                                Box(modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        if(journal.mostMemorialImage.isEmpty()){
+                                            Color(journal.color.toULong()).copy(0.75f)
+                                        }
+                                        else Color.Transparent
+                                    ), contentAlignment = Alignment.TopStart) {
                                     Text(text = journal.title, modifier = Modifier.padding(10.dp))
                                 }
                                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomStart) {
@@ -363,7 +381,9 @@ class ProfileViewModel : ViewModel() {
                             Box(modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.CenterStart)
                             {
-                                Row(modifier = Modifier.fillMaxSize().padding(3.dp),
+                                Row(modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(3.dp),
                                     verticalAlignment = Alignment.CenterVertically)
                                 {
                                     Card(
