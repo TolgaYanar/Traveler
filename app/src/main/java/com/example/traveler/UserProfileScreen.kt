@@ -59,6 +59,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.traveler.data.Injection
 import com.example.traveler.data.Journal
 import com.example.traveler.data.User
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
 import java.util.Calendar
@@ -200,6 +202,7 @@ fun UserProfileScreen(
                             profileViewModel.currentUser.value = null
                             navController.navigate(Screen.LoginScreen.route)
                         }
+                        authenticationViewModel.getGoogleSignInClient(context = context).signOut()
                     }) {
                         Icon(painter = painterResource(id = R.drawable.baseline_logout_24), contentDescription = null)
                     }

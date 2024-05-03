@@ -1,5 +1,6 @@
 package com.example.traveler
 
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -68,6 +70,8 @@ fun LoginScreen(
     var showPassword by remember {
         mutableStateOf(false)
     }
+
+    val context = LocalContext.current
 
     val result by authenticationViewModel.authResult.observeAsState()
 
@@ -137,11 +141,13 @@ fun LoginScreen(
                         when (result) {
                             is Result.Success -> {
                                 if(result.data){
+                                    println("sdadasdsa")
                                     profileViewModel.loadCurrentUser()
                                     navController.navigate(Screen.MainMenuScreen.route)
                                 }
                             }
                             is Result.Fail -> {
+                                println("trfhyjjut")
                                 // Handle failure case if needed
                             }
                             else -> {
@@ -153,7 +159,15 @@ fun LoginScreen(
 
                 Text(text = "Or Sign in with", modifier = Modifier.padding(20.dp), fontSize = 16.sp, color = Color(0x80000000))
                 Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Image(painter = painterResource(id = R.drawable.google), contentDescription = null, modifier =  Modifier.padding(horizontal = 8.dp))
+                    authenticationViewModel.GetGoogleSignInClient(
+                        context = context,
+                        onSignInSuccess = {
+                            authenticationViewModel.signInViaGoogle(it)
+                        },
+                        onSignInFailed = {
+                            Toast.makeText(context, "Sign-in via Google Failed", Toast.LENGTH_LONG).show()
+                        }
+                    )
                     Image(painter = painterResource(id = R.drawable.instagram), contentDescription = null)
                     Image(painter = painterResource(id = R.drawable.twitterx), contentDescription = null, modifier =  Modifier.padding(horizontal = 8.dp))
                 }

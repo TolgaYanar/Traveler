@@ -87,6 +87,7 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("androidx.compose.runtime:runtime-livedata:1.5.2")
+    implementation("com.google.android.gms:play-services-auth:20.4.1")
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
