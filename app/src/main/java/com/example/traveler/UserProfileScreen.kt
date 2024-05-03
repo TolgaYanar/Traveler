@@ -256,11 +256,11 @@ fun UserProfileScreen(
                                     .padding(end = 30.dp)
                             ) {
                                 Text(text = "Following", modifier = Modifier.clickable {
-                                    followingsExpanded = true
+                                    if(isOwnProfile) followingsExpanded = true
                                 })
                                 Spacer(modifier = Modifier.width(20.dp))
                                 Text(text = "Followers", modifier = Modifier.clickable {
-                                    followersExpanded = true
+                                    if(isOwnProfile) followersExpanded = true
                                 })
                             }
 
@@ -446,16 +446,19 @@ fun UserProfileScreen(
                                     Text(text = ongoingJournal.value.location, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp))
                                 }
 
-                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopEnd) {
-                                    Icon(painter = painterResource(id = R.drawable.baseline_add_a_photo_24), contentDescription = null,
-                                        tint = Color.LightGray, modifier = Modifier
-                                            .clickable {
-                                                singlePhotoPicker.launch(
-                                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                                )
-                                            }
-                                            .padding(10.dp))
+                                if(isOwnProfile){
+                                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopEnd) {
+                                        Icon(painter = painterResource(id = R.drawable.baseline_add_a_photo_24), contentDescription = null,
+                                            tint = Color.LightGray, modifier = Modifier
+                                                .clickable {
+                                                    singlePhotoPicker.launch(
+                                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                                    )
+                                                }
+                                                .padding(10.dp))
+                                    }
                                 }
+
                             }
                         }
                         Row(horizontalArrangement = Arrangement.SpaceBetween,
