@@ -1,5 +1,6 @@
 package com.example.traveler
 
+import android.app.Activity
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
@@ -10,6 +11,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,7 +27,6 @@ import com.example.traveler.data.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import com.example.traveler.data.Result
-import com.example.traveler.data.User
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -114,6 +115,11 @@ class AuthenticationViewModel: ViewModel() {
                 }
         )
 
+    }
+    fun getTwitterSignInClient(context: Context){
+        viewModelScope.launch {
+            _authResult.value = _userRepository.signInViaTwitter(context)
+        }
     }
 
     fun signOut() {

@@ -1,10 +1,13 @@
 package com.example.traveler.data
 
+import android.app.Activity
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -111,6 +114,32 @@ class UserRepository(
 
         }
         catch (e: Exception){
+            Result.Fail(e)
+        }
+
+    suspend fun signInViaTwitter(context: Context): Result<Boolean> =
+
+        try {
+            val provider = OAuthProvider.newBuilder("twitter.com")
+            val signInActivity = FirebaseAuth.getInstance().startActivityForSignInWithProvider(
+                context as Activity, provider.build()).await()
+            val credential = signInActivity.credential
+            if(credential != null){
+                auth.signInWithCredential(credential).await()
+                val usersCollectionSnap = firestore.collection("users").get().await()
+                var userExist = false
+                usersCollectionSnap.documents.forEach {doc->
+                    if(doc.id == auth.uid) userExist = true
+                }
+                if(!userExist){
+                    saveUserToFirestore(User(signInActivity.additionalUserInfo?.username!!, signInActivity.user?.email!!))
+                }
+
+                if(signInActivity.user != null) Result.Success(true)
+                else Result.Success(false)
+            }
+            else Result.Success(false)
+        }catch (e:Exception){
             Result.Fail(e)
         }
 

@@ -141,13 +141,11 @@ fun LoginScreen(
                         when (result) {
                             is Result.Success -> {
                                 if(result.data){
-                                    println("sdadasdsa")
                                     profileViewModel.loadCurrentUser()
                                     navController.navigate(Screen.MainMenuScreen.route)
                                 }
                             }
                             is Result.Fail -> {
-                                println("trfhyjjut")
                                 // Handle failure case if needed
                             }
                             else -> {
@@ -157,7 +155,7 @@ fun LoginScreen(
                     }
                 }
 
-                Text(text = "Or Sign in with", modifier = Modifier.padding(20.dp), fontSize = 16.sp, color = Color(0x80000000))
+                Text(text = "Or Continue With", modifier = Modifier.padding(20.dp), fontSize = 16.sp, color = Color(0x80000000))
                 Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                     authenticationViewModel.GetGoogleSignInClient(
                         context = context,
@@ -168,8 +166,12 @@ fun LoginScreen(
                             Toast.makeText(context, "Sign-in via Google Failed", Toast.LENGTH_LONG).show()
                         }
                     )
-                    Image(painter = painterResource(id = R.drawable.instagram), contentDescription = null)
-                    Image(painter = painterResource(id = R.drawable.twitterx), contentDescription = null, modifier =  Modifier.padding(horizontal = 8.dp))
+                    Image(painter = painterResource(id = R.drawable.twitterx), contentDescription = null,
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .clickable {
+                                authenticationViewModel.getTwitterSignInClient(context)
+                            })
                 }
                 Row(modifier = Modifier
                     .padding(32.dp)
