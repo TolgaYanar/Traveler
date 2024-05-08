@@ -76,6 +76,8 @@ import kotlin.random.Random
 
 class JournalPropertiesViewModel : ViewModel() {
 
+    val firestore = Injection.instance()
+
     @Composable
     fun ColorPicker(onDismissRequest: () -> Unit,
                     onColorSelected: (Color) -> Unit)
@@ -245,7 +247,6 @@ class JournalPropertiesViewModel : ViewModel() {
     fun uploadToNotes(imageOrText : String, journal : Journal, context: Context){
         val user = FirebaseAuth.getInstance().currentUser
         val added = Calendar.getInstance().time.time
-        val firestore = Injection.instance()
         val notesCollection = firestore.collection("users").document(user!!.uid).collection("journals")
             .document(journal.title).collection("notes")
         val noteDoc = notesCollection.document(added.toString())
@@ -380,7 +381,6 @@ class JournalPropertiesViewModel : ViewModel() {
 
             val usersID = mutableListOf<String>()
             val users = mutableListOf<String>()
-            val firestore = Injection.instance()
 
             val usersCollection = firestore.collection("users")
             val usersCollectionSnapshot = usersCollection.get().await()
@@ -424,7 +424,6 @@ class JournalPropertiesViewModel : ViewModel() {
     fun getNotifications(notificationList : MutableState<List<AlarmItem>>){
 
         viewModelScope.launch {
-            val firestore = Injection.instance()
             val userID = FirebaseAuth.getInstance().uid
 
             val notificationsCollection = firestore.collection("users")
@@ -441,7 +440,6 @@ class JournalPropertiesViewModel : ViewModel() {
     fun deleteNotification(id : String){
 
         viewModelScope.launch {
-            val firestore = Injection.instance()
             val userID = FirebaseAuth.getInstance().uid
 
             val notificationDocument = firestore.collection("users")
@@ -455,7 +453,6 @@ class JournalPropertiesViewModel : ViewModel() {
     fun getNotes(journal : Journal, list : MutableState<List<Notes>>, user : User?){
 
         viewModelScope.launch {
-            val firestore = Injection.instance()
             val notesCollection = user?.let {
                 firestore.collection("users").document(it.uid)
                     .collection("journals").document(journal.title).collection("notes")
@@ -472,7 +469,6 @@ class JournalPropertiesViewModel : ViewModel() {
     fun deleteNote(journal: Journal, note: Notes, user: User?){
 
         viewModelScope.launch {
-            val firestore = Injection.instance()
             val notesCollection = user?.let {
                 firestore.collection("users").document(it.uid)
                     .collection("journals").document(journal.title).collection("notes")
@@ -502,7 +498,6 @@ class JournalPropertiesViewModel : ViewModel() {
         viewModelScope.launch{
             try {
                 val user = FirebaseAuth.getInstance().currentUser
-                val firestore = Injection.instance()
 
                 val dayCollectionRef = firestore.collection("users")
                     .document(user!!.uid).collection("journals").document(journal.title)

@@ -175,7 +175,7 @@ fun LoginScreen(
                 }
                 Row(modifier = Modifier
                     .padding(32.dp)
-                    .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    .fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                     Text(text = "Don't have an account?", modifier = Modifier.padding(horizontal = 27.dp), fontSize = 16.sp, color = Color(4278190208))
                     Text(text = "Sign Up", fontWeight = FontWeight.Bold, modifier = Modifier
                         .padding(horizontal = 27.dp)

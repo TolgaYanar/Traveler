@@ -59,7 +59,13 @@ import java.util.Calendar
 
 class ProfileViewModel : ViewModel() {
 
-    private val _userRepository: UserRepository
+    private val _userRepository: UserRepository = UserRepository(
+        FirebaseAuth.getInstance(),
+        Injection.instance()
+    )
+
+    private val auth = FirebaseAuth.getInstance()
+    private val firestore = Injection.instance()
 
     private val _currentUser = MutableLiveData<User?>()
     val currentUser : MutableLiveData<User?> get() = _currentUser
@@ -76,10 +82,6 @@ class ProfileViewModel : ViewModel() {
 
 
     init {
-        _userRepository = UserRepository(
-            FirebaseAuth.getInstance(),
-            Injection.instance()
-        )
         loadCurrentUser()
     }
 
@@ -100,81 +102,78 @@ class ProfileViewModel : ViewModel() {
 
     fun loadFeaturesOfUser() {
         viewModelScope.launch {
-            val user = FirebaseAuth.getInstance().currentUser
-            val firestore = Injection.instance()
+            if(auth.uid != null){
+                val favoritesCollectionRef = auth.uid?.let {
+                    firestore.collection("users")
+                        .document(it).collection("favorites")
+                }
 
-            val favoritesCollectionRef = firestore.collection("users")
-                    .document(user!!.uid).collection("favorites")
-
-            val favoritesSnapshot = favoritesCollectionRef.get().await()
-            val itemList = favoritesSnapshot.toObjects<City>()
-            _favoriteCities.value = itemList
+                val favoritesSnapshot = favoritesCollectionRef?.get()?.await()
+                val itemList = favoritesSnapshot?.toObjects<City>()
+                _favoriteCities.value = itemList
+            }
         }
     }
 
     fun followingsOfUser(){
         viewModelScope.launch {
-            val user = FirebaseAuth.getInstance().currentUser
-            val firestore = Injection.instance()
+            if(auth.uid != null){
+                val followingList = mutableListOf<User?>()
 
-            val followingList = mutableListOf<User?>()
+                val usersCollection = firestore.collection("users")
 
-            val usersCollection = firestore.collection("users")
+                val followingCollection = auth.uid?.let {
+                    usersCollection.document(it)
+                        .collection("following")
+                }
 
-            val followingCollection = usersCollection.document(user!!.uid)
-                .collection("following")
+                val followingsSnapshot = followingCollection?.get()?.await()
+                followingsSnapshot?.documents?.forEach {document->
 
-            val followingsSnapshot = followingCollection.get().await()
-            followingsSnapshot.documents.forEach {document->
-
-                val snapshotUser = usersCollection.document(document.id).get().await()
-                followingList.add(snapshotUser.toObject(User::class.java))
+                    val snapshotUser = usersCollection.document(document.id).get().await()
+                    followingList.add(snapshotUser.toObject(User::class.java))
+                }
+                _followings.value = followingList
             }
-            _followings.value = followingList
-
-            println(followings.value)
         }
     }
 
     fun followersOfUser(){
         viewModelScope.launch {
-            val user = FirebaseAuth.getInstance().currentUser
-            val firestore = Injection.instance()
+            if(auth.uid != null){
+                val followersList = mutableListOf<User?>()
 
-            val followersList = mutableListOf<User?>()
+                val usersCollection = firestore.collection("users")
 
-            val usersCollection = firestore.collection("users")
+                val followersSnapshot = usersCollection.get().await()
+                followersSnapshot.documents.forEach {document->
+                    val documentsFollowingCol = document.reference.collection("following")
+                    val documentsFollowingSnap = documentsFollowingCol.get().await()
 
-            val followersSnapshot = usersCollection.get().await()
-            followersSnapshot.documents.forEach {document->
-                val documentsFollowingCol = document.reference.collection("following")
-                val documentsFollowingSnap = documentsFollowingCol.get().await()
-
-                documentsFollowingSnap.documents.forEach {possibleFollower->
-                    if(possibleFollower.id == user!!.uid){
-                        val snapshotUser = usersCollection.document(document.id).get().await()
-                        followersList.add(snapshotUser.toObject(User::class.java))
+                    documentsFollowingSnap.documents.forEach {possibleFollower->
+                        if(possibleFollower.id == auth.uid){
+                            val snapshotUser = usersCollection.document(document.id).get().await()
+                            followersList.add(snapshotUser.toObject(User::class.java))
+                        }
                     }
                 }
+                _followers.value = followersList
             }
-            _followers.value = followersList
-
-            println(followers.value)
         }
     }
 
     fun loadJournalsOfUser(user: User?, orderBy : String, list : MutableState<List<Journal>>){
         viewModelScope.launch {
-            val firestore = Injection.instance()
-
-            val collectionRef = user?.let {
-                firestore.collection("users")
-                    .document(it.uid).collection("journals").orderBy(orderBy)
-            }
-            val snapshot = collectionRef?.get()?.await()
-            var itemList = snapshot?.toObjects(Journal::class.java)
-            if (itemList != null) {
-                list.value = itemList
+            if(user != null && auth.uid != null){
+                val collectionRef = user.let {
+                    firestore.collection("users")
+                        .document(it.uid).collection("journals").orderBy(orderBy)
+                }
+                val snapshot = collectionRef.get().await()
+                val itemList = snapshot?.toObjects(Journal::class.java)
+                if (itemList != null) {
+                    list.value = itemList
+                }
             }
         }
     }
@@ -207,13 +206,13 @@ class ProfileViewModel : ViewModel() {
         GlobalScope.launch {
             isFollowing.value = false
             followingBox.value = "Follow"
-            val firestore = Injection.instance()
-            val currentUser = FirebaseAuth.getInstance().currentUser
 
-            val followingCollectionSnapshot = currentUser?.let {
-                firestore.collection("users").document(it.uid).collection("following")
-                    .get().await()
-            }
+            val followingCollectionSnapshot =
+                auth.uid?.let {
+                    firestore.collection("users").document(it).collection("following")
+                        .get().await()
+                }
+
 
             followingCollectionSnapshot?.forEach { following ->
                 if (user.uid == following.id) {
@@ -353,8 +352,6 @@ class ProfileViewModel : ViewModel() {
                 {
 
                     items(followingsOrFollowers){ user->
-
-                        println(user)
                         
                         val isFollowing by remember {
                             mutableStateOf(mutableStateOf<Boolean?>(null))
@@ -459,8 +456,6 @@ class ProfileViewModel : ViewModel() {
         followed: User,
         followingNum: MutableState<Int?>
     ){
-
-        val firestore = Injection.instance()
 
         if (followingBox.value == "Follow") {
 

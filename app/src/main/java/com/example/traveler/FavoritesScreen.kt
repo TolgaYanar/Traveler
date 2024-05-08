@@ -132,7 +132,7 @@ fun FavoritesScreen(navController: NavController, profileViewModel: ProfileViewM
                             Box(modifier = Modifier.background(Color.Transparent)){
 
                                 AsyncImage(model = city.imageUrl, contentDescription = null,
-                                    contentScale = ContentScale.Crop)
+                                    contentScale = ContentScale.FillBounds, modifier = Modifier.fillMaxSize())
                                 Box(modifier = Modifier
                                     .fillMaxSize()
                                     .padding(8.dp)

@@ -235,7 +235,7 @@ fun CityInformationScreen(city: City,
                            ) {
                                Box(modifier = Modifier.fillMaxSize()){
                                    AsyncImage(model = it.profile_image, contentDescription = null,
-                                       contentScale = ContentScale.Crop)
+                                       contentScale = ContentScale.FillBounds, modifier = Modifier.fillMaxSize())
                                    Box(modifier = Modifier
                                        .fillMaxSize()
                                        .padding(8.dp)

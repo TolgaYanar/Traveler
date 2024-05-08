@@ -40,14 +40,10 @@ import kotlinx.coroutines.tasks.await
 
 class AuthenticationViewModel: ViewModel() {
 
-    private val _userRepository : UserRepository
-
-    init {
-        _userRepository = UserRepository(
-            FirebaseAuth.getInstance(), //default firebase auth instance from abstract class
-            Injection.instance() // returns firebase firestore
-        )
-    }
+    private val _userRepository : UserRepository = UserRepository(
+        FirebaseAuth.getInstance(), //default firebase auth instance from abstract class
+        Injection.instance() // returns firebase firestore
+    )
 
     private val _authResult = MutableLiveData<Result<Boolean>>()
     val authResult: LiveData<Result<Boolean>> get() = _authResult

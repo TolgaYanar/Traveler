@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -223,8 +224,7 @@ fun UserProfileScreen(
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Card(
                             modifier = Modifier
@@ -242,10 +242,11 @@ fun UserProfileScreen(
                         }
                         Column(
                             modifier = Modifier
-                                .fillMaxWidth(), horizontalAlignment = Alignment.End
+                                .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
                         ) {
 
-                            Row(modifier = Modifier.padding(end = 70.dp)) {
+                            Row(modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center) {
                                 Text(text = followingNum.value.toString(), fontWeight = FontWeight.Bold)
                                 Spacer(modifier = Modifier.width(70.dp))
                                 Text(text = followersNum.value.toString(), fontWeight = FontWeight.Bold)
@@ -253,7 +254,6 @@ fun UserProfileScreen(
                             Row(
                                 modifier = Modifier
                                     .padding(vertical = 5.dp, horizontal = 10.dp)
-                                    .padding(end = 30.dp)
                             ) {
                                 Text(text = "Following", modifier = Modifier.clickable {
                                     if(isOwnProfile) followingsExpanded = true
@@ -332,6 +332,7 @@ fun UserProfileScreen(
                                     Card(backgroundColor = Color.LightGray, modifier = Modifier
                                         .height(30.dp)
                                         .width(80.dp)
+                                        .wrapContentSize()
                                         .clickable {
                                             profileViewModel.followAction(
                                                 followingBox, user,
@@ -436,7 +437,9 @@ fun UserProfileScreen(
                                 Box(modifier = Modifier
                                     .fillMaxSize()
                                     .background(
-                                        if(ongoingJournal.value.mostMemorialImage.isEmpty()) Color(ongoingJournal.value.color.toULong()).copy(0.75f)
+                                        if (ongoingJournal.value.mostMemorialImage.isEmpty()) Color(
+                                            ongoingJournal.value.color.toULong()
+                                        ).copy(0.75f)
                                         else Color.Transparent
                                     ), contentAlignment = Alignment.TopStart) {
                                     Text(text = ongoingJournal.value.title, modifier = Modifier.padding(10.dp))
@@ -452,7 +455,9 @@ fun UserProfileScreen(
                                             tint = Color.LightGray, modifier = Modifier
                                                 .clickable {
                                                     singlePhotoPicker.launch(
-                                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                                        PickVisualMediaRequest(
+                                                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                                                        )
                                                     )
                                                 }
                                                 .padding(10.dp))
@@ -549,10 +554,11 @@ fun UserProfileScreen(
 
                                                 Box(modifier = Modifier
                                                     .background(
-                                                        if(journal.mostMemorialImage.isEmpty()){
-                                                            Color(journal.color.toULong()).copy(0.75f)
-                                                        }
-                                                        else Color.Transparent
+                                                        if (journal.mostMemorialImage.isEmpty()) {
+                                                            Color(journal.color.toULong()).copy(
+                                                                0.75f
+                                                            )
+                                                        } else Color.Transparent
                                                     )
                                                     .fillMaxSize()
                                                     .padding(8.dp)
@@ -606,12 +612,4 @@ fun UserProfileScreen(
 @Composable
 fun prrreview(journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
 
-    val currentDate = Calendar.getInstance().time.time
-
-    val endDate = 1713657600000
-
-    Column {
-        Text(text = journalPropertiesViewModel.getDayDifference(currentDate, endDate).toString())
-        Text(text = journalPropertiesViewModel.getDayDifference(endDate, currentDate).toString())
-    }
 }
