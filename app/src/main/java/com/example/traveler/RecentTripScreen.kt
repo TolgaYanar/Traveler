@@ -66,7 +66,7 @@ fun RecentTripScreen(navController: NavController, journal: Journal, user: User,
 
     Box(modifier = Modifier.fillMaxSize()){
         AsyncImage(modifier = Modifier.fillMaxSize(),model = journal.mostMemorialImage, contentDescription = null,
-            contentScale = ContentScale.Crop)
+            contentScale = ContentScale.FillBounds)
 
         Column(
             modifier = Modifier,

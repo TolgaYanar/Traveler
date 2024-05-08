@@ -70,13 +70,14 @@ import java.util.TimeZone
 @Composable
 fun AddJournal(navController: NavController,
                profileViewModel: ProfileViewModel,
-               journalPropertiesViewModel: JournalPropertiesViewModel){
+               journalPropertiesViewModel: JournalPropertiesViewModel,
+               loc: String = ""){
 
     var title by remember {
         mutableStateOf("")
     }
     var location by remember {
-        mutableStateOf("")
+        mutableStateOf(loc)
     }
     var color by remember {
         mutableStateOf(Color.White)
@@ -133,13 +134,15 @@ fun AddJournal(navController: NavController,
                         Text(text = "Title", color = Color.Black)
                     }, placeholder = {
                         Text(text = "Enter Title", color = Color.Black)
-                    })
+                    },
+                    maxLines = 1)
                 TextField(value = location, onValueChange = {location = it}, modifier = Modifier.padding(vertical = 10.dp),
                     label = {
                         Text(text = "Location", color = Color.Black)
                     }, placeholder = {
                         Text(text = "Enter Location", color = Color.Black)
-                    })
+                    },
+                    maxLines = 1)
 
                 Spacer(modifier = Modifier.height(30.dp))
 

@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -217,30 +218,66 @@ fun CityInformationScreen(city: City,
                    horizontalAlignment = Alignment.CenterHorizontally)
                {
 
-                   items(otherUsers){
-                       
-                       Card(modifier = Modifier
-                           .padding(vertical = 10.dp)
-                           .height(90.dp)
-                           .fillMaxWidth()
-                           .clickable {
-                               navController.currentBackStackEntry?.savedStateHandle?.set(
-                                   "user",
-                                   it
-                               )
-                               navController.navigate(Screen.UserProfileScreen.route)
-                           }
-                       ) {
-                           Box(modifier = Modifier.fillMaxSize()){
-                               AsyncImage(model = it.profile_image, contentDescription = null,
-                                   contentScale = ContentScale.Crop)
-                               Box(modifier = Modifier
-                                   .fillMaxSize()
-                                   .padding(8.dp)
-                                   .background(Color.Transparent),
-                                   contentAlignment = Alignment.BottomStart) {
-                                   Text(text = it.fullName, fontWeight = FontWeight.Bold, color = Color.Black, fontSize = 20.sp)
+                   if(otherUsers.isNotEmpty()){
+                       items(otherUsers){
+
+                           Card(modifier = Modifier
+                               .padding(vertical = 10.dp)
+                               .height(90.dp)
+                               .fillMaxWidth()
+                               .clickable {
+                                   navController.currentBackStackEntry?.savedStateHandle?.set(
+                                       "user",
+                                       it
+                                   )
+                                   navController.navigate(Screen.UserProfileScreen.route)
                                }
+                           ) {
+                               Box(modifier = Modifier.fillMaxSize()){
+                                   AsyncImage(model = it.profile_image, contentDescription = null,
+                                       contentScale = ContentScale.Crop)
+                                   Box(modifier = Modifier
+                                       .fillMaxSize()
+                                       .padding(8.dp)
+                                       .background(Color.Transparent),
+                                       contentAlignment = Alignment.BottomStart) {
+                                       Text(text = it.fullName, fontWeight = FontWeight.Bold, color = Color.Black, fontSize = 20.sp)
+                                   }
+                               }
+                           }
+                       }
+                       item{
+                           Row(modifier = Modifier.padding(bottom = 10.dp).fillMaxWidth(),
+                               horizontalArrangement = Arrangement.Center) {
+                               Text(text = "Plan a Trip to the ", fontWeight = FontWeight.Bold)
+                               Text(text = city.name, fontSize = 16.sp, color = Color.Blue, fontStyle = FontStyle.Italic,
+                                   fontWeight = FontWeight.SemiBold,
+                                   modifier = Modifier
+                                       .clickable {
+                                           navController.currentBackStackEntry?.savedStateHandle?.set(
+                                               "location",
+                                               city.name
+                                           )
+                                           navController.navigate(Screen.AddJournalScreen.route)
+                                       }
+                               )
+                           }
+                       }
+                   }
+                   else{
+                       item{
+                           Column(modifier = Modifier.padding(bottom = 10.dp).fillMaxWidth(),
+                               horizontalAlignment = Alignment.CenterHorizontally) {
+                               Text(text = "There is not any journal located in ${city.name}.",
+                                   fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+                                   maxLines = 1)
+                               Text(text = "Be First!", fontWeight = FontWeight.Bold,
+                                   fontSize = 16.sp, color = Color.Blue, fontStyle = FontStyle.Italic,
+                                   modifier = Modifier.clickable {
+                                       navController.currentBackStackEntry?.savedStateHandle?.set("location", city.name)
+                                       navController.navigate(Screen.AddJournalScreen.route)
+                                   }
+                               )
                            }
                        }
                    }

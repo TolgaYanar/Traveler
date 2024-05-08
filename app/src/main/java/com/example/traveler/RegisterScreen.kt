@@ -142,9 +142,9 @@ fun RegisterScreen(
             )
             Button(onClick = {
                 if(password.isNotEmpty() && confirmPassword.isNotEmpty() && name.isNotEmpty() && email.isNotEmpty() ){
-                    if(password == confirmPassword){
+                    if(password.trim() == confirmPassword.trim()){
                         try {
-                            authenticationViewModel.signUp(email,password,name)
+                            authenticationViewModel.signUp(email.trim(),password.trim(),name.trim())
                             email = ""
                             name = ""
                             password = ""

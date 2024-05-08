@@ -130,7 +130,7 @@ fun LoginScreen(
                 )
                 Spacer(modifier = Modifier.padding(20.dp))
                 Button(onClick = {
-                    authenticationViewModel.signIn(email,password)
+                    authenticationViewModel.signIn(email.trim(),password.trim())
                 }, modifier = Modifier.size(200.dp,40.dp)) {
                     Text(text = "LOGIN", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }

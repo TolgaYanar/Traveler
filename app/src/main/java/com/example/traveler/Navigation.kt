@@ -116,7 +116,12 @@ fun Navigation(
         }
 
         composable(Screen.AddJournalScreen.route){
-            AddJournal(navController = navController, journalPropertiesViewModel = journalPropertiesViewModel,
+            val location = navController.previousBackStackEntry?.savedStateHandle?.get<String>("location")
+            if (location != null) {
+                AddJournal(navController = navController, journalPropertiesViewModel = journalPropertiesViewModel,
+                    profileViewModel = profileViewModel, loc = location)
+            }
+            else AddJournal(navController = navController, journalPropertiesViewModel = journalPropertiesViewModel,
                 profileViewModel = profileViewModel)
         }
 

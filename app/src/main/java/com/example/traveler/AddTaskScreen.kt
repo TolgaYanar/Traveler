@@ -130,7 +130,8 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                 TextField(value = title, onValueChange = {title = it},
                     placeholder = {
                         Text(text = "Title")
-                    }
+                    },
+                    maxLines = 1
                 )
                 Spacer(modifier = Modifier.height(50.dp))
                 TextField(value = startTime, onValueChange = {},

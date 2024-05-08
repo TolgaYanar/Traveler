@@ -144,13 +144,14 @@ fun MainMenu(profileViewModel: ProfileViewModel, navController: NavController,
 
                         SearchField(countryViewModel = countryViewModel,
                             onValueChange = {
-                            search = it
+                            search = it.trim()
                         })
 
                         Row(modifier = Modifier
                             .padding(20.dp)
                             .fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                            Text(text = "Explore Cities", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.alpha(0.6f))
+                            Text(text = "Explore Cities", fontSize = 20.sp, fontWeight = FontWeight.Bold,
+                                modifier = Modifier.alpha(0.6f))
                         }
 
 
@@ -280,7 +281,7 @@ fun SearchField(
         },
         trailingIcon = {
             IconButton(onClick = {
-                countryViewModel.fetchParticularCityData(search)
+                countryViewModel.fetchParticularCityData(search.trim())
             }) {
                 Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = null)
             }
