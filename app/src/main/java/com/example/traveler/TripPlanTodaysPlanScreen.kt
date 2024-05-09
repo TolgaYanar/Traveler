@@ -113,12 +113,11 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
 
     var isEdit : MutableState<Boolean> = remember { mutableStateOf(false) }
 
-    var calendar by remember {
-        mutableStateOf(Calendar.getInstance())
+    var dateToString by remember {
+        mutableStateOf(journalPropertiesViewModel.longToDate(journal.startDateInMillis))
     }
 
     val context = LocalContext.current
-    
 
     Scaffold(
         topBar = {
@@ -223,6 +222,9 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                                                 selectedDay!!,
                                                 selectedTasks
                                             )
+                                            dateToString = journalPropertiesViewModel
+                                                .longToDate(journal.startDateInMillis +
+                                                selected * 24 * 60 * 60 * 1000)
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -240,10 +242,11 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                         .padding(horizontal = 20.dp)
                         .padding(vertical = 20.dp), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top
                 ) {
-                    calendar.timeZone = TimeZone.getTimeZone("Europe/Istanbul")
-                    journalPropertiesViewModel.longToDate(calendar.time.time)?.let {
-                            it1 -> Text(text = it1, fontSize = 17.sp, fontWeight = FontWeight.Bold,
-                        modifier = Modifier.alpha(0.8f))}
+
+                    dateToString?.let { it1 ->
+                        Text(text = it1, fontSize = 17.sp, fontWeight = FontWeight.Bold,
+                            modifier = Modifier.alpha(0.8f))
+                    }
 
                     Divider(modifier = Modifier.fillMaxWidth())
 
