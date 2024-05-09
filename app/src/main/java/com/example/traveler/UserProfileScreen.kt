@@ -117,6 +117,10 @@ fun UserProfileScreen(
         mutableStateOf(mutableStateOf<String?>(null))
     }
 
+    LaunchedEffect(key1 = isOwnProfile){
+        profileViewModel.loadCurrentUser()
+    }
+
     LaunchedEffect(key1 = isFollowing){
         if (!isOwnProfile){
             if (user != null) {
