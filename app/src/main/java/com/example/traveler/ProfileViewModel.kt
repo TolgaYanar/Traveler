@@ -115,19 +115,18 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-    fun followingsOfUser(){
+    fun followingsOfUser(user: User){
         viewModelScope.launch {
             if(auth.uid != null){
                 val followingList = mutableListOf<User?>()
 
                 val usersCollection = firestore.collection("users")
 
-                val followingCollection = auth.uid?.let {
-                    usersCollection.document(it)
+                val followingCollection = usersCollection.document(user.uid)
                         .collection("following")
-                }
 
-                val followingsSnapshot = followingCollection?.get()?.await()
+
+                val followingsSnapshot = followingCollection.get().await()
                 followingsSnapshot?.documents?.forEach {document->
 
                     val snapshotUser = usersCollection.document(document.id).get().await()
@@ -138,24 +137,19 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-    fun followersOfUser(){
+    fun followersOfUser(user: User){
         viewModelScope.launch {
             if(auth.uid != null){
                 val followersList = mutableListOf<User?>()
-
                 val usersCollection = firestore.collection("users")
+                val followersCollection = usersCollection.document(user.uid)
+                    .collection("followers")
 
-                val followersSnapshot = usersCollection.get().await()
+                val followersSnapshot = followersCollection.get().await()
                 followersSnapshot.documents.forEach {document->
-                    val documentsFollowingCol = document.reference.collection("following")
-                    val documentsFollowingSnap = documentsFollowingCol.get().await()
 
-                    documentsFollowingSnap.documents.forEach {possibleFollower->
-                        if(possibleFollower.id == auth.uid){
-                            val snapshotUser = usersCollection.document(document.id).get().await()
-                            followersList.add(snapshotUser.toObject(User::class.java))
-                        }
-                    }
+                    val snapshotUser = usersCollection.document(document.id).get().await()
+                    followersList.add(snapshotUser.toObject(User::class.java))
                 }
                 _followers.value = followersList
             }
@@ -403,29 +397,30 @@ class ProfileViewModel : ViewModel() {
                                             fontSize = 12.sp)
                                     }
                                 }
-                                Row(modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = 10.dp)
-                                    .padding(vertical = 3.dp),
-                                    horizontalArrangement = Arrangement.End)
-                                {
-                                    Card(
-                                        modifier = Modifier
-                                            .padding(3.dp)
-                                            .width(80.dp)
-                                            .height(25.dp)
-                                            .clickable {
-                                                onFollowBoxClick(user!!, followingBox)
+                                if(user!!.uid != auth.uid){
+                                    Row(modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(horizontal = 10.dp)
+                                        .padding(vertical = 3.dp),
+                                        horizontalArrangement = Arrangement.End)
+                                    {
+                                        Card(
+                                            modifier = Modifier
+                                                .padding(3.dp)
+                                                .width(80.dp)
+                                                .height(25.dp)
+                                                .clickable {
+                                                    onFollowBoxClick(user, followingBox)
+                                                }
+                                        ) {
+                                            Box(modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(Color.LightGray),
+                                                contentAlignment = Alignment.Center)
+                                            {
+                                                Text(text = followingBox.value.toString(), fontSize = 14.sp)
                                             }
-                                    ) {
-                                        Box(modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(Color.LightGray),
-                                            contentAlignment = Alignment.Center)
-                                        {
-                                            Text(text = followingBox.value.toString(), fontSize = 14.sp)
                                         }
-                                    }
 //                                Card(
 //                                    modifier = Modifier
 //                                        .padding(3.dp)
@@ -440,6 +435,7 @@ class ProfileViewModel : ViewModel() {
 //                                        Icon(painter = painterResource(id = R.drawable.baseline_message_24), contentDescription = null)
 //                                    }
 //                                }
+                                    }
                                 }
                             }
                         }
@@ -457,79 +453,97 @@ class ProfileViewModel : ViewModel() {
         followingNum: MutableState<Int?>
     ){
 
-        if (followingBox.value == "Follow") {
+        if(auth.uid != null){
+            if (followingBox.value == "Follow") {
 
-            firestore
-                .collection("users")
-                .document(
-                    currentUser.value!!.uid
-                )
-                .collection("following")
-                .document(followed.uid).set(followed)
-                .addOnSuccessListener {
-                    firestore
-                        .collection("users")
-                        .document(currentUser.value!!.uid)
-                        .update(
-                            "following",
-                            currentUser.value!!.following + 1
-                        )
-                    Injection
-                        .instance()
-                        .collection("users")
-                        .document(followed.uid)
-                        .update(
-                            "followers",
-                            followed.followers + 1
-                        )
-                    followingNum.value =
-                        followingNum.value!! + 1
-                    followed.followers++
-                    println("User followed successfully")
-                    currentUser.value!!.following++
-                }
-                .addOnFailureListener {
-                    println("User couldn't followed. Error.")
-                }
-        followingBox.value = "Following"
-        } else if (followingBox.value == "Following") {
+                firestore
+                    .collection("users")
+                    .document(
+                        currentUser.value!!.uid
+                    )
+                    .collection("following")
+                    .document(followed.uid).set(followed)
+                    .addOnSuccessListener {
+                        firestore
+                            .collection("users")
+                            .document(currentUser.value!!.uid)
+                            .update(
+                                "following",
+                                currentUser.value!!.following + 1
+                            )
+                        Injection
+                            .instance()
+                            .collection("users")
+                            .document(followed.uid)
+                            .update(
+                                "followers",
+                                followed.followers + 1
+                            )
+                        Injection.instance()
+                            .collection("users")
+                            .document(followed.uid)
+                            .collection("followers")
+                            .document(auth.uid!!).set(hashMapOf<String, Any>(
+                                "uid" to auth.uid!!
+                            ))
+                        if(followingNum.value != null){
+                            followingNum.value =
+                                followingNum.value!! + 1
+                        }
+                        followed.followers++
+                        println("User followed successfully")
+                        currentUser.value!!.following++
+                    }
+                    .addOnFailureListener {
+                        println("User couldn't followed. Error.")
+                    }
+                followingBox.value = "Following"
+            } else if (followingBox.value == "Following") {
 
-            Injection
-                .instance()
-                .collection("users")
-                .document(
-                    currentUser.value!!.uid
-                )
-                .collection("following")
-                .document(followed.uid)
-                .delete()
-                .addOnSuccessListener {
-                    Injection
-                        .instance()
-                        .collection("users")
-                        .document(currentUser.value!!.uid)
-                        .update(
-                            "following",
-                            currentUser.value!!.following - 1
-                        )
-                    Injection
-                        .instance()
-                        .collection("users")
-                        .document(followed.uid)
-                        .update(
-                            "followers",
-                            followed.followers - 1
-                        )
-                    followingNum.value =
-                        followingNum.value!! - 1
-                    followed.followers--
-                    println("User unfollowed successfully")
-                    currentUser.value!!.following--
-                }
-                .addOnFailureListener {
-                    println("User couldn't unfollowed. Error.")
-                }
-            followingBox.value = "Follow"
+                Injection
+                    .instance()
+                    .collection("users")
+                    .document(
+                        currentUser.value!!.uid
+                    )
+                    .collection("following")
+                    .document(followed.uid)
+                    .delete()
+                    .addOnSuccessListener {
+                        Injection
+                            .instance()
+                            .collection("users")
+                            .document(currentUser.value!!.uid)
+                            .update(
+                                "following",
+                                currentUser.value!!.following - 1
+                            )
+                        Injection
+                            .instance()
+                            .collection("users")
+                            .document(followed.uid)
+                            .update(
+                                "followers",
+                                followed.followers - 1
+                            )
+                        Injection.instance()
+                            .collection("users")
+                            .document(followed.uid)
+                            .collection("followers")
+                            .document(auth.uid!!).delete()
+                        if(followingNum.value != null){
+                            followingNum.value =
+                                followingNum.value!! - 1
+                        }
+                        followed.followers--
+                        println("User unfollowed successfully")
+                        currentUser.value!!.following--
+                    }
+                    .addOnFailureListener {
+                        println("User couldn't unfollowed. Error.")
+                    }
+                followingBox.value = "Follow"
+            }
         }
     }
 }

@@ -256,18 +256,18 @@ fun UserProfileScreen(
                                     .padding(vertical = 5.dp, horizontal = 10.dp)
                             ) {
                                 Text(text = "Following", modifier = Modifier.clickable {
-                                    if(isOwnProfile) followingsExpanded = true
+                                    followingsExpanded = true
                                 })
                                 Spacer(modifier = Modifier.width(20.dp))
                                 Text(text = "Followers", modifier = Modifier.clickable {
-                                    if(isOwnProfile) followersExpanded = true
+                                    followersExpanded = true
                                 })
                             }
 
                             if(followingsExpanded){
 
                                 LaunchedEffect(key1 = profileViewModel.followings){
-                                    profileViewModel.followingsOfUser()
+                                    profileViewModel.followingsOfUser(user)
                                 }
 
                                 followings?.let { followings ->
@@ -295,7 +295,7 @@ fun UserProfileScreen(
                             } else if(followersExpanded){
 
                                 LaunchedEffect(key1 = profileViewModel.followers){
-                                    profileViewModel.followersOfUser()
+                                    profileViewModel.followersOfUser(user)
                                 }
 
                                 followers?.let { followers ->
