@@ -475,8 +475,14 @@ fun UserProfileScreen(
                                 .padding(horizontal = 35.dp, vertical = 5.dp)
                                 .fillMaxWidth()
                                 .height(50.dp),
-                            verticalAlignment = Alignment.Top) {
-                            Text(text = "${journalPropertiesViewModel.getDayDifference(currentDate + 3 * 60 * 60 * 1000, ongoingJournal.value.endDateInMillis)} more days", modifier = Modifier
+                            verticalAlignment = Alignment.Top
+                        ){
+                            val dayDiff = journalPropertiesViewModel.getDayDifference(currentDate + 3 * 60 * 60 * 1000, ongoingJournal.value.endDateInMillis)
+                            var dayDiffToString = "$dayDiff more days"
+                            if(dayDiff == 0){
+                                dayDiffToString = "Last Day"
+                            }
+                            Text(text = dayDiffToString, modifier = Modifier
                                 .alpha(0.6f),
                                 fontWeight = FontWeight.Bold, fontSize = 16.sp)
                             if(isOwnProfile){
@@ -571,7 +577,12 @@ fun UserProfileScreen(
                                                     Text(text = journal.location, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                                                 }
                                             }
-                                            Text(text = "${journalPropertiesViewModel.getDayDifference(journalEndDate,currentDate + 3 * 60 * 60 * 1000)} days ago...", fontWeight = FontWeight.Bold,
+                                            val dayDiff = journalPropertiesViewModel.getDayDifference(journalEndDate,currentDate + 3 * 60 * 60 * 1000)
+                                            var dayDiffToString = "$dayDiff days ago..."
+                                            if(dayDiff == 0){
+                                                dayDiffToString = "Yesterday"
+                                            }
+                                            Text(text = dayDiffToString, fontWeight = FontWeight.Bold,
                                                 modifier = Modifier
                                                     .alpha(0.5f)
                                                     .padding(horizontal = 15.dp))
