@@ -139,7 +139,7 @@ fun Navigation(
         composable(Screen.MessageRoom.route){
             val result = navController.previousBackStackEntry?.savedStateHandle?.get<User>("friend")
             if(result != null){
-                ChatScreen(friend = result, profileViewModel = profileViewModel)
+                ChatScreen(friend = result, profileViewModel = profileViewModel, navController = navController)
             }
         }
     }
