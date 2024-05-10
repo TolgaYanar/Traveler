@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.Surface
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,7 +66,7 @@ class ProfileViewModel : ViewModel() {
         Injection.instance()
     )
 
-    private val auth = FirebaseAuth.getInstance()
+    val auth = FirebaseAuth.getInstance()
     private val firestore = Injection.instance()
 
     private val _currentUser = MutableLiveData<User?>()
@@ -328,7 +330,8 @@ class ProfileViewModel : ViewModel() {
         followingsOrFollowers: MutableList<User?>,
         onClickProfile: (User) -> Unit,
         onDismissRequest: () -> Unit,
-        onFollowBoxClick: (User, MutableState<String?>) -> Unit
+        onFollowBoxClick: (User, MutableState<String?>) -> Unit,
+        onMessageAction: (User) -> Unit
     ){
 
         Dialog(onDismissRequest = { onDismissRequest() }) {
@@ -421,20 +424,25 @@ class ProfileViewModel : ViewModel() {
                                                 Text(text = followingBox.value.toString(), fontSize = 14.sp)
                                             }
                                         }
-//                                Card(
-//                                    modifier = Modifier
-//                                        .padding(3.dp)
-//                                        .width(40.dp)
-//                                        .height(25.dp)
-//                                ) {
-//                                    Box(modifier = Modifier
-//                                        .fillMaxSize()
-//                                        .background(Color.LightGray),
-//                                        contentAlignment = Alignment.Center)
-//                                    {
-//                                        Icon(painter = painterResource(id = R.drawable.baseline_message_24), contentDescription = null)
-//                                    }
-//                                }
+                                        Card(
+                                            modifier = Modifier
+                                                .padding(3.dp)
+                                                .width(40.dp)
+                                                .height(25.dp)
+                                                .clickable {
+                                                    onMessageAction(
+                                                        user
+                                                    )
+                                                }
+                                        ) {
+                                            Box(modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(Color.LightGray),
+                                                contentAlignment = Alignment.Center)
+                                            {
+                                                Icon(painter = painterResource(id = R.drawable.baseline_message_24), contentDescription = null)
+                                            }
+                                        }
                                     }
                                 }
                             }

@@ -135,5 +135,12 @@ fun Navigation(
                     weatherViewModel = weatherViewModel)
             }
         }
+
+        composable(Screen.MessageRoom.route){
+            val result = navController.previousBackStackEntry?.savedStateHandle?.get<User>("friend")
+            if(result != null){
+                ChatScreen(friend = result, profileViewModel = profileViewModel)
+            }
+        }
     }
 }

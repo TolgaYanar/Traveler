@@ -63,6 +63,7 @@ import com.example.traveler.data.User
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.storage
 import java.util.Calendar
 import java.util.UUID
@@ -283,18 +284,24 @@ fun UserProfileScreen(
                                         },
                                         onDismissRequest = {
                                             followingsExpanded = false
+                                        },
+                                        onFollowBoxClick = { followed, followingBox ->
+                                            val nothing = mutableStateOf<Int?>(null)
+                                            profileViewModel.followAction(
+                                                followingBox = followingBox,
+                                                followed = followed,
+                                                followingNum =
+                                                if(isOwnProfile){
+                                                    followingNum
+                                                }else nothing
+                                            )
+
+                                        },
+                                        onMessageAction = {friend->
+                                            navController.currentBackStackEntry?.savedStateHandle?.set("friend",friend)
+                                            navController.navigate(Screen.MessageRoom.route)
                                         }
-                                    ) { followed, followingBox ->
-                                        val nothing = mutableStateOf<Int?>(null)
-                                        profileViewModel.followAction(
-                                            followingBox = followingBox,
-                                            followed = followed,
-                                            followingNum =
-                                            if(isOwnProfile){
-                                                followingNum
-                                            }else nothing
-                                        )
-                                    }
+                                    )
                                 }
                             } else if(followersExpanded){
 
@@ -311,18 +318,23 @@ fun UserProfileScreen(
                                         },
                                         onDismissRequest = {
                                             followersExpanded = false
+                                        },
+                                        onFollowBoxClick = { follower, followingBox ->
+                                            val nothing = mutableStateOf<Int?>(null)
+                                            profileViewModel.followAction(
+                                                followingBox = followingBox,
+                                                followed = follower,
+                                                followingNum =
+                                                if(isOwnProfile){
+                                                    followingNum
+                                                }else nothing
+                                            )
+                                        },
+                                        onMessageAction = {friend->
+                                            navController.currentBackStackEntry?.savedStateHandle?.set("friend",friend)
+                                            navController.navigate(Screen.MessageRoom.route)
                                         }
-                                    ) { follower, followingBox ->
-                                        val nothing = mutableStateOf<Int?>(null)
-                                        profileViewModel.followAction(
-                                            followingBox = followingBox,
-                                            followed = follower,
-                                            followingNum =
-                                            if(isOwnProfile){
-                                                followingNum
-                                            }else nothing
-                                        )
-                                    }
+                                    )
                                 }
                             }
 
@@ -335,8 +347,7 @@ fun UserProfileScreen(
                                 ) {
                                     Card(backgroundColor = Color.LightGray, modifier = Modifier
                                         .height(30.dp)
-                                        .width(80.dp)
-                                        .wrapContentSize()
+                                        .width(85.dp)
                                         .clickable {
                                             profileViewModel.followAction(
                                                 followingBox, user,
@@ -360,6 +371,26 @@ fun UserProfileScreen(
                                                     fontWeight = FontWeight.Bold
                                                 )
                                             }
+                                        }
+                                    }
+
+                                    Card(backgroundColor = Color.LightGray, modifier = Modifier
+                                        .padding(horizontal = 5.dp)
+                                        .height(30.dp)
+                                        .width(85.dp)
+                                        .clickable {
+                                            navController.currentBackStackEntry?.savedStateHandle?.set("friend",user)
+                                            navController.navigate(Screen.MessageRoom.route)
+                                        }
+                                    ) {
+                                        Box(
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = "Message",
+                                                fontWeight = FontWeight.Bold
+                                            )
                                         }
                                     }
                                 }
