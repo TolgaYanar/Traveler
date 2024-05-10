@@ -1,7 +1,10 @@
 package com.example.traveler
 
+import android.Manifest
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -53,6 +56,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.traveler.data.AlarmItem
@@ -102,6 +106,41 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
     }
 
     val context = LocalContext.current
+
+    var permissionGranted by remember {
+        mutableStateOf(false)
+    }
+
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { permissions ->
+            if (permissions[Manifest.permission.POST_NOTIFICATIONS] == true
+                && permissions[Manifest.permission.ACCESS_NOTIFICATION_POLICY] == true
+                && permissions[Manifest.permission.USE_EXACT_ALARM] == true){
+                //I HAVE ACCESS to location
+                permissionGranted = true
+            } else {
+                //Ask for permission
+                val rationaleRequired = ActivityCompat.shouldShowRequestPermissionRationale(
+                    context as MainActivity,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) || ActivityCompat.shouldShowRequestPermissionRationale(
+                    context as MainActivity,
+                    Manifest.permission.ACCESS_NOTIFICATION_POLICY
+                ) || ActivityCompat.shouldShowRequestPermissionRationale(
+                    context as MainActivity,
+                    Manifest.permission.USE_EXACT_ALARM
+                )
+
+                if(rationaleRequired){
+                    Toast.makeText(context, "Notification Permission is required for this feature to work",
+                        Toast.LENGTH_LONG).show()
+                }else{
+                    Toast.makeText(context, "Notification Permission is required. Please enable it in the Android Settings",
+                        Toast.LENGTH_LONG).show()
+                }
+            }
+        })
 
     Scaffold(
         topBar = {
@@ -222,6 +261,16 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                     .padding(20.dp), horizontalArrangement = Arrangement.End) {
                     Button(onClick = {
                         if(title.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty() && repeat.isNotEmpty() && reminder.isNotEmpty() ){
+
+                            requestPermissionLauncher.launch(
+                                arrayOf(
+                                    Manifest.permission.ACCESS_NOTIFICATION_POLICY,
+                                    Manifest.permission.POST_NOTIFICATIONS,
+                                    Manifest.permission.USE_EXACT_ALARM
+                                )
+                            )
+
+                            if (permissionGranted) Toast.makeText(context, "Permission Granted!", Toast.LENGTH_SHORT).show()
 
                             val task = hashMapOf<String, Any>(
                                 "title" to title,

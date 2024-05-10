@@ -7,18 +7,6 @@
       </entry>
       <entry key="app">
         <State>
-          <runningDeviceTargetSelectedWithDropDown>
-            <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\turkc\.android\avd\Medium_Phone_API_34.avd" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-05-10T10:29:36.901332Z" />
           <runningDeviceTargetsSelectedWithDialog>
             <Target>
               <type value="RUNNING_DEVICE_TARGET" />
