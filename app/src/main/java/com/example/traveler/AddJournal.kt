@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -121,173 +122,216 @@ fun AddJournal(navController: NavController,
                 ))
         }
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-                .background(colorResource(id = R.color.add_journal_color)),
-            verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
+        Column(
+            modifier = Modifier.padding(it)
+                .background(colorResource(id = R.color.add_journal_color))
         ) {
-            item {
-                TextField(value = title, onValueChange = {title = it}, modifier = Modifier.padding(vertical = 10.dp),
-                    label = {
-                        Text(text = "Title", color = Color.Black)
-                    }, placeholder = {
-                        Text(text = "Enter Title", color = Color.Black)
-                    },
-                    maxLines = 1)
-                TextField(value = location, onValueChange = {location = it}, modifier = Modifier.padding(vertical = 10.dp),
-                    label = {
-                        Text(text = "Location", color = Color.Black)
-                    }, placeholder = {
-                        Text(text = "Enter Location", color = Color.Black)
-                    },
-                    maxLines = 1)
 
-                Spacer(modifier = Modifier.height(30.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth().weight(1f),
+                verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    TextField(value = title,
+                        onValueChange = { title = it },
+                        modifier = Modifier.fillMaxWidth(0.75f),
+                        label = {
+                            Text(text = "Title", color = Color.Black)
+                        },
+                        placeholder = {
+                            Text(text = "Enter Title", color = Color.Black)
+                        },
+                        maxLines = 1
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+                item {
+                    TextField(value = location,
+                        onValueChange = { location = it },
+                        modifier = Modifier.fillMaxWidth(0.75f),
+                        label = {
+                            Text(text = "Location", color = Color.Black)
+                        },
+                        placeholder = {
+                            Text(text = "Enter Location", color = Color.Black)
+                        },
+                        maxLines = 1
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
 
-                Card(modifier = Modifier
-                    .height(80.dp)
-                    .width(287.dp)
-                    .padding(vertical = 10.dp),
-                    backgroundColor = color
-                ) {
-                    Text(text = "Color of Journal", color = Color.Black, modifier = Modifier.padding(6.dp),
-                        fontWeight = FontWeight.Bold)
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
-                        Icon(painter = painterResource(id = R.drawable.baseline_color_lens_24),
-                            contentDescription = null, tint = Color.Gray,
-                            modifier = Modifier
-                                .padding(10.dp)
-                                .size(40.dp)
-                                .clickable {
-                                    colorPickerVisibility = true
-                                })
-                    }
-                    if(colorPickerVisibility){
-                        journalPropertiesViewModel.ColorPicker(onDismissRequest = { colorPickerVisibility = false },
-                            onColorSelected = {
-                                color = it
+                item {
+                    Card(
+                        modifier = Modifier
+                            .height(80.dp)
+                            .fillMaxWidth(0.75f)
+                            .padding(vertical = 10.dp),
+                        backgroundColor = color
+                    ) {
+                        Text(
+                            text = "Color of Journal",
+                            color = Color.Black,
+                            modifier = Modifier.padding(6.dp),
+                            fontWeight = FontWeight.Bold
+                        )
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.BottomEnd
+                        ) {
+                            Icon(painter = painterResource(id = R.drawable.baseline_color_lens_24),
+                                contentDescription = null, tint = Color.Gray,
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .size(40.dp)
+                                    .clickable {
+                                        colorPickerVisibility = true
+                                    })
+                        }
+                        if (colorPickerVisibility) {
+                            journalPropertiesViewModel.ColorPicker(onDismissRequest = {
                                 colorPickerVisibility = false
-                            }
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(30.dp))
-
-                TextField(value = "" + journalPropertiesViewModel.longToDate(startDateInMillis), onValueChange = {}, modifier = Modifier.padding(vertical = 10.dp),
-                    label = {
-                        Text(text = "Starting Time", color = Color.Black)
-                    }, enabled = false,
-                    trailingIcon = {
-                        Icon(imageVector = Icons.Filled.DateRange, contentDescription = null,
-                            modifier = Modifier.clickable {
-                                datePickerExpanded = true
-                            })
-                    }
-                )
-
-                TextField(value = "" + journalPropertiesViewModel.longToDate(endDateInMillis), onValueChange = {}, modifier = Modifier.padding(vertical = 10.dp),
-                    label = {
-                        Text(text = "Ending Time", color = Color.Black)
-                    }, enabled = false,
-                    trailingIcon = {
-                        Icon(imageVector = Icons.Filled.DateRange, contentDescription = null,
-                            modifier = Modifier.clickable {
-                                datePickerExpanded = true
-                            })
-                    }
-                )
-
-                if (datePickerExpanded){
-
-                    DatePickerDialog(onDismissRequest = {
-                        datePickerExpanded = false
-                    }, confirmButton = {
-                        TextButton(onClick = {
-                            startDateInMillis = dateRangeDialogState.selectedStartDateMillis
-                            endDateInMillis = dateRangeDialogState.selectedEndDateMillis
-                            datePickerExpanded = false
-                        }) {
-                            Text(text = "Select")
-                        }
-                    }, dismissButton = {
-                        TextButton(onClick = { datePickerExpanded = false }) {
-                            Text(text = "Cancel")
-                        }
-                    }
-                    ) {
-                        DateRangePicker(state = dateRangeDialogState,
-//                        dateValidator = {
-//                            it >= Calendar.getInstance(TimeZone.getDefault()).time.time
-//                        }
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(30.dp))
-
-                OutlinedTextField(value = notes, onValueChange = {notes = it},
-                    colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Gray, focusedContainerColor = Color.Gray),
-                    placeholder = {
-                        Text(text = "Notes", color = Color.Black)
-                    }, modifier = Modifier.height(200.dp),
-                    label = {
-                        Text(text = "Notes", color = Color.Black)
-                    }
-                )
-
-                Checkbox(checked = private, onCheckedChange = {
-                    private = !private
-                })
-                Text(text = "Make it private", color = Color.Black)
-
-                Row(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 20.dp).padding(end = 30.dp),
-                    horizontalArrangement = Arrangement.End)
-                {
-
-                    Button(onClick = {
-
-                        if(location.isNotEmpty() && title.isNotEmpty() && startDateInMillis != null &&
-                            endDateInMillis != null)
-                        {
-                            val journal = hashMapOf<String, Any?>(
-                                "title" to title,
-                                "location" to location,
-                                "color" to color.value.toString(),
-                                "startDate" to journalPropertiesViewModel.longToDate(startDateInMillis),
-                                "endDate" to journalPropertiesViewModel.longToDate(endDateInMillis),
-                                "startDateInMillis" to startDateInMillis,
-                                "endDateInMillis" to endDateInMillis,
-                                "notes" to notes,
-                                "private" to private
+                            },
+                                onColorSelected = {
+                                    color = it
+                                    colorPickerVisibility = false
+                                }
                             )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
 
-                            profileViewModel.currentUser.value?.let { it1 ->
-                                Injection.instance().collection("users").document(
-                                    it1.uid).collection("journals").document(title).set(journal)
-                                    .addOnSuccessListener {
-                                        println("Journal added successfully")
-                                        navController.navigateUp()
-                                    }.addOnFailureListener{
-                                        println("Error occurred during journal adding")
+                item {
+                    TextField(value = "" + journalPropertiesViewModel.longToDate(startDateInMillis),
+                        onValueChange = {},
+                        modifier = Modifier.fillMaxWidth(0.75f),
+                        label = {
+                            Text(text = "Starting Time", color = Color.Black)
+                        },
+                        enabled = false,
+                        trailingIcon = {
+                            Icon(imageVector = Icons.Filled.DateRange, contentDescription = null,
+                                modifier = Modifier.clickable {
+                                    datePickerExpanded = true
+                                })
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+                item {
+                    TextField(value = "" + journalPropertiesViewModel.longToDate(endDateInMillis),
+                        onValueChange = {},
+                        modifier = Modifier.fillMaxWidth(0.75f),
+                        label = {
+                            Text(text = "Ending Time", color = Color.Black)
+                        },
+                        enabled = false,
+                        trailingIcon = {
+                            Icon(imageVector = Icons.Filled.DateRange, contentDescription = null,
+                                modifier = Modifier.clickable {
+                                    datePickerExpanded = true
+                                })
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
 
-                                    }
+                item {
+                    if (datePickerExpanded) {
+
+                        DatePickerDialog(onDismissRequest = {
+                            datePickerExpanded = false
+                        }, confirmButton = {
+                            TextButton(onClick = {
+                                startDateInMillis = dateRangeDialogState.selectedStartDateMillis
+                                endDateInMillis = dateRangeDialogState.selectedEndDateMillis
+                                datePickerExpanded = false
+                            }) {
+                                Text(text = "Select")
+                            }
+                        }, dismissButton = {
+                            TextButton(onClick = { datePickerExpanded = false }) {
+                                Text(text = "Cancel")
                             }
                         }
-                        else{
-                            Toast.makeText(context, "Please fill the blanks.", Toast.LENGTH_LONG).show()
+                        ) {
+                            DateRangePicker(
+                                state = dateRangeDialogState,
+                            )
                         }
                     }
-                    ) {
-                        Text(text = "Add")
-                    }
                 }
+
+                item {
+                    OutlinedTextField(value = notes, onValueChange = { notes = it },
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.Gray,
+                            focusedContainerColor = Color.Gray
+                        ),
+                        placeholder = {
+                            Text(text = "Notes", color = Color.Black)
+                        }, modifier = Modifier.fillMaxWidth(0.75f).aspectRatio(2f),
+                        label = {
+                            Text(text = "Notes", color = Color.Black)
+                        }
+                    )
+                }
+
+                item {
+                    Checkbox(checked = private, onCheckedChange = {
+                        private = !private
+                    })
+                    Text(text = "Make it private", color = Color.Black)
+                }
+
             }
 
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 20.dp)
+                .padding(end = 30.dp),
+                horizontalArrangement = Arrangement.End)
+            {
+
+                Button(onClick = {
+
+                    if(location.isNotEmpty() && title.isNotEmpty() && startDateInMillis != null &&
+                        endDateInMillis != null)
+                    {
+                        val journal = hashMapOf<String, Any?>(
+                            "title" to title,
+                            "location" to location,
+                            "color" to color.value.toString(),
+                            "startDate" to journalPropertiesViewModel.longToDate(startDateInMillis),
+                            "endDate" to journalPropertiesViewModel.longToDate(endDateInMillis),
+                            "startDateInMillis" to startDateInMillis,
+                            "endDateInMillis" to endDateInMillis,
+                            "notes" to notes,
+                            "private" to private
+                        )
+
+                        profileViewModel.currentUser.value?.let { it1 ->
+                            Injection.instance().collection("users").document(
+                                it1.uid).collection("journals").document(title).set(journal)
+                                .addOnSuccessListener {
+                                    println("Journal added successfully")
+                                    navController.navigateUp()
+                                }.addOnFailureListener{
+                                    println("Error occurred during journal adding")
+
+                                }
+                        }
+                    }
+                    else{
+                        Toast.makeText(context, "Please fill the blanks.", Toast.LENGTH_LONG).show()
+                    }
+                }
+                ) {
+                    Text(text = "Add")
+                }
+            }
         }
     }
 }

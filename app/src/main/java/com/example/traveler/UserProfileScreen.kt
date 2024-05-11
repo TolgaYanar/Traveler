@@ -449,233 +449,237 @@ fun UserProfileScreen(
 
                 }
 
-                Column(modifier = Modifier.fillMaxSize(),
+                LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f),
                     verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally)
                 {
 
-                    Column {
-                        Row {
-                            Spacer(modifier = Modifier.width(20.dp))
-                            Text(text = "Ongoing Trip", modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(10.dp)
-                                .alpha(0.7f), fontWeight = FontWeight.ExtraBold,
-                                fontSize = 18.sp, textAlign = TextAlign.Start
-                            )
-                        }
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                            Card(modifier = Modifier
-                                .height(90.dp)
-                                .fillMaxWidth()
-                                .padding(horizontal = 30.dp)
-                                .clickable {
-                                    if (isOwnProfile) {
-                                        if (ongoingJournal.value.title.isNotEmpty()) {
-                                            navController.currentBackStackEntry?.savedStateHandle?.set(
-                                                "journal",
-                                                ongoingJournal.value
-                                            )
-                                            navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
-                                        } else {
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    "You don't have ongoing trip right now, please" +
-                                                            " update",
-                                                    Toast.LENGTH_LONG
-                                                )
-                                                .show()
-                                        }
-                                    }
-                                }, shape = RoundedCornerShape(20.dp)
-                            ) {
-                                LaunchedEffect(key1 = ongoingJournal){
-                                    profileViewModel.loadOngoingTrip(user, ongoingJournal)
-                                }
-
-                                Image(painter = rememberAsyncImagePainter(model = ongoingJournal.value.mostMemorialImage), contentDescription = null,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.FillBounds,
-                                    alpha = 0.75f)
-
-                                Box(modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(
-                                        if (ongoingJournal.value.mostMemorialImage.isEmpty()) Color(
-                                            ongoingJournal.value.color.toULong()
-                                        ).copy(0.75f)
-                                        else Color.Transparent
-                                    ), contentAlignment = Alignment.TopStart) {
-                                    Text(text = ongoingJournal.value.title, modifier = Modifier.padding(10.dp))
-                                }
-
-                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomStart) {
-                                    Text(text = ongoingJournal.value.location, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp))
-                                }
-
-                                if(isOwnProfile){
-                                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopEnd) {
-                                        Icon(painter = painterResource(id = R.drawable.baseline_add_a_photo_24), contentDescription = null,
-                                            tint = Color.LightGray, modifier = Modifier
-                                                .clickable {
-                                                    singlePhotoPicker.launch(
-                                                        PickVisualMediaRequest(
-                                                            ActivityResultContracts.PickVisualMedia.ImageOnly
-                                                        )
-                                                    )
-                                                }
-                                                .padding(10.dp))
-                                    }
-                                }
-
-                            }
-                        }
-                        Row(horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier
-                                .padding(horizontal = 35.dp, vertical = 5.dp)
-                                .fillMaxWidth()
-                                .height(50.dp),
-                            verticalAlignment = Alignment.Top
-                        ){
-                            val dayDiff = journalPropertiesViewModel.getDayDifference(currentDate + 3 * 60 * 60 * 1000, ongoingJournal.value.endDateInMillis)
-                            var dayDiffToString = "$dayDiff more days"
-                            if(dayDiff == 0){
-                                dayDiffToString = "Last Day"
-                            }
-                            Text(text = dayDiffToString, modifier = Modifier
-                                .alpha(0.6f),
-                                fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                            if(isOwnProfile){
-                                Button(onClick = { updateJournalExpanded = true }, modifier = Modifier
-                                    .height(30.dp)
-                                    .width(135.dp)) {
-                                    Text(text = "Add Update", fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                                }
-                            }
-                        }
-                    }
-
-                    if(updateJournalExpanded){
-                        profileViewModel.UpdateJournal(
-                            journals = journals,
-                            onDismissRequest = { updateJournalExpanded = false },
-                            onSuccessRequest = {journal->
-                                ongoingJournal.value = journal
-                                Injection.instance().collection("users").document(user.uid)
-                                    .update("ongoing_trip", journal.title).addOnSuccessListener {
-                                        profileViewModel.currentUser.value!!.ongoing_trip = journal.title
-                                        println("ongoing trip updated.")
-                                    }.addOnFailureListener {
-                                        println("ongoing trip couldn't updated.")
-                                    }
-                                updateJournalExpanded = false
-                            }
-                        )
-                    }
-
-                    Column {
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp)) {
-                            Text(text = "Recent Trips", modifier = Modifier
-                                .padding(horizontal = 20.dp)
-                                .alpha(0.7f), fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold)
-                        }
-
-                        LaunchedEffect(key1 = true){
-                            profileViewModel.loadJournalsOfUser(user,"endDateInMillis",journals)
-                        }
-
-                        LazyRow(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp)) {
-
-                            items(journals.value.reversed()) { journal ->
-
-                                val journalEndDate = journal.endDateInMillis
-                                if(
-                                    currentDate + 3 * 60 * 60 * 1000 > journalEndDate
-                                ){
-                                    if(isOwnProfile || (!isOwnProfile && !journal.private))
-                                        Column {
-                                            Card(
-                                                elevation = 20.dp,
-                                                modifier = Modifier
-                                                    .width(160.dp)
-                                                    .height(140.dp)
-                                                    .padding(8.dp)
-                                                    .padding(horizontal = 8.dp)
-                                                    .clickable {
-                                                        navController.currentBackStackEntry?.savedStateHandle?.set(
-                                                            "journal",
-                                                            journal
-                                                        )
-                                                        navController.currentBackStackEntry?.savedStateHandle?.set(
-                                                            "user",
-                                                            user
-                                                        )
-                                                        navController.navigate(Screen.RecentTripScreen.route)
-                                                    }
-                                            ) {
-
-                                                Image(painter = rememberAsyncImagePainter(model = journal.mostMemorialImage), contentDescription = null,
-                                                    modifier = Modifier.fillMaxSize(),
-                                                    contentScale = ContentScale.FillBounds,
-                                                    alpha = 0.75f)
-
-                                                Box(modifier = Modifier
-                                                    .background(
-                                                        if (journal.mostMemorialImage.isEmpty()) {
-                                                            Color(journal.color.toULong()).copy(
-                                                                0.75f
-                                                            )
-                                                        } else Color.Transparent
-                                                    )
-                                                    .fillMaxSize()
-                                                    .padding(8.dp)
-                                                    .background(Color.Transparent),
-                                                    contentAlignment = Alignment.BottomStart){
-                                                    Text(text = journal.location, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                                                }
-                                            }
-                                            val dayDiff = journalPropertiesViewModel.getDayDifference(journalEndDate,currentDate + 3 * 60 * 60 * 1000)
-                                            var dayDiffToString = "$dayDiff days ago..."
-                                            if(dayDiff == 0){
-                                                dayDiffToString = "Yesterday"
-                                            }
-                                            Text(text = dayDiffToString, fontWeight = FontWeight.Bold,
-                                                modifier = Modifier
-                                                    .alpha(0.5f)
-                                                    .padding(horizontal = 15.dp))
-                                        }
-                                }
-                            }
-
-                        }
-                    }
-
-                    Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom, modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(25.dp))
-                    {
-                        if(isOwnProfile){
-                            Image(painter = painterResource(id = R.drawable.baseline_add_circle_outline_24), contentDescription = null,
-                                alignment = Alignment.BottomEnd, modifier = Modifier
-                                    .alpha(0.7f)
-                                    .size(70.dp)
+                    item {
+                        Column {
+                            Row {
+                                Spacer(modifier = Modifier.width(20.dp))
+                                Text(text = "Ongoing Trip", modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(end = 20.dp)
-                                    .padding(bottom = 10.dp)
+                                    .padding(10.dp)
+                                    .alpha(0.7f), fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 18.sp, textAlign = TextAlign.Start
+                                )
+                            }
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                                Card(modifier = Modifier
+                                    .height(90.dp)
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 30.dp)
                                     .clickable {
-                                        navController.navigate(Screen.AddJournalScreen.route)
+                                        if (isOwnProfile) {
+                                            if (ongoingJournal.value.title.isNotEmpty()) {
+                                                navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                    "journal",
+                                                    ongoingJournal.value
+                                                )
+                                                navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
+                                            } else {
+                                                Toast
+                                                    .makeText(
+                                                        context,
+                                                        "You don't have ongoing trip right now, please" +
+                                                                " update",
+                                                        Toast.LENGTH_LONG
+                                                    )
+                                                    .show()
+                                            }
+                                        }
+                                    }, shape = RoundedCornerShape(20.dp)
+                                ) {
+                                    LaunchedEffect(key1 = ongoingJournal){
+                                        profileViewModel.loadOngoingTrip(user, ongoingJournal)
                                     }
-                            )
-                            Text(text = "Add Journal", fontWeight = FontWeight.Bold, fontSize = 16.sp,
-                                textAlign = TextAlign.End)
+
+                                    Image(painter = rememberAsyncImagePainter(model = ongoingJournal.value.mostMemorialImage), contentDescription = null,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.FillBounds,
+                                        alpha = 0.75f)
+
+                                    Box(modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            if (ongoingJournal.value.mostMemorialImage.isEmpty()) Color(
+                                                ongoingJournal.value.color.toULong()
+                                            ).copy(0.75f)
+                                            else Color.Transparent
+                                        ), contentAlignment = Alignment.TopStart) {
+                                        Text(text = ongoingJournal.value.title, modifier = Modifier.padding(10.dp))
+                                    }
+
+                                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomStart) {
+                                        Text(text = ongoingJournal.value.location, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp))
+                                    }
+
+                                    if(isOwnProfile){
+                                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopEnd) {
+                                            Icon(painter = painterResource(id = R.drawable.baseline_add_a_photo_24), contentDescription = null,
+                                                tint = Color.LightGray, modifier = Modifier
+                                                    .clickable {
+                                                        singlePhotoPicker.launch(
+                                                            PickVisualMediaRequest(
+                                                                ActivityResultContracts.PickVisualMedia.ImageOnly
+                                                            )
+                                                        )
+                                                    }
+                                                    .padding(10.dp))
+                                        }
+                                    }
+
+                                }
+                            }
+                            Row(horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier
+                                    .padding(horizontal = 35.dp, vertical = 5.dp)
+                                    .fillMaxWidth()
+                                    .height(50.dp),
+                                verticalAlignment = Alignment.Top
+                            ){
+                                val dayDiff = journalPropertiesViewModel.getDayDifference(currentDate + 3 * 60 * 60 * 1000, ongoingJournal.value.endDateInMillis)
+                                var dayDiffToString = "$dayDiff more days"
+                                if(dayDiff == 0){
+                                    dayDiffToString = "Last Day"
+                                }
+                                Text(text = dayDiffToString, modifier = Modifier
+                                    .alpha(0.6f),
+                                    fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                if(isOwnProfile){
+                                    Button(onClick = { updateJournalExpanded = true }, modifier = Modifier
+                                        .height(30.dp)
+                                        .width(135.dp)) {
+                                        Text(text = "Add Update", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
                         }
                     }
 
+                    item {
+                        if(updateJournalExpanded){
+                            profileViewModel.UpdateJournal(
+                                journals = journals,
+                                onDismissRequest = { updateJournalExpanded = false },
+                                onSuccessRequest = {journal->
+                                    ongoingJournal.value = journal
+                                    Injection.instance().collection("users").document(user.uid)
+                                        .update("ongoing_trip", journal.title).addOnSuccessListener {
+                                            profileViewModel.currentUser.value!!.ongoing_trip = journal.title
+                                            println("ongoing trip updated.")
+                                        }.addOnFailureListener {
+                                            println("ongoing trip couldn't updated.")
+                                        }
+                                    updateJournalExpanded = false
+                                }
+                            )
+                        }
+                    }
+
+                    item {
+                        Column {
+                            Row(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp)) {
+                                Text(text = "Recent Trips", modifier = Modifier
+                                    .padding(horizontal = 20.dp)
+                                    .alpha(0.7f), fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold)
+                            }
+
+                            LaunchedEffect(key1 = true){
+                                profileViewModel.loadJournalsOfUser(user,"endDateInMillis",journals)
+                            }
+
+                            LazyRow(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp)) {
+
+                                items(journals.value.reversed()) { journal ->
+
+                                    val journalEndDate = journal.endDateInMillis
+                                    if(
+                                        currentDate + 3 * 60 * 60 * 1000 > journalEndDate
+                                    ){
+                                        if(isOwnProfile || (!isOwnProfile && !journal.private))
+                                            Column {
+                                                Card(
+                                                    elevation = 20.dp,
+                                                    modifier = Modifier
+                                                        .width(160.dp)
+                                                        .height(140.dp)
+                                                        .padding(8.dp)
+                                                        .padding(horizontal = 8.dp)
+                                                        .clickable {
+                                                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                                "journal",
+                                                                journal
+                                                            )
+                                                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                                "user",
+                                                                user
+                                                            )
+                                                            navController.navigate(Screen.RecentTripScreen.route)
+                                                        }
+                                                ) {
+
+                                                    Image(painter = rememberAsyncImagePainter(model = journal.mostMemorialImage), contentDescription = null,
+                                                        modifier = Modifier.fillMaxSize(),
+                                                        contentScale = ContentScale.FillBounds,
+                                                        alpha = 0.75f)
+
+                                                    Box(modifier = Modifier
+                                                        .background(
+                                                            if (journal.mostMemorialImage.isEmpty()) {
+                                                                Color(journal.color.toULong()).copy(
+                                                                    0.75f
+                                                                )
+                                                            } else Color.Transparent
+                                                        )
+                                                        .fillMaxSize()
+                                                        .padding(8.dp)
+                                                        .background(Color.Transparent),
+                                                        contentAlignment = Alignment.BottomStart){
+                                                        Text(text = journal.location, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                                                    }
+                                                }
+                                                val dayDiff = journalPropertiesViewModel.getDayDifference(journalEndDate,currentDate + 3 * 60 * 60 * 1000)
+                                                var dayDiffToString = "$dayDiff days ago..."
+                                                if(dayDiff == 0){
+                                                    dayDiffToString = "Yesterday"
+                                                }
+                                                Text(text = dayDiffToString, fontWeight = FontWeight.Bold,
+                                                    modifier = Modifier
+                                                        .alpha(0.5f)
+                                                        .padding(horizontal = 15.dp))
+                                            }
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+                Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 25.dp).padding(bottom = 15.dp))
+                {
+                    if(isOwnProfile){
+                        Image(painter = painterResource(id = R.drawable.baseline_add_circle_outline_24), contentDescription = null,
+                            alignment = Alignment.BottomEnd, modifier = Modifier
+                                .alpha(0.7f)
+                                .size(70.dp)
+                                .fillMaxWidth()
+                                .padding(end = 20.dp)
+                                .padding(bottom = 10.dp)
+                                .clickable {
+                                    navController.navigate(Screen.AddJournalScreen.route)
+                                }
+                        )
+                        Text(text = "Add Journal", fontWeight = FontWeight.Bold, fontSize = 16.sp,
+                            textAlign = TextAlign.End)
+                    }
                 }
             }
 

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -175,8 +176,7 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                     Spacer(modifier = Modifier.height(10.dp))
                     TextField(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 30.dp),
+                            .fillMaxWidth(0.75f),
                         value = title, onValueChange = { title = it },
                         placeholder = {
                             Text(text = "Title")
@@ -188,8 +188,7 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                 item {
                     TextField(value = startTime, onValueChange = {},
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 30.dp),
+                            .fillMaxWidth(0.75f),
                         label = {
                             Text(text = "Starts")
                         }, enabled = false,
@@ -205,8 +204,7 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                     )
                     TextField(value = endTime, onValueChange = {},
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 30.dp),
+                            .fillMaxWidth(0.75f),
                         label = {
                             Text(text = "Ends")
                         }, enabled = false,
@@ -240,8 +238,7 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
 
                     TextField(value = repeat, onValueChange = {},
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 30.dp),
+                            .fillMaxWidth(0.75f),
                         trailingIcon = {
                             IconButton(onClick = { repeatExpanded = !repeatExpanded }) {
                                 Icon(
@@ -266,8 +263,7 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                 item {
                     TextField(value = "$reminder minutes", onValueChange = {},
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 30.dp),
+                            .fillMaxWidth(0.75f),
                         trailingIcon = {
                             IconButton(onClick = { reminderExpanded = !repeatExpanded }) {
                                 Icon(
@@ -298,9 +294,8 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                         placeholder = {
                             Text(text = "Notes")
                         }, modifier = Modifier
-                            .height(200.dp)
-                            .fillMaxWidth()
-                            .padding(horizontal = 30.dp),
+                            .fillMaxWidth(0.75f)
+                            .aspectRatio(2f),
                         label = {
                             Text(text = "Notes")
                         }
