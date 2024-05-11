@@ -10,12 +10,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -42,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -188,12 +192,12 @@ fun AddNotesScreen(navController: NavController, journal: Journal,
                         backgroundColor = Color.Gray,
                         modifier = Modifier
                             .padding(vertical = 30.dp)
-                            .height(250.dp)
-                            .width(250.dp)
+                            .fillMaxWidth(0.75f)
+                            .aspectRatio(1f)
                     ) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            Image(painter = rememberAsyncImagePainter(model = image,
-                                contentScale = ContentScale.Crop), contentDescription = null,
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Image(painter = rememberAsyncImagePainter(model = image, contentScale = ContentScale.Crop),
+                                contentDescription = null,
                                 contentScale = ContentScale.Crop)
                         }
                     }
@@ -224,8 +228,9 @@ fun AddNotesScreen(navController: NavController, journal: Journal,
                     TextField(value = text, onValueChange = {text = it},
                         modifier = Modifier
                             .padding(20.dp)
-                            .height(400.dp)
-                            .width(300.dp), colors = TextFieldDefaults.colors(
+                            .fillMaxWidth(0.75f)
+                            .aspectRatio(1f),
+                        colors = TextFieldDefaults.colors(
                         unfocusedContainerColor = Color(0xFFE8E8E8),
                         focusedContainerColor = Color(0xFFE8E8E8)
                     ),
@@ -236,7 +241,7 @@ fun AddNotesScreen(navController: NavController, journal: Journal,
                     )
 
                     Button(onClick = {
-                        journalPropertiesViewModel.uploadToNotes(text, journal, context)
+                        journalPropertiesViewModel.uploadToNotes(text.trim(), journal, context)
                         text = ""
                     }) {
                         Text(text = "Add Text")

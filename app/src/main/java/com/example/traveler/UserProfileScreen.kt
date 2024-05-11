@@ -220,13 +220,16 @@ fun UserProfileScreen(
             followingNum.value = user.following
             followersNum.value = user.followers
 
-            LazyColumn(
+            Column(
                 modifier = Modifier
-                    .padding(it),
-                horizontalAlignment = Alignment.Start
-            ) {
+                    .padding(it)
+            ){
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.Start
+                ) {
 
-                item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
@@ -250,11 +253,19 @@ fun UserProfileScreen(
                                 .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
                         ) {
 
-                            Row(modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center) {
-                                Text(text = followingNum.value.toString(), fontWeight = FontWeight.Bold)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = followingNum.value.toString(),
+                                    fontWeight = FontWeight.Bold
+                                )
                                 Spacer(modifier = Modifier.width(70.dp))
-                                Text(text = followersNum.value.toString(), fontWeight = FontWeight.Bold)
+                                Text(
+                                    text = followersNum.value.toString(),
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                             Row(
                                 modifier = Modifier
@@ -269,17 +280,20 @@ fun UserProfileScreen(
                                 })
                             }
 
-                            if(followingsExpanded){
+                            if (followingsExpanded) {
 
-                                LaunchedEffect(key1 = profileViewModel.followings){
+                                LaunchedEffect(key1 = profileViewModel.followings) {
                                     profileViewModel.followingsOfUser(user)
                                 }
 
                                 followings?.let { followings ->
                                     profileViewModel.Followings(
                                         followingsOrFollowers = followings,
-                                        onClickProfile = { user->
-                                            navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
+                                        onClickProfile = { user ->
+                                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                "user",
+                                                user
+                                            )
                                             navController.navigate(Screen.UserProfileScreen.route)
                                         },
                                         onDismissRequest = {
@@ -291,29 +305,35 @@ fun UserProfileScreen(
                                                 followingBox = followingBox,
                                                 followed = followed,
                                                 followingNum =
-                                                if(isOwnProfile){
+                                                if (isOwnProfile) {
                                                     followingNum
-                                                }else nothing
+                                                } else nothing
                                             )
 
                                         },
-                                        onMessageAction = {friend->
-                                            navController.currentBackStackEntry?.savedStateHandle?.set("friend",friend)
+                                        onMessageAction = { friend ->
+                                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                "friend",
+                                                friend
+                                            )
                                             navController.navigate(Screen.MessageRoom.route)
                                         }
                                     )
                                 }
-                            } else if(followersExpanded){
+                            } else if (followersExpanded) {
 
-                                LaunchedEffect(key1 = profileViewModel.followers){
+                                LaunchedEffect(key1 = profileViewModel.followers) {
                                     profileViewModel.followersOfUser(user)
                                 }
 
                                 followers?.let { followers ->
                                     profileViewModel.Followings(
                                         followingsOrFollowers = followers,
-                                        onClickProfile = { user->
-                                            navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
+                                        onClickProfile = { user ->
+                                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                "user",
+                                                user
+                                            )
                                             navController.navigate(Screen.UserProfileScreen.route)
                                         },
                                         onDismissRequest = {
@@ -325,13 +345,16 @@ fun UserProfileScreen(
                                                 followingBox = followingBox,
                                                 followed = follower,
                                                 followingNum =
-                                                if(isOwnProfile){
+                                                if (isOwnProfile) {
                                                     followingNum
-                                                }else nothing
+                                                } else nothing
                                             )
                                         },
-                                        onMessageAction = {friend->
-                                            navController.currentBackStackEntry?.savedStateHandle?.set("friend",friend)
+                                        onMessageAction = { friend ->
+                                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                "friend",
+                                                friend
+                                            )
                                             navController.navigate(Screen.MessageRoom.route)
                                         }
                                     )
@@ -379,7 +402,10 @@ fun UserProfileScreen(
                                         .height(30.dp)
                                         .width(85.dp)
                                         .clickable {
-                                            navController.currentBackStackEntry?.savedStateHandle?.set("friend",user)
+                                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                "friend",
+                                                user
+                                            )
                                             navController.navigate(Screen.MessageRoom.route)
                                         }
                                     ) {
@@ -421,10 +447,13 @@ fun UserProfileScreen(
                         maxLines = 3,
                     )
 
-                    Column(modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally)
-                    {
+                }
 
+                Column(modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally)
+                {
+
+                    Column {
                         Row {
                             Spacer(modifier = Modifier.width(20.dp))
                             Text(text = "Ongoing Trip", modifier = Modifier
@@ -524,25 +553,27 @@ fun UserProfileScreen(
                                 }
                             }
                         }
+                    }
 
-                        if(updateJournalExpanded){
-                            profileViewModel.UpdateJournal(
-                                journals = journals,
-                                onDismissRequest = { updateJournalExpanded = false },
-                                onSuccessRequest = {journal->
-                                    ongoingJournal.value = journal
-                                    Injection.instance().collection("users").document(user.uid)
-                                        .update("ongoing_trip", journal.title).addOnSuccessListener {
-                                            profileViewModel.currentUser.value!!.ongoing_trip = journal.title
-                                            println("ongoing trip updated.")
-                                        }.addOnFailureListener {
-                                            println("ongoing trip couldn't updated.")
-                                        }
-                                    updateJournalExpanded = false
-                                }
-                            )
-                        }
+                    if(updateJournalExpanded){
+                        profileViewModel.UpdateJournal(
+                            journals = journals,
+                            onDismissRequest = { updateJournalExpanded = false },
+                            onSuccessRequest = {journal->
+                                ongoingJournal.value = journal
+                                Injection.instance().collection("users").document(user.uid)
+                                    .update("ongoing_trip", journal.title).addOnSuccessListener {
+                                        profileViewModel.currentUser.value!!.ongoing_trip = journal.title
+                                        println("ongoing trip updated.")
+                                    }.addOnFailureListener {
+                                        println("ongoing trip couldn't updated.")
+                                    }
+                                updateJournalExpanded = false
+                            }
+                        )
+                    }
 
+                    Column {
                         Row(modifier = Modifier
                             .fillMaxWidth()
                             .padding(20.dp)) {
@@ -622,29 +653,32 @@ fun UserProfileScreen(
                             }
 
                         }
+                    }
 
+                    Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom, modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(25.dp))
+                    {
                         if(isOwnProfile){
-                            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom, modifier = Modifier
-                                .fillMaxSize()
-                                .padding(25.dp)) {
-                                Image(painter = painterResource(id = R.drawable.baseline_add_circle_outline_24), contentDescription = null,
-                                    alignment = Alignment.BottomEnd, modifier = Modifier
-                                        .alpha(0.7f)
-                                        .size(70.dp)
-                                        .fillMaxWidth()
-                                        .padding(end = 20.dp)
-                                        .padding(bottom = 10.dp)
-                                        .clickable {
-                                            navController.navigate(Screen.AddJournalScreen.route)
-                                        }
-                                )
-                                Text(text = "Add Journal", fontWeight = FontWeight.Bold, fontSize = 16.sp,
-                                    textAlign = TextAlign.End)
-                            }
+                            Image(painter = painterResource(id = R.drawable.baseline_add_circle_outline_24), contentDescription = null,
+                                alignment = Alignment.BottomEnd, modifier = Modifier
+                                    .alpha(0.7f)
+                                    .size(70.dp)
+                                    .fillMaxWidth()
+                                    .padding(end = 20.dp)
+                                    .padding(bottom = 10.dp)
+                                    .clickable {
+                                        navController.navigate(Screen.AddJournalScreen.route)
+                                    }
+                            )
+                            Text(text = "Add Journal", fontWeight = FontWeight.Bold, fontSize = 16.sp,
+                                textAlign = TextAlign.End)
                         }
                     }
+
                 }
             }
+
         }else{
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
@@ -656,6 +690,6 @@ fun UserProfileScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun prrreview(journalPropertiesViewModel: JournalPropertiesViewModel = viewModel()){
+fun prrreview(){
 
 }

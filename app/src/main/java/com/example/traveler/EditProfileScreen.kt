@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -145,22 +146,25 @@ fun EditProfileScreen(navController: NavController,
     Scaffold(
         topBar = { AppBarView(title = "Edit Profile", arrow = true,
             onBackNavClicked = { navController.navigate(Screen.UserProfileScreen.route) }) }
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-                .background(Color(0XFFADD8E6)),
-            horizontalAlignment = Alignment.Start
-        ){
-            item {
-
+    )
+    {
+        Column(
+            modifier  = Modifier.padding(it)
+                .background(Color(0XFFADD8E6))
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly
+            ){
                 if(user != null){
-                    Row(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(10.dp), horizontalArrangement = Arrangement.Center) {
+                    item {
                         Card(modifier = Modifier
-                            .size(100.dp),
+                            .padding(10.dp)
+                            .fillMaxWidth(0.3f)
+                            .aspectRatio(1f),
                             backgroundColor = Color.LightGray,
                             shape = CircleShape) {
                             Box(
@@ -170,8 +174,6 @@ fun EditProfileScreen(navController: NavController,
                                     contentScale = ContentScale.Crop)
                             }
                         }
-                    }
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                         Text(text = "Edit Profile Picture", color = Color.Black, modifier = Modifier
                             .alpha(0.7f)
                             .clickable {
@@ -180,12 +182,8 @@ fun EditProfileScreen(navController: NavController,
                                 )
                             })
                     }
-                    Spacer(modifier = Modifier.height(40.dp))
-                    Column(modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
 
-
+                    item {
                         TextField(value = user!!.fullName, onValueChange = {fullname -> user = user!!.copy(fullName = fullname)},
                             trailingIcon = {
                                 Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,
@@ -196,11 +194,11 @@ fun EditProfileScreen(navController: NavController,
                                     focusedContainerColor = Color.Transparent,
                                     unfocusedTextColor = Color.Black,
                                     focusedTextColor = Color.Black),
-                            modifier = Modifier.width(330.dp)
+                            modifier = Modifier.fillMaxWidth(0.75f)
                         )
+                    }
 
-                        Spacer(modifier = Modifier.height(20.dp))
-
+                    item {
                         TextField(value = newEmail, onValueChange = {email -> newEmail = email},
                             trailingIcon = {
                                 Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,
@@ -211,17 +209,16 @@ fun EditProfileScreen(navController: NavController,
                                     focusedContainerColor = Color.Transparent,
                                     unfocusedTextColor = Color.Black,
                                     focusedTextColor = Color.Black),
-                            modifier = Modifier.width(330.dp),
+                            modifier = Modifier.fillMaxWidth(0.75f),
                             placeholder = {
                                 if (currentUser != null) {
                                     currentUser.email?.let { it1 -> Text(text = it1, color = Color.Black) }
                                 }
                             }
                         )
+                    }
 
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
+                    item {
                         TextField(value = currentPassword, onValueChange = {currentPassword = it},
                             trailingIcon = {
                                 Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,
@@ -234,10 +231,11 @@ fun EditProfileScreen(navController: NavController,
                                     focusedTextColor = Color.Black),
                             label = {
                                 Text(text = "Current Password", color = Color.Black)
-                            }, modifier = Modifier.width(330.dp))
+                            }, modifier = Modifier.fillMaxWidth(0.75f)
+                        )
+                    }
 
-                        Spacer(modifier = Modifier.height(20.dp))
-
+                    item {
                         TextField(value = newPassword, onValueChange = {newPassword = it},
                             trailingIcon = {
                                 Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,
@@ -248,14 +246,14 @@ fun EditProfileScreen(navController: NavController,
                                     focusedContainerColor = Color.Transparent,
                                     unfocusedTextColor = Color.Black,
                                     focusedTextColor = Color.Black,
-                                    ),
+                                ),
                             label = {
                                 Text(text = "New Password", color = Color.Black)
-                            }, modifier = Modifier.width(330.dp))
+                            }, modifier = Modifier.fillMaxWidth(0.75f)
+                        )
+                    }
 
-                        Spacer(modifier = Modifier.height(20.dp))
-
-
+                    item {
                         TextField(value = user!!.about, onValueChange = {about -> user = user!!.copy(about = about)},
                             trailingIcon = {
                                 Icon(painter = painterResource(id = R.drawable.baseline_edit_24), contentDescription = null,
@@ -266,47 +264,50 @@ fun EditProfileScreen(navController: NavController,
                                     focusedContainerColor = Color.Transparent,
                                     unfocusedTextColor = Color.Black,
                                     focusedTextColor = Color.Black),
-                            modifier = Modifier.width(330.dp),
+                            modifier = Modifier.fillMaxWidth(0.75f),
                         )
-
                     }
-                    Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.End) {
-                        Button(onClick = {
-                            if (user != null && currentUser != null) {
-                                if((newEmail != currentUser.email && newEmail.isNotEmpty()) && newPassword.isNotEmpty()){
-                                    Toast.makeText(context, "Email and password cannot be updated at the same time.", Toast.LENGTH_LONG).show()
-                                    navController.navigate(Screen.EditProfileScreen.route)
-                                }
-                                else{
+                }
+                else{
+                    item {
+                        CircularProgressIndicator(modifier = Modifier
+                            .fillMaxSize()
+                            .wrapContentSize(Alignment.Center))
+                    }
+                }
 
-                                    Injection.instance().collection("users").document(user!!.uid).set(user!!)
-                                    profileViewModel.currentUser.value = user
+            }
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.End) {
+                Button(onClick = {
+                    if (user != null && currentUser != null) {
+                        if((newEmail != currentUser.email && newEmail.isNotEmpty()) && newPassword.isNotEmpty()){
+                            Toast.makeText(context, "Email and password cannot be updated at the same time.", Toast.LENGTH_LONG).show()
+                            navController.navigate(Screen.EditProfileScreen.route)
+                        }
+                        else{
 
-                                    if(newPassword.isNotEmpty() && currentPassword.isNotEmpty()) {
-                                        authenticationViewModel.reauthentication(
-                                            user = currentUser,
-                                            currentPassword = currentPassword,
-                                            newPassword = newPassword,
-                                            context = context
-                                        )
-                                    }
-                                    else if(newEmail != currentUser.email && newEmail.isNotEmpty()){
-                                        authenticationViewModel.updateEmail(newEmail, context)
-                                    }
-                                    navController.navigate(Screen.UserProfileScreen.route)
-                                }
+                            Injection.instance().collection("users").document(user!!.uid).set(user!!)
+                            profileViewModel.currentUser.value = user
+
+                            if(newPassword.isNotEmpty() && currentPassword.isNotEmpty()) {
+                                authenticationViewModel.reauthentication(
+                                    user = currentUser,
+                                    currentPassword = currentPassword,
+                                    newPassword = newPassword,
+                                    context = context
+                                )
                             }
-                        }, modifier = Modifier
-                            .padding(40.dp)
-                            .width(125.dp)) {
-                            Text(text = "SAVE", fontWeight = FontWeight.Bold)
+                            else if(newEmail != currentUser.email && newEmail.isNotEmpty()){
+                                authenticationViewModel.updateEmail(newEmail, context)
+                            }
+                            navController.navigate(Screen.UserProfileScreen.route)
                         }
                     }
-                }else{
-                    CircularProgressIndicator(modifier = Modifier
-                        .fillMaxSize()
-                        .wrapContentSize(Alignment.Center))
+                }, modifier = Modifier
+                    .padding(40.dp)
+                    .width(125.dp)) {
+                    Text(text = "SAVE", fontWeight = FontWeight.Bold)
                 }
             }
         }

@@ -139,254 +139,250 @@ fun TripPlanTodaysPlanScreen(navController: NavController, journal: Journal,
                 )
         }
     ) {
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it), verticalArrangement = Arrangement.Top
         )
         {
-            item {
-                Row(
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp), verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            )
+            {
+                Card(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp), verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                )
-                {
-                    Card(
-                        modifier = Modifier
-                            .height(45.dp)
-                            .width(160.dp),
-                        backgroundColor = Color(0xFF728FF3),
-                        shape = RoundedCornerShape(25.dp),
-                    ) {
-                        Text(text = "Today's Plan", textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(top = 10.dp), fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold, color = Color.White)
-                    }
-
-                    Card(
-                        modifier = Modifier
-                            .height(45.dp)
-                            .width(160.dp)
-                            .clickable {
-                                navController.currentBackStackEntry?.savedStateHandle?.set(
-                                    "journal",
-                                    journal
-                                )
-                                navController.navigate(Screen.TripPlanJournalScreen.route)
-                            },
-                        backgroundColor = Color.Gray.copy(alpha = 0.4f),
-                        shape = RoundedCornerShape(25.dp)
-                    ) {
-                        Text(text = "Journal", textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(top = 10.dp), fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold)
-                    }
+                        .height(45.dp)
+                        .width(160.dp),
+                    backgroundColor = Color(0xFF728FF3),
+                    shape = RoundedCornerShape(25.dp),
+                ) {
+                    Text(text = "Today's Plan", textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 10.dp), fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold, color = Color.White)
                 }
 
-                Row(
+                Card(
                     modifier = Modifier
-                        .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                        .height(45.dp)
+                        .width(160.dp)
+                        .clickable {
+                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                "journal",
+                                journal
+                            )
+                            navController.navigate(Screen.TripPlanJournalScreen.route)
+                        },
+                    backgroundColor = Color.Gray.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(25.dp)
                 ) {
-                    Card(
-                        modifier = Modifier
-                            .height(30.dp)
-                            .fillMaxWidth()
-                            .padding(horizontal = 30.dp),
-                        backgroundColor = Color.Gray.copy(alpha = 0.4f),
-                        shape = RoundedCornerShape(25.dp)
-                    ) {
+                    Text(text = "Journal", textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 10.dp), fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold)
+                }
+            }
 
-                        LazyRow(modifier = Modifier.fillMaxSize(),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            verticalAlignment = Alignment.CenterVertically){
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Card(
+                    modifier = Modifier
+                        .height(30.dp)
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp),
+                    backgroundColor = Color.Gray.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(25.dp)
+                ) {
 
-                            items(journalDuration){
+                    LazyRow(modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically){
 
-                                Box(
-                                    modifier = Modifier
-                                        .background(
-                                            if (it == selected) Color(0xFF728FF3)
-                                            else Color(0xFFA5B7F7), shape = RoundedCornerShape(6.dp)
+                        items(journalDuration){
+
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (it == selected) Color(0xFF728FF3)
+                                        else Color(0xFFA5B7F7), shape = RoundedCornerShape(6.dp)
+                                    )
+                                    .height(25.dp)
+                                    .width(60.dp)
+                                    .clickable {
+                                        selected = it
+                                        selectedDay = "day${selected + 1}"
+                                        selectedTasks = SnapshotStateList()
+                                        journalPropertiesViewModel.loadTasksOfDay(
+                                            journal,
+                                            selectedDay!!,
+                                            selectedTasks
                                         )
-                                        .height(25.dp)
-                                        .width(60.dp)
-                                        .clickable {
-                                            selected = it
-                                            selectedDay = "day${selected + 1}"
-                                            selectedTasks = SnapshotStateList()
-                                            journalPropertiesViewModel.loadTasksOfDay(
-                                                journal,
-                                                selectedDay!!,
-                                                selectedTasks
-                                            )
-                                            dateToString = journalPropertiesViewModel
-                                                .longToDate(journal.startDateInMillis +
-                                                selected * 24 * 60 * 60 * 1000)
-                                        },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(text = "Day ${it + 1}")
-                                }
-                                Spacer(modifier = Modifier.width(10.dp))
+                                        dateToString = journalPropertiesViewModel
+                                            .longToDate(journal.startDateInMillis +
+                                                    selected * 24 * 60 * 60 * 1000)
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = "Day ${it + 1}")
                             }
+                            Spacer(modifier = Modifier.width(10.dp))
                         }
                     }
                 }
+            }
 
-                Column(
-                    modifier = Modifier
-                        .height(575.dp)
-                        .padding(horizontal = 20.dp)
-                        .padding(vertical = 20.dp), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top
-                ) {
+            Column(
+                modifier = Modifier
+                    .padding(20.dp), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top
+            ) {
 
-                    dateToString?.let { it1 ->
-                        Text(text = it1, fontSize = 17.sp, fontWeight = FontWeight.Bold,
-                            modifier = Modifier.alpha(0.8f))
-                    }
+                dateToString?.let { it1 ->
+                    Text(text = it1, fontSize = 17.sp, fontWeight = FontWeight.Bold,
+                        modifier = Modifier.alpha(0.8f))
+                }
 
-                    Divider(modifier = Modifier.fillMaxWidth())
+                Divider(modifier = Modifier.fillMaxWidth())
 
-                    Spacer(modifier = Modifier.padding(15.dp))
+                Spacer(modifier = Modifier.padding(15.dp))
 
-                    if(isLoading.value == true){
-                        CircularProgressIndicator()
-                    }else{
+                if(isLoading.value == true){
+                    CircularProgressIndicator()
+                }else{
 
-                        if(selectedDay != null){
+                    if(selectedDay != null){
 
-                            if (selectedTasks.isNotEmpty()){
+                        if (selectedTasks.isNotEmpty()){
 
-                                LazyColumn(modifier = Modifier
-                                    .padding(horizontal = 10.dp)
-                                    .wrapContentSize(),
-                                    horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top){
-                                    var index = 0
-                                    items(selectedTasks){task->
+                            LazyColumn(modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 10.dp),
+                                horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top){
+                                var index = 0
+                                items(selectedTasks){task->
 
-                                        var isUpdateTask by remember {
-                                            mutableStateOf(false)
-                                        }
+                                    var isUpdateTask by remember {
+                                        mutableStateOf(false)
+                                    }
 
-                                        Card(modifier = Modifier
-                                            .height(120.dp)
-                                            .fillMaxWidth()
-                                        )
-                                        {
-                                            Row {
-                                                Box(modifier = Modifier
-                                                    .background(Color.Transparent)
-                                                    .padding(horizontal = 10.dp)
-                                                    .padding(top = 10.dp)) {
-                                                    Text(text = journalPropertiesViewModel.longToTime(task.startTime),
-                                                        fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                                                }
-                                                Column(modifier = Modifier
-                                                    .padding(horizontal = 10.dp)
-                                                    .padding(top = 10.dp)) {
+                                    Card(modifier = Modifier
+                                        .height(120.dp)
+                                        .fillMaxWidth()
+                                    )
+                                    {
+                                        Row {
+                                            Box(modifier = Modifier
+                                                .background(Color.Transparent)
+                                                .padding(horizontal = 10.dp)
+                                                .padding(top = 10.dp)) {
+                                                Text(text = journalPropertiesViewModel.longToTime(task.startTime),
+                                                    fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                                            }
+                                            Column(modifier = Modifier
+                                                .padding(horizontal = 10.dp)
+                                                .padding(top = 10.dp)) {
 
-                                                    Canvas(modifier = Modifier
-                                                        .padding(top = 10.dp)
-                                                        .padding(horizontal = 10.dp),
-                                                        onDraw = {
-                                                            drawCircle(Color.Black, radius = 30f)
-                                                        })
-                                                    Divider(modifier = Modifier
-                                                        .padding(start = 8.dp)
-                                                        .width(3.dp)
-                                                        .fillMaxHeight()
-                                                        .padding(top = 11.dp))
-                                                }
-                                                Column(modifier  = Modifier
-                                                    .padding(10.dp)
-                                                    .width(160.dp)) {
-                                                    Text(text = task.title, fontSize = 18.sp, fontWeight = FontWeight.Bold,
-                                                        color = Color.Black)
-                                                    Spacer(modifier = Modifier.height(10.dp))
-                                                    Text(text = task.notes, color = Color(0xFF5581F1))
-                                                }
+                                                Canvas(modifier = Modifier
+                                                    .padding(top = 10.dp)
+                                                    .padding(horizontal = 10.dp),
+                                                    onDraw = {
+                                                        drawCircle(Color.Black, radius = 30f)
+                                                    })
+                                                Divider(modifier = Modifier
+                                                    .padding(start = 8.dp)
+                                                    .width(3.dp)
+                                                    .fillMaxHeight()
+                                                    .padding(top = 11.dp))
+                                            }
+                                            Column(modifier  = Modifier
+                                                .padding(10.dp)
+                                                .width(160.dp)) {
+                                                Text(text = task.title, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                                                    color = Color.Black)
+                                                Spacer(modifier = Modifier.height(10.dp))
+                                                Text(text = task.notes, color = Color(0xFF5581F1))
+                                            }
 
-                                                if(isEdit.value){
-                                                    Row(
-                                                        modifier = Modifier.fillMaxWidth(),
-                                                        horizontalArrangement = Arrangement.End
+                                            if(isEdit.value){
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.End
+                                                ) {
+                                                    Box(
+                                                        contentAlignment = Alignment.Center,
+                                                        modifier = Modifier
+                                                            .fillMaxHeight()
+                                                            .width(35.dp)
+                                                            .background(Color.Gray)
+                                                            .clickable {
+                                                                isUpdateTask = !isUpdateTask
+                                                            }
                                                     ) {
-                                                        Box(
-                                                            contentAlignment = Alignment.Center,
-                                                            modifier = Modifier
-                                                                .fillMaxHeight()
-                                                                .width(35.dp)
-                                                                .background(Color.Gray)
-                                                                .clickable {
-                                                                    isUpdateTask = !isUpdateTask
-                                                                }
-                                                        ) {
-                                                            Icon(imageVector = Icons.Filled.Edit, contentDescription = null)
-                                                        }
+                                                        Icon(imageVector = Icons.Filled.Edit, contentDescription = null)
+                                                    }
 
-                                                        if(isUpdateTask){
-                                                            journalPropertiesViewModel.UpdateTask(
-                                                                task = task,
-                                                                journal = journal,
-                                                                thatDay = (journal.startDateInMillis + (selected*24*60*60*1000)),
-                                                                dayNum = selected+1,
-                                                                navController = navController,
-                                                                onDismissRequest = {
-                                                                    isUpdateTask = false
-                                                                }
-                                                            )
-                                                        }
+                                                    if(isUpdateTask){
+                                                        journalPropertiesViewModel.UpdateTask(
+                                                            task = task,
+                                                            journal = journal,
+                                                            thatDay = (journal.startDateInMillis + (selected*24*60*60*1000)),
+                                                            dayNum = selected+1,
+                                                            navController = navController,
+                                                            onDismissRequest = {
+                                                                isUpdateTask = false
+                                                            }
+                                                        )
+                                                    }
 
-                                                        Box(
-                                                            contentAlignment = Alignment.Center,
-                                                            modifier = Modifier
-                                                                .fillMaxHeight()
-                                                                .width(35.dp)
-                                                                .background(Color.Red)
-                                                                .clickable {
-                                                                    journalPropertiesViewModel.deleteTask(
-                                                                        selectedDay!!,
-                                                                        navController,
-                                                                        task,
-                                                                        journal,
-                                                                        context
-                                                                    )
-                                                                }
-                                                        ) {
-                                                            Icon(imageVector = Icons.Filled.Delete, contentDescription = null)
-                                                        }
+                                                    Box(
+                                                        contentAlignment = Alignment.Center,
+                                                        modifier = Modifier
+                                                            .fillMaxHeight()
+                                                            .width(35.dp)
+                                                            .background(Color.Red)
+                                                            .clickable {
+                                                                journalPropertiesViewModel.deleteTask(
+                                                                    selectedDay!!,
+                                                                    navController,
+                                                                    task,
+                                                                    journal,
+                                                                    context
+                                                                )
+                                                            }
+                                                    ) {
+                                                        Icon(imageVector = Icons.Filled.Delete, contentDescription = null)
                                                     }
                                                 }
                                             }
                                         }
-                                        index++
                                     }
+                                    index++
                                 }
                             }
                         }
-                    }
-                }
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(20.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom
-                ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom
+                        ) {
 
-                    Button(onClick = {
-                        if(selected != -1){
-                            navController.currentBackStackEntry?.savedStateHandle?.set("thatday", (journal.startDateInMillis + (selected*24*60*60*1000)))
-                            navController.currentBackStackEntry?.savedStateHandle?.set("daynumber", selected+1)
-                            navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
-                            navController.navigate(Screen.AddTaskScreen.route)
-                        }else{
-                            Toast.makeText(context, "You need to choose a day to continue...", Toast.LENGTH_LONG).show()
+                            Button(onClick = {
+                                if(selected != -1){
+                                    navController.currentBackStackEntry?.savedStateHandle?.set("thatday", (journal.startDateInMillis + (selected*24*60*60*1000)))
+                                    navController.currentBackStackEntry?.savedStateHandle?.set("daynumber", selected+1)
+                                    navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
+                                    navController.navigate(Screen.AddTaskScreen.route)
+                                }else{
+                                    Toast.makeText(context, "You need to choose a day to continue...", Toast.LENGTH_LONG).show()
+                                }
+                            } ) {
+                                Text(text = "Add Task")
+                            }
                         }
-                    } ) {
-                        Text(text = "Add Task")
                     }
                 }
             }

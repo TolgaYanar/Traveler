@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -205,9 +206,9 @@ fun TripPlanJournalScreen(navController: NavController, journal: Journal,
                             if(note.note.startsWith("https://firebasestorage.googleapis.com/v0/b/traveller-4d4df.appspot.com/o/images")){
                                 Card(
                                     modifier = Modifier
-                                        .height(250.dp)
-                                        .width(250.dp)
-                                        .padding(20.dp)
+                                        .padding(vertical = 20.dp)
+                                        .fillMaxWidth(0.75f)
+                                        .aspectRatio(1f)
                                 ) {
                                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
                                         Image(painter = rememberAsyncImagePainter(model = note.note,
@@ -218,8 +219,9 @@ fun TripPlanJournalScreen(navController: NavController, journal: Journal,
                             }
                             else{
                                 Text(text = note.note, modifier = Modifier
-                                    .width(325.dp)
-                                    .padding(20.dp))
+                                    .padding(20.dp)
+                                    .fillMaxWidth(0.75f)
+                                )
                             }
                         }
                     }

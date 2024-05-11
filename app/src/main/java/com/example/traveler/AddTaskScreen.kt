@@ -156,142 +156,194 @@ fun AddTaskScreen(navController: NavController, journal : Journal, thatDay : Lon
                 ))
         },
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-                .background(Color(0XFFADD8E6)), horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
-        )
-        {
-            item {
-                Spacer(modifier = Modifier.height(20.dp))
-                TextField(value = title, onValueChange = {title = it},
-                    placeholder = {
-                        Text(text = "Title")
-                    },
-                    maxLines = 1
-                )
-                Spacer(modifier = Modifier.height(50.dp))
-                TextField(value = startTime, onValueChange = {},
-                    label = {
-                        Text(text = "Starts")
-                    }, enabled = false,
-                    trailingIcon = {
-                        Image(modifier = Modifier.clickable {
-                            timePickerExpanded = true
-                        },
-                            painter = painterResource(id = R.drawable.baseline_access_alarm_24), contentDescription = null)
-                    }
-                )
-                TextField(value = endTime, onValueChange = {},
-                    label = {
-                        Text(text = "Ends")
-                    }, enabled = false,
-                    trailingIcon = {
-                        Image(modifier = Modifier.clickable {
-                            timePickerExpanded = true
-                        },
-                            painter = painterResource(id = R.drawable.baseline_access_alarm_24), contentDescription = null)
-                    }
-                )
 
-                if (timePickerExpanded){
-                    journalPropertiesViewModel.TimePicker(onDismissRequest = { timePickerExpanded = false },
-                        onTimeSelected = { start, end ->
-                            startTime = start
-                            endTime = end
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .background(Color(0XFFADD8E6))
+        ) {
+
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly,
+            )
+            {
+                item {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 30.dp),
+                        value = title, onValueChange = { title = it },
+                        placeholder = {
+                            Text(text = "Title")
+                        },
+                        maxLines = 1
+                    )
+                    Spacer(modifier = Modifier.height(50.dp))
+                }
+                item {
+                    TextField(value = startTime, onValueChange = {},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 30.dp),
+                        label = {
+                            Text(text = "Starts")
+                        }, enabled = false,
+                        trailingIcon = {
+                            Image(
+                                modifier = Modifier.clickable {
+                                    timePickerExpanded = true
+                                },
+                                painter = painterResource(id = R.drawable.baseline_access_alarm_24),
+                                contentDescription = null
+                            )
+                        }
+                    )
+                    TextField(value = endTime, onValueChange = {},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 30.dp),
+                        label = {
+                            Text(text = "Ends")
+                        }, enabled = false,
+                        trailingIcon = {
+                            Image(
+                                modifier = Modifier.clickable {
+                                    timePickerExpanded = true
+                                },
+                                painter = painterResource(id = R.drawable.baseline_access_alarm_24),
+                                contentDescription = null
+                            )
+                        }
+                    )
+
+                    if (timePickerExpanded) {
+                        journalPropertiesViewModel.TimePicker(onDismissRequest = {
                             timePickerExpanded = false
+                        },
+                            onTimeSelected = { start, end ->
+                                startTime = start
+                                endTime = end
+                                timePickerExpanded = false
+                            }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(30.dp))
+                }
+
+                item {
+
+                    TextField(value = repeat, onValueChange = {},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 30.dp),
+                        trailingIcon = {
+                            IconButton(onClick = { repeatExpanded = !repeatExpanded }) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_repeat_on_24),
+                                    contentDescription = null
+                                )
+                            }
+                            journalPropertiesViewModel.DropDownMenu(
+                                list = listOf("Once", "Often", "Always"),
+                                expanded = repeatExpanded,
+                                onDismissRequest = { repeatExpanded = false },
+                                onClick = { item ->
+                                    repeat = item.toString()
+                                    repeatExpanded = false
+                                }
+                            )
+                        })
+
+                    Spacer(modifier = Modifier.height(30.dp))
+                }
+
+                item {
+                    TextField(value = "$reminder minutes", onValueChange = {},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 30.dp),
+                        trailingIcon = {
+                            IconButton(onClick = { reminderExpanded = !repeatExpanded }) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_access_time_24),
+                                    contentDescription = null
+                                )
+                            }
+                            journalPropertiesViewModel.DropDownMenu(
+                                list = listOf("5", "10", "15", "30", "45", "60"),
+                                expanded = reminderExpanded,
+                                onDismissRequest = { reminderExpanded = false },
+                                onClick = { item ->
+                                    reminder = item.toString()
+                                    reminderExpanded = false
+                                }
+                            )
+                        })
+
+                    Spacer(modifier = Modifier.height(50.dp))
+                }
+
+                item{
+                    OutlinedTextField(value = notes, onValueChange = { notes = it },
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.Gray,
+                            focusedContainerColor = Color.Gray
+                        ),
+                        placeholder = {
+                            Text(text = "Notes")
+                        }, modifier = Modifier
+                            .height(200.dp)
+                            .fillMaxWidth()
+                            .padding(horizontal = 30.dp),
+                        label = {
+                            Text(text = "Notes")
                         }
                     )
                 }
+            }
 
-                Spacer(modifier = Modifier.height(30.dp))
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(30.dp), horizontalArrangement = Arrangement.End) {
+                Button(onClick = {
+                    if(title.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty() && repeat.isNotEmpty() && reminder.isNotEmpty() ){
 
-                TextField(value = repeat, onValueChange = {},
-                    trailingIcon = {
-                        IconButton(onClick = { repeatExpanded = !repeatExpanded }) {
-                            Icon(painter = painterResource(id = R.drawable.baseline_repeat_on_24),
-                                contentDescription = null)
-                        }
-                        journalPropertiesViewModel.DropDownMenu(
-                            list = listOf("Once", "Often", "Always"),
-                            expanded = repeatExpanded,
-                            onDismissRequest = { repeatExpanded = false },
-                            onClick = {item->
-                                repeat = item.toString()
-                                repeatExpanded = false
-                            }
-                        )
-                    })
-
-                Spacer(modifier = Modifier.height(30.dp))
-
-                TextField(value = "$reminder minutes", onValueChange = {},
-                    trailingIcon = {
-                        IconButton(onClick = { reminderExpanded = !repeatExpanded }) {
-                            Icon(painter = painterResource(id = R.drawable.baseline_access_time_24),
-                                contentDescription = null)
-                        }
-                        journalPropertiesViewModel.DropDownMenu(
-                            list = listOf("5", "10", "15", "30", "45", "60"),
-                            expanded = reminderExpanded,
-                            onDismissRequest = { reminderExpanded = false },
-                            onClick = {item->
-                                reminder = item.toString()
-                                reminderExpanded = false
-                            }
-                        )
-                    })
-
-                Spacer(modifier = Modifier.height(50.dp))
-
-                OutlinedTextField(value = notes, onValueChange = {notes = it},
-                    colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Gray, focusedContainerColor = Color.Gray),
-                    placeholder = {
-                        Text(text = "Notes")
-                    }, modifier = Modifier.height(200.dp),
-                    label = {
-                        Text(text = "Notes")
-                    }
-                )
-
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp), horizontalArrangement = Arrangement.End) {
-                    Button(onClick = {
-                        if(title.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty() && repeat.isNotEmpty() && reminder.isNotEmpty() ){
-
-                            requestPermissionLauncher.launch(
-                                arrayOf(
-                                    Manifest.permission.ACCESS_NOTIFICATION_POLICY,
-                                    Manifest.permission.POST_NOTIFICATIONS,
-                                    Manifest.permission.USE_EXACT_ALARM
-                                )
+                        requestPermissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_NOTIFICATION_POLICY,
+                                Manifest.permission.POST_NOTIFICATIONS,
+                                Manifest.permission.USE_EXACT_ALARM
                             )
+                        )
 
-                            if (permissionGranted) Toast.makeText(context, "Permission Granted!", Toast.LENGTH_SHORT).show()
+                        if (permissionGranted) Toast.makeText(context, "Permission Granted!", Toast.LENGTH_SHORT).show()
 
-                            val task = hashMapOf<String, Any>(
-                                "title" to title,
-                                "startTime" to (journalPropertiesViewModel.timeToLong(startTime) + thatDay),
-                                "endTime" to (journalPropertiesViewModel.timeToLong(endTime) + thatDay),
-                                "notes" to notes,
-                                "remind" to reminder
-                            )
-                            journalPropertiesViewModel.addTask(context, repeat, reminder = reminder, journal, dayNumber, task = task)
-                            navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
-                            navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
+                        val task = hashMapOf<String, Any>(
+                            "title" to title,
+                            "startTime" to (journalPropertiesViewModel.timeToLong(startTime) + thatDay),
+                            "endTime" to (journalPropertiesViewModel.timeToLong(endTime) + thatDay),
+                            "notes" to notes,
+                            "remind" to reminder
+                        )
+                        journalPropertiesViewModel.addTask(context, repeat, reminder = reminder, journal, dayNumber, task = task)
+                        navController.currentBackStackEntry?.savedStateHandle?.set("journal", journal)
+                        navController.navigate(Screen.TripPlanTodaysPlanScreen.route)
 
-                        }else{
-                            Toast.makeText(context, "Please fill the blanks.", Toast.LENGTH_LONG).show()
-                        }
-                    }, ) {
-                        Text(text = "Add")
+                    }else{
+                        Toast.makeText(context, "Please fill the blanks.", Toast.LENGTH_LONG).show()
                     }
+                }, ) {
+                    Text(text = "Add")
                 }
             }
         }
+
 
     }
 }
