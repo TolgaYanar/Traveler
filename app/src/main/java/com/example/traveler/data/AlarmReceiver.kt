@@ -27,17 +27,18 @@ class AlarmReceiver: BroadcastReceiver() {
         //get message
         val message = intent?.getStringExtra("EXTRA_MESSAGE") ?: return
         println("Alarm triggered $message")
-
+        //get id
         val id = intent.getStringExtra("UNIQUE_ID") ?: return
-
+        //get task start time
         val taskStart = intent.getLongExtra("TASK_TIME", 0L)
-
+        //get title
         val title = intent.getStringExtra("TITLE") ?: return
-
+        //get notify time
         val notified = intent.getLongExtra("NOTIFIED", 0L)
-
+        //get is seen
         val seen = intent.getBooleanExtra("SEEN", false)
 
+        //create notification channel
         createNotificationChannel(context)
 
         //build notification

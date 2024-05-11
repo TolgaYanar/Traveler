@@ -9,7 +9,10 @@ object ApiKey {
         "AcSgjUaoDOyfo+zxZSfyLQ==Gpc49F8jYu0GSiU1",
         "I76m8UjXZC4T1S2qEBIeig==gDb5W0aGY0rzQ9ys",
         "niKcZF9Jy4rFEsthV1oRDA==SZnlzL6YPJngMstV",
-        "4JW72fW5knYfaNDkraw56A==opg6dNVlLplVQ8rR"
+        "4JW72fW5knYfaNDkraw56A==opg6dNVlLplVQ8rR",
+        "pZWA35GbN/Yq5+Ii3pK5tg==zWS4i5wATE2gwhZB",
+        "M1KDKptomGB2etKkZ63pbw==hyfHxCDzWlOWjGxF",
+        "fB7Xh5ae1Wl0tx7zlAya4Q==GnF15hj9gN6Vm7sH"
     )
 
     fun getCityApiKey(): String {
